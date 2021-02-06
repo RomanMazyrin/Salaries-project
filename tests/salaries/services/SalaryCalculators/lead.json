@@ -1,0 +1,215 @@
+{
+    "name": "Аудит",
+    "price": 95000,
+    "responsible_user_id": 6096748,
+    "group_id": 415356,
+    "status_id": 25434121,
+    "pipeline_id": 1693621,
+    "loss_reason_id": null,
+    "source_id": null,
+    "created_by": 6096748,
+    "updated_by": 6096748,
+    "created_at": 1667570469,
+    "updated_at": 1668607072,
+    "closed_at": null,
+    "closest_task_at": 1669618800,
+    "is_deleted": false,
+    "custom_fields_values": [
+        {
+            "field_id": 701560,
+            "field_code": null,
+            "field_name": "Встреча",
+            "field_type": "date_time",
+            "values": [
+                {
+                    "value": "2022-11-07T12:00:00.000000Z"
+                }
+            ]
+        },
+        {
+            "field_id": 484723,
+            "field_code": null,
+            "field_name": "Источник заявки",
+            "field_type": "select",
+            "values": [
+                {
+                    "value": "Прозвон базы",
+                    "enum_id": 1069446
+                }
+            ]
+        },
+        {
+            "field_id": 484855,
+            "field_code": null,
+            "field_name": "Способ оплаты",
+            "field_type": "radiobutton",
+            "values": [
+                {
+                    "value": "Безнал",
+                    "enum_id": 940339
+                }
+            ]
+        },
+        {
+            "field_id": 701227,
+            "field_code": null,
+            "field_name": "% Robokassa",
+            "field_type": "numeric",
+            "values": [
+                {
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "field_id": 488202,
+            "field_code": null,
+            "field_name": "Демо-продукт",
+            "field_type": "radiobutton",
+            "values": [
+                {
+                    "value": "Аудит",
+                    "enum_id": 943584
+                }
+            ]
+        },
+        {
+            "field_id": 442538,
+            "field_code": null,
+            "field_name": "google_folder_id",
+            "field_type": "text",
+            "values": [
+                {
+                    "value": "1BZXSPtV18aOf7gUVev5c0_3QJTEv2jrs"
+                }
+            ]
+        },
+        {
+            "field_id": 487593,
+            "field_code": null,
+            "field_name": "Кол-во пользователей",
+            "field_type": "numeric",
+            "values": [
+                {
+                    "value": "5"
+                }
+            ]
+        },
+        {
+            "field_id": 487597,
+            "field_code": null,
+            "field_name": "Источники заявок",
+            "field_type": "multiselect",
+            "values": [
+                {
+                    "value": "Накопленная база",
+                    "enum_id": 943548
+                },
+                {
+                    "value": "Холодная база",
+                    "enum_id": 942901
+                }
+            ]
+        },
+        {
+            "field_id": 487599,
+            "field_code": null,
+            "field_name": "Каналы общения",
+            "field_type": "multiselect",
+            "values": [
+                {
+                    "value": "Телефония",
+                    "enum_id": 942887
+                },
+                {
+                    "value": "WhatsApp",
+                    "enum_id": 942889
+                }
+            ]
+        },
+        {
+            "field_id": 487603,
+            "field_code": null,
+            "field_name": "Направления продаж (воронки)",
+            "field_type": "textarea",
+            "values": [
+                {
+                    "value": "2"
+                }
+            ]
+        },
+        {
+            "field_id": 489154,
+            "field_code": null,
+            "field_name": "Дата демо/аудита",
+            "field_type": "date",
+            "values": [
+                {
+                    "value": "2022-11-06T21:00:00.000000Z"
+                }
+            ]
+        },
+        {
+            "field_id": 433467,
+            "field_code": null,
+            "field_name": "Услуги",
+            "field_type": "select",
+            "values": [
+                {
+                    "value": "Настройка",
+                    "enum_id": 852085
+                }
+            ]
+        },
+        {
+            "field_id": 475349,
+            "field_code": null,
+            "field_name": "Дата лицензии",
+            "field_type": "date",
+            "values": [
+                {
+                    "value": "2023-05-03T21:00:00.000000Z"
+                }
+            ]
+        },
+        {
+            "field_id": 484725,
+            "field_code": null,
+            "field_name": "Количество пользователей",
+            "field_type": "numeric",
+            "values": [
+                {
+                    "value": "5"
+                }
+            ]
+        },
+        {
+            "field_id": 484727,
+            "field_code": null,
+            "field_name": "Тариф",
+            "field_type": "select",
+            "values": [
+                {
+                    "value": "Расширенный",
+                    "enum_id": 940183
+                }
+            ]
+        }
+    ],
+    "score": null,
+    "account_id": 16351501,
+    "id": 30835474,
+    "company": {
+        "name": null,
+        "responsible_user_id": null,
+        "group_id": null,
+        "created_by": null,
+        "updated_by": null,
+        "created_at": null,
+        "updated_at": null,
+        "closest_task_at": null,
+        "custom_fields_values": null,
+        "account_id": null,
+        "id": 44256802
+    }
+}

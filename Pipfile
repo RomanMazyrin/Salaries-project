@@ -1,0 +1,32 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+flake8 = "*"
+autopep8 = "*"
+pytest = "*"
+pytest-cov = "*"
+pre-commit = "*"
+black = "*"
+isort = "*"
+mypy = "*"
+
+[packages]
+django = "==3.2.11"
+pillow = "*"
+requests = "*"
+gunicorn = {extras = ["gevent"], version = "*"}
+whitenoise = "*"
+python-dotenv = "*"
+pytest-django = "*"
+xlsxwriter = "*"
+django-prometheus = "*"
+psycopg2 = "*"
+pytz = "*"
+djangorestframework = "*"
+django-cors-headers = "*"
+
+[requires]
+python_version = "3.9"

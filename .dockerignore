@@ -1,0 +1,16 @@
+.idea
+test.py
+.gitignore
+.DS_Store
+.pytest_cache
+__pycache__
+src/db.sqlite3
+src/uploads/
+src/static/
+.dockerignore
+docker-compose.yml
+docker-compose.dev.yml
+.env
+.coverage
+htmlcov
+frontend_components/

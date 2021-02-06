@@ -1,0 +1,16 @@
+.DS_Store
+.idea/
+.pytest_cache
+__pycache__
+db.sqlite3
+src/uploads/**
+!src/uploads/.gitkeep
+src/static/
+.env
+.ignore
+.vscode/
+src/prometheus_metrics/*
+!src/prometheus_metrics/.gitkeep
+.coverage
+node_modules/
+data/

@@ -1,0 +1,17 @@
+{% extends "./../base.html" %}
+
+{% block title %} 
+    {{ report.employee }} с {{ report.date_from|date:"d.m.Y" }} по {{ report.date_to|date:"d.m.Y" }}
+{% endblock title %}
+
+{% block content %}
+
+    <section class="section">
+        <div class="row">
+            <div class="col-12 col-sm-8 offset-sm-2">
+                {% block report_content %} {% endblock report_content %}
+            </div>
+        </div>
+    </section>
+
+{% endblock content %}

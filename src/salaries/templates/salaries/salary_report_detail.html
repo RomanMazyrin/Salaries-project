@@ -1,0 +1,26 @@
+{% extends './salary_report_base.html' %}
+{% load static %}
+
+{% block report_content %}
+
+    <div class="card">
+        <div class="card-header">
+            Report link
+        </div>
+        <div class="card-body">
+            <div class="alert alert-light-info color-info">
+                <i class="bi-globe"></i>
+                <a href="{{ report_link }}" style="margin-left: 10px;">{{ report_link }}</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="report-form"></div>
+
+    <script src="{% static 'salaries/js/Components.js' %}"></script>
+    <script>
+        MyLibrary.renderSalaryReportForm('{{ report.slug_id }}', 'report-form', {{ can_edit | lower }});
+    </script>
+
+{% endblock report_content %}
+

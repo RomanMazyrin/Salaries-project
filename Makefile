@@ -1,0 +1,13 @@
+runserver:
+	cd src && gunicorn -w=2 --worker-class=gevent --worker-connections=1000 -t=60 app.wsgi --bind 0.0.0.0:80 --reload
+	
+lint:
+	black src
+	flake8 src
+
+test:
+	pytest -s
+
+test-coverage:
+	pytest -s --cov --cov-report html --cov-report term --cov-fail-under=70
+    
