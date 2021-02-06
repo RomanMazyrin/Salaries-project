@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Сотрудники</title>
+</head>
+<body>
+{% for w in employee_list %}
+<form action="{% url 'salaries:salary_result' w.id %}" method="POST">
+    {% csrf_token %}
+    <p>{{ w.name }}</p>
+    From <input type="date" name="date_from">
+    To <input type="date" name="date_to">
+    <button type="submit">Calculate!</button>
+</form>
+{% endfor %}
+</body>
+</html>

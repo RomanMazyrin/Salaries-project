@@ -1,0 +1,56 @@
+<html>
+<head>
+</head>
+<body>
+
+<a href={% url "integrations:index" %}>Список интеграций</a>
+
+<table>
+	<tr>
+		<td>Название</td>
+		<td>{{integration.sys_name}}</td>
+	</tr>
+
+	<tr>
+		<td>Ссылка на сайт</td>
+		<td>
+			<a href='{{integration.site_link}}'>{{integration.site_link}}</a>
+		</td>
+	</tr>
+
+	<tr>
+		<td>Логотип</td>
+		<td><img src='{{integration.logo.url}}'></td>
+	</tr>
+
+	<tr>
+		<td>Отзывы</td>
+		<td>
+			<ul>
+				{% for i in ratings %}
+				<li> {{ i.created_date|date:'d.m.Y, H:i' }}: {{i.review_text}} </li>				
+				{% endfor %}
+			</ul>
+		</td>
+	</tr>
+
+	<tr>
+		<td>Оставить отзыв</td>
+		<td>
+			<form method='POST' action='{% url "integrations:add_review" integration.id %}'>
+				{% csrf_token %}
+				<textarea placeholder="Текст отзыва" name="review_text"></textarea>
+				<input type='radio' name='rating_value' value='1'> 1
+				<input type='radio' name='rating_value' value='2'> 2
+				<input type='radio' name='rating_value' value='3'> 3
+				<input type='radio' name='rating_value' value='4'> 4
+				<input type='radio' name='rating_value' value='5'> 5
+				<button type="submit">Отзыв!</button>
+			</form>
+		</td>
+	</tr>
+
+</table>
+
+</body>
+</html>
