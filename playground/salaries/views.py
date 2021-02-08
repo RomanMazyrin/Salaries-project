@@ -27,4 +27,10 @@ class SalaryResultView(View):
         calculator = SalaryCounter(client)
         report = calculator.get_detailed_report(employee, timestamp_from, timestamp_to)
 
+        report.update({
+            'employee': employee,
+            'from': request.POST['date_from'],
+            'to': request.POST['date_to'],
+        })
+
         return render(request, "salaries/salary_result.html", report)

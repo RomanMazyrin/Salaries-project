@@ -6,22 +6,30 @@
 </head>
 <body>
 
+<h1>{{ employee.name }} с {{ from }} по {{ to }}</h1>
+
 Total calls outbound: {{ calls_outbound_count }}<br>
 Total calls inbound: {{ calls_inbound_count }}<br>
 Total calls: {{ calls_total_count }}<br>
-{% comment %} Money: {{ money }} <br> {% endcomment %}
+Money for calls: {{ money_for_calls }} <br><br>
 
 Licenses sold amount: {{ licenses_amount }} <br>
 Licenses sold sum: {{ licenses_sum }} <br>
+Money for licenses: {{ money_for_licenses }} <br><br>
 
 Widgets sold amount: {{ widgets_amount }} <br>
 Widgets sold sum: {{ widgets_sum }} <br>
+Money for widgets: {{ money_for_widgets }} <br><br>
 
 Projects sold amount: {{ projects_amount }} <br>
 Projects sold sum: {{ projects_sum }} <br>
+Money for projects: {{ money_for_projects }} <br><br>
 
 Courses sold amount: {{ courses_amount }} <br>
 Courses sold sum: {{ courses_sum }} <br>
+Money for courses: {{ money_for_courses }} <br><br>
+
+<b>Total money: {{ money }}</b>
 
 </body>
 </html>

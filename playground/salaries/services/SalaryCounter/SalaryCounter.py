@@ -23,8 +23,6 @@ class SalaryCounter:
             user_talk_time_from=21
         )
 
-        sal = int((len(res_outbound) + len(res_inbound)) * employee.one_call_cost)
-
         request_params = {
             'auth_key': 'oweiurghw85gh74o8m7h48',
             "filter": json.dumps({
@@ -44,17 +42,38 @@ class SalaryCounter:
 
         res = requests.get("http://localhost:9898/deltasales/get-leads-by-filter", params=request_params)
 
-        return {
-            "money": sal,
+        report_obj = {
+
             'calls_outbound_count': len(res_outbound),
             'calls_inbound_count': len(res_inbound),
             'calls_total_count': len(res_inbound) + len(res_outbound),
+            'money_for_calls': int((len(res_outbound) + len(res_inbound)) * employee.one_call_cost),
+
             'licenses_amount': len([lead for lead in res.json()['leads'] if lead['pipeline_id'] == 1212574]),
             'licenses_sum': sum([lead['price'] for lead in res.json()['leads'] if lead['pipeline_id'] == 1212574]),
+            'money_for_licenses': sum([(lead['price']/2)*(employee.sale_fee_percent/100) for lead in res.json()['leads'] if lead['pipeline_id'] == 1212574]),
+
             'widgets_amount': len([lead for lead in res.json()['leads'] if lead['pipeline_id'] == 1693720]),
             'widgets_sum': sum([lead['price'] for lead in res.json()['leads'] if lead['pipeline_id'] == 1693720]),
+            'money_for_widgets': sum([lead['price']*(employee.sale_fee_percent/100) for lead in res.json()['leads'] if lead['pipeline_id'] == 1693720]),
+
             'projects_amount': len([lead for lead in res.json()['leads'] if lead['pipeline_id'] == 1693621]),
             'projects_sum': sum([lead['price'] for lead in res.json()['leads'] if lead['pipeline_id'] == 1693621]),
+            'money_for_projects': sum([lead['price']*(employee.sale_fee_percent/100) for lead in res.json()['leads'] if lead['pipeline_id'] == 1693621]),
+
+
             'courses_amount': len([lead for lead in res.json()['leads'] if lead['pipeline_id'] == 3941655]),
-            'courses_sum': sum([lead['price'] for lead in res.json()['leads'] if lead['pipeline_id'] == 3941655])
+            'courses_sum': sum([lead['price'] for lead in res.json()['leads'] if lead['pipeline_id'] == 3941655]),
+            'money_for_courses': sum([lead['price']*(employee.sale_fee_percent/100) for lead in res.json()['leads'] if lead['pipeline_id'] == 3941655])
+        
         }
+
+        report_obj['money'] = sum([
+            report_obj['money_for_calls'],
+            report_obj['money_for_licenses'],
+            report_obj['money_for_widgets'],
+            report_obj['money_for_projects'],
+            report_obj['money_for_courses']
+        ])
+
+        return report_obj
