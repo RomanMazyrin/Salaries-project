@@ -20,7 +20,6 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('integrations/', include('integrations.urls')),
     path('salaries/', include('salaries.urls'))
 ]
 

@@ -40,7 +40,7 @@ class SalaryCounter:
             })
         }
 
-        res = requests.get("http://localhost:9898/deltasales/get-leads-by-filter", params=request_params)
+        res = requests.get("https://mazdata.ru/deltasales/get-leads-by-filter", params=request_params)
 
         report_obj = {
 
