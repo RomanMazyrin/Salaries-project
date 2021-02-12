@@ -11,6 +11,7 @@ uwsgi = "*"
 pillow = "*"
 requests = "*"
 pytest = "*"
+bjoern = "*"
 
 [requires]
 python_version = "3.7"
