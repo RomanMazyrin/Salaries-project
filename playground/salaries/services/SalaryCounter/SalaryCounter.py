@@ -24,8 +24,13 @@ class SalaryCounter:
             user_talk_time_from=21
         )
 
-        request_params = {
-            'auth_key': 'oweiurghw85gh74o8m7h48',
+        base_url = "https://mazdata.ru/deltasales/get-leads-by-filter"
+
+        request_base_params = {
+            'auth_key': 'oweiurghw85gh74o8m7h48'
+        }
+
+        request_closed_leads_params = {
             "filter": json.dumps({
                 "closed_at": {
                     "from": timestamp_from,
@@ -41,7 +46,27 @@ class SalaryCounter:
             })
         }
 
-        res = requests.get("https://mazdata.ru/deltasales/get-leads-by-filter", params=request_params)
+        request_audits_leads_params = {
+            "filter": json.dumps({
+                "responsible_user_id": employee.amocrm_id,
+                'custom_fields': {
+                    '489154': {
+                        "from": timestamp_from,
+                        "to": timestamp_to
+                    }
+                }
+            })
+        }
+
+        res = requests.get(base_url, params={
+            **request_base_params,
+            **request_closed_leads_params
+        })
+
+        audits_leads_res = requests.get(base_url, params={
+            **request_base_params,
+            **request_audits_leads_params
+        })
 
         report_obj = {
 
@@ -64,8 +89,10 @@ class SalaryCounter:
 
             'courses_amount': len([lead for lead in res.json()['leads'] if lead['pipeline_id'] == 3941655]),
             'courses_sum': sum([lead['price'] for lead in res.json()['leads'] if lead['pipeline_id'] == 3941655]),
-            'money_for_courses': sum([lead['price']*(employee.sale_fee_percent/100) for lead in res.json()['leads'] if lead['pipeline_id'] == 3941655])
-        
+            'money_for_courses': sum([lead['price']*(employee.sale_fee_percent/100) for lead in res.json()['leads'] if lead['pipeline_id'] == 3941655]),
+
+            'audits_amount' : len(audits_leads_res.json()['leads']),
+            'money_for_audits': 500 * len(audits_leads_res.json()['leads'])
         }
 
         report_obj['money'] = sum([
@@ -73,7 +100,8 @@ class SalaryCounter:
             report_obj['money_for_licenses'],
             report_obj['money_for_widgets'],
             report_obj['money_for_projects'],
-            report_obj['money_for_courses']
+            report_obj['money_for_courses'],
+            report_obj['money_for_audits']
         ])
 
         return report_obj

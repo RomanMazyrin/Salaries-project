@@ -12,6 +12,7 @@ pillow = "*"
 requests = "*"
 pytest = "*"
 bjoern = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.7"
