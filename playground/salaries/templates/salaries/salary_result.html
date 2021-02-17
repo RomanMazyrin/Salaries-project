@@ -1,38 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Salary</title>
-</head>
-<body>
+{% extends './../base.html' %}
 
-<h1>{{ employee.name }} с {{ from }} по {{ to }}</h1>
+{% block title %} {{ employee.name }} с {{ from }} по {{ to }} {% endblock title %}
+{% block content%}
 
-Всего звонков исходящих: {{ calls_outbound_count }}<br>
-Всего звонков входящих: {{ calls_inbound_count }}<br>
-Всего звонков: {{ calls_total_count }}<br>
-Денег за звонки: {{ money_for_calls }} <br><br>
+<h3>{{ employee.name }} с {{ from }} по {{ to }}</h1>
 
-Всего лицензий продано: {{ licenses_amount }} <br>
-Сумма продаж по лицензиям: {{ licenses_sum }} <br>
-Денег за лицензии: {{ money_for_licenses }} <br><br>
+{% for key, group in report.get_grouped_metrics.items %}
+<div class="row mb-5">
+    {% for metrica in group %}
+        <div class="card col-md-2 rounded me-2 text-white" style='background-color: rgba(12,37,61,.95)'>
+            <div class="card-body">
+                <h5 class="card-title">{{ metrica.name }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{ metrica.description|default_if_none:"" }}</h6>
+                <p class="card-text">{{ metrica.value }}</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endfor %}
 
-Виджетов всего продано: {{ widgets_amount }} <br>
-Сумма продаж по виджетам: {{ widgets_sum }} <br>
-Денег за виджеты: {{ money_for_widgets }} <br><br>
-
-Проектов всего продано: {{ projects_amount }} <br>
-Сумма продаж по проектам: {{ projects_sum }} <br>
-Денег за проекты: {{ money_for_projects }} <br><br>
-
-Курсов всего продано: {{ courses_amount }} <br>
-Сумма продаж по курсам: {{ courses_sum }} <br>
-Денег за курсы: {{ money_for_courses }} <br><br>
-
-Аудитов проведено: {{ audits_amount }}<br>
-Денег за аудиты: {{ money_for_audits }}<br><br>
-
-<b>Всего денег: {{ money }}</b>
-
-</body>
-</html>
+{% endblock content %}

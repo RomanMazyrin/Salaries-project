@@ -1,6 +1,8 @@
 import json 
 import requests
 import math
+from .Report import Report
+from .Metrica import Metrica
 
 class SalaryCounter:
 
@@ -68,40 +70,45 @@ class SalaryCounter:
             **request_audits_leads_params
         })
 
-        report_obj = {
+        report = Report()
 
-            'calls_outbound_count': len(res_outbound),
-            'calls_inbound_count': len(res_inbound),
-            'calls_total_count': len(res_inbound) + len(res_outbound),
-            'money_for_calls': int((len(res_outbound) + len(res_inbound)) * employee.one_call_cost),
+        report.add_metrica(Metrica("Кол-во исходящих звонков", len(res_outbound), 'calls'))
+        report.add_metrica(Metrica("Кол-во входящих звонков", len(res_inbound), 'calls'))
+        report.add_metrica(Metrica("Кол-во звонков всего", len(res_inbound) + len(res_outbound), 'calls'))
+        report.add_metrica(Metrica("Денег за звонки", int((len(res_outbound) + len(res_inbound)) * employee.one_call_cost), 'calls', label='calls_money'))
 
-            'licenses_amount': len([lead for lead in res.json()['leads'] if lead['pipeline_id'] == 1212574]),
-            'licenses_sum': sum([lead['price'] for lead in res.json()['leads'] if lead['pipeline_id'] == 1212574]),
-            'money_for_licenses': math.floor(sum([(lead['price']/2)*(employee.sale_fee_percent/100) for lead in res.json()['leads'] if lead['pipeline_id'] == 1212574])),
+        report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], 1212574, "licenses", 'лицензий', 'лицензии', employee, lambda x: x/2))
+        report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], 1693720, "widgets", 'Виджетов', 'виджеты', employee))
+        report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], 1693621, "projects", 'Проектов', 'проекты', employee))
+        report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], 3941655, "courses", 'Курсов', 'курсы', employee))
 
-            'widgets_amount': len([lead for lead in res.json()['leads'] if lead['pipeline_id'] == 1693720]),
-            'widgets_sum': sum([lead['price'] for lead in res.json()['leads'] if lead['pipeline_id'] == 1693720]),
-            'money_for_widgets': math.floor(sum([lead['price']*(employee.sale_fee_percent/100) for lead in res.json()['leads'] if lead['pipeline_id'] == 1693720])),
+        report.add_metrica(Metrica("Аудитов продано", len(audits_leads_res.json()['leads']), 'audits'))
+        report.add_metrica(Metrica("Денег за аудиты", 500 * len(audits_leads_res.json()['leads']), 'audits', label='audits_money'))
 
-            'projects_amount': len([lead for lead in res.json()['leads'] if lead['pipeline_id'] == 1693621]),
-            'projects_sum': sum([lead['price'] for lead in res.json()['leads'] if lead['pipeline_id'] == 1693621]),
-            'money_for_projects': sum([lead['price']*(employee.sale_fee_percent/100) for lead in res.json()['leads'] if lead['pipeline_id'] == 1693621]),
-
-            'courses_amount': len([lead for lead in res.json()['leads'] if lead['pipeline_id'] == 3941655]),
-            'courses_sum': sum([lead['price'] for lead in res.json()['leads'] if lead['pipeline_id'] == 3941655]),
-            'money_for_courses': sum([lead['price']*(employee.sale_fee_percent/100) for lead in res.json()['leads'] if lead['pipeline_id'] == 3941655]),
-
-            'audits_amount' : len(audits_leads_res.json()['leads']),
-            'money_for_audits': 500 * len(audits_leads_res.json()['leads'])
-        }
-
-        report_obj['money'] = sum([
-            report_obj['money_for_calls'],
-            report_obj['money_for_licenses'],
-            report_obj['money_for_widgets'],
-            report_obj['money_for_projects'],
-            report_obj['money_for_courses'],
-            report_obj['money_for_audits']
+        money_amount = sum([
+            report.get_metrica_by_label('calls_money').value,
+            report.get_metrica_by_label('widgets_money').value,
+            report.get_metrica_by_label('projects_money').value,
+            report.get_metrica_by_label('courses_money').value,
+            report.get_metrica_by_label('audits_money').value
         ])
 
-        return report_obj
+        report.add_metrica(Metrica("Денег всего", money_amount))
+
+        return report
+
+    def get_metrics_from_leads(
+        self,
+        leads_list,
+        pipeline_id,
+        group,
+        entity_name,
+        entity_name_plural,
+        employee,
+        lead_price_processor = lambda x: x):
+
+            return [
+                Metrica(entity_name + " продано", len([lead for lead in leads_list if lead['pipeline_id'] == pipeline_id]), group),
+                Metrica(entity_name + " продано на сумму", sum([lead['price'] for lead in leads_list if lead['pipeline_id'] == pipeline_id]), group),
+                Metrica("Денег за " + entity_name_plural, math.floor(sum([lead_price_processor(lead['price'])*(employee.sale_fee_percent/100) for lead in leads_list if lead['pipeline_id'] == pipeline_id])), group, label=group+"_money") 
+            ]
