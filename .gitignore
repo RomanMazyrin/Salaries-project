@@ -9,3 +9,6 @@ test.py
 __pycache__
 
 db.sqlite3
+
+playground/uploads/
+playground/static/

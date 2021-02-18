@@ -1,0 +1,6 @@
+.idea
+.pytest_cache
+test.py
+.gitignore
+playground/db.sqlite3
+playground/uploads
