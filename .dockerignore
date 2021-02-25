@@ -1,6 +1,12 @@
 .idea
-.pytest_cache
 test.py
 .gitignore
+.DS_Store
+.pytest_cache
+__pycache__
 playground/db.sqlite3
-playground/uploads
+playground/uploads/
+playground/static/
+.dockerignore
+docker-compose.yml
+.env
