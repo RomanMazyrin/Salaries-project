@@ -7,3 +7,7 @@ services:
     entrypoint: pipenv run gunicorn -w=$NUM_OF_WORKERS playground.wsgi --bind 0.0.0.0:$PORT --reload
     environment:
       DEBUG: 1
+  
+  nginx:
+    volumes:
+     - ./playground/static:/app/static
