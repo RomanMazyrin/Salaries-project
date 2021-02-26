@@ -88,6 +88,7 @@ class SalaryCounter:
         money_amount = sum([
             report.get_metrica_by_label('calls_money').value,
             report.get_metrica_by_label('widgets_money').value,
+            report.get_metrica_by_label('licenses_money').value,
             report.get_metrica_by_label('projects_money').value,
             report.get_metrica_by_label('courses_money').value,
             report.get_metrica_by_label('audits_money').value
