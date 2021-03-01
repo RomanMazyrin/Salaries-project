@@ -9,4 +9,5 @@ playground/uploads/
 playground/static/
 .dockerignore
 docker-compose.yml
+docker-compose.dev.yml
 .env
