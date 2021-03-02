@@ -26,8 +26,6 @@ jobs:
         with:
           file: ./docker/app/Dockerfile
           push: true
-          cache-from: type=registry,ref=ghcr.io/romanmazyrin/django_playground_web:latest
-          cache-to: type=inline
           tags: |
             ghcr.io/romanmazyrin/django_playground_web:latest
             
@@ -49,8 +47,6 @@ jobs:
         with:
           file: ./docker/nginx/Dockerfile
           push: true
-          cache-from: type=registry,ref=ghcr.io/romanmazyrin/django_playground_nginx:latest
-          cache-to: type=inline
           tags: |
             ghcr.io/romanmazyrin/django_playground_nginx:latest
             
