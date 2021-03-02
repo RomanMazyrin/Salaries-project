@@ -1,12 +1,15 @@
 name: Docker
 
+
 on:
   push:
     branches:
       - github_actions_deploy
+      
 
 jobs:
-          
+    
+    
   build_and_push_web:
     runs-on: ubuntu-latest
     steps:
@@ -23,8 +26,12 @@ jobs:
         with:
           file: ./docker/app/Dockerfile
           push: true
+          cache-from: type=registry,ref=ghcr.io/romanmazyrin/django_playground_web:latest
+          cache-to: type=inline
           tags: |
             ghcr.io/romanmazyrin/django_playground_web:latest
+            
+            
             
   build_and_push_nginx:
     runs-on: ubuntu-latest
@@ -42,8 +49,12 @@ jobs:
         with:
           file: ./docker/nginx/Dockerfile
           push: true
+          cache-from: type=registry,ref=ghcr.io/romanmazyrin/django_playground_nginx:latest
+          cache-to: type=inline
           tags: |
             ghcr.io/romanmazyrin/django_playground_nginx:latest
+            
+            
             
   deploy:
     runs-on: ubuntu-latest
