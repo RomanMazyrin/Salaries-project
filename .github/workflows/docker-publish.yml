@@ -25,4 +25,35 @@ jobs:
           push: true
           tags: |
             ghcr.io/romanmazyrin/django_playground_web:latest
-            ghcr.io/romanmazyrin/django_playground_web:${{ github.sha }}
+            
+  build_and_push_nginx:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Login to GitHub Container Registry
+        uses: docker/login-action@v1 
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          file: ./docker/nginx/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/romanmazyrin/django_playground_nginx:latest
+            
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build_and_push_nginx, build_and_push_web]
+    steps:
+      - name: executing remote ssh docker stack deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          script: docker stack deploy -c salary_service/django_salaries_stack.yml --with-registry-auth django_salaries
+    
