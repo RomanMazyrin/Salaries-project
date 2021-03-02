@@ -4,14 +4,18 @@
 
 {% block content %}
 
-    {% for w in employee_list %}
-    <form action="{% url 'salaries:salary_result' w.id %}" method="POST">
-        {% csrf_token %}
-        <p>{{ w.name }}</p>
-        From <input type="date" name="date_from">
-        To <input type="date" name="date_to">
-        <button  class="btn btn-success" type="submit">Calculate!</button>
-    </form>
-    {% endfor %}
+    {% if employee_list %}
+        {% for w in employee_list %}
+        <form action="{% url 'salaries:salary_result' w.id %}" method="POST">
+            {% csrf_token %}
+            <p>{{ w.name }}</p>
+            From <input type="date" name="date_from">
+            To <input type="date" name="date_to">
+            <button  class="btn btn-success" type="submit">Calculate!</button>
+        </form>
+        {% endfor %}
+    {% else %}
+        Не найдено ни одного сотрудника
+    {% endif %}
 
 {% endblock content %}
