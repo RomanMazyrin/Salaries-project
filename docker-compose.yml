@@ -2,6 +2,7 @@ version: "3.8"
 
 services:
   web:
+    image: ghcr.io/romanmazyrin/django_playground_web:latest
     build:
       context: ./
       dockerfile: docker/app/Dockerfile
@@ -12,6 +13,7 @@ services:
 
 
   nginx:
+    image: ghcr.io/romanmazyrin/django_playground_nginx:latest
     build:
       context: ./
       dockerfile: docker/nginx/Dockerfile
