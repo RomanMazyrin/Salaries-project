@@ -4,7 +4,7 @@ name: Docker
 on:
   push:
     branches:
-      - master
+      - update_deploy
       
 
 jobs:
@@ -98,5 +98,8 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
-          script: docker stack deploy -c salary_service/django_salaries_stack.yml --with-registry-auth django_salaries
+          script: |
+            docker pull ghcr.io/romanmazyrin/django_playground_nginx:latest
+            docker pull ghcr.io/romanmazyrin/django_playground_web:latest
+            docker stack deploy -c salary_service/docker-compose.yml --with-registry-auth django_salaries
     
