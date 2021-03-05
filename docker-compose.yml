@@ -10,6 +10,8 @@ services:
     environment:
       DEBUG: 0
     restart: unless-stopped
+    depends_on:
+      - migration
 
 
   nginx:
@@ -22,3 +24,7 @@ services:
     depends_on:
       - web
     restart: unless-stopped
+  
+  migration:
+    image: ghcr.io/romanmazyrin/django_playground_web:latest
+    entrypoint: pipenv run python3 manage.py migrate --no-input

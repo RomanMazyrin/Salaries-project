@@ -11,3 +11,7 @@ services:
   nginx:
     volumes:
      - ./playground/static:/app/static
+
+  migration:
+    volumes:
+      - "./:/usr/src/app/"
