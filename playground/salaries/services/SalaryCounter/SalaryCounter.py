@@ -44,6 +44,7 @@ class SalaryCounter:
                     {"status_id": 142, "pipeline_id": 1693621},
                     {"status_id": 142, "pipeline_id": 1693720},
                     {"status_id": 142, "pipeline_id": 3941655},
+                    {"status_id": 142, "pipeline_id": 3346951},
                 ]
             })
         }
@@ -79,7 +80,7 @@ class SalaryCounter:
 
         report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], 1212574, "licenses", 'лицензий', 'лицензии', employee, lambda x: x/2))
         report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], 1693720, "widgets", 'Виджетов', 'виджеты', employee))
-        report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], 1693621, "projects", 'Проектов', 'проекты', employee))
+        report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], [1693621, 3346951], "projects", 'Проектов', 'проекты', employee))
         report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], 3941655, "courses", 'Курсов', 'курсы', employee))
 
         report.add_metrica(Metrica("Аудитов продано", len(audits_leads_res.json()['leads']), 'audits'))
@@ -101,15 +102,18 @@ class SalaryCounter:
     def get_metrics_from_leads(
         self,
         leads_list,
-        pipeline_id,
+        pipeline_id_list,
         group,
         entity_name,
         entity_name_plural,
         employee,
         lead_price_processor = lambda x: x):
 
+            if not isinstance(pipeline_id_list, list):
+                pipeline_id_list = [pipeline_id_list]
+                
             return [
-                Metrica(entity_name + " продано", len([lead for lead in leads_list if lead['pipeline_id'] == pipeline_id]), group),
-                Metrica(entity_name + " продано на сумму", sum([lead['price'] for lead in leads_list if lead['pipeline_id'] == pipeline_id]), group),
-                Metrica("Денег за " + entity_name_plural, math.floor(sum([lead_price_processor(lead['price'])*(employee.sale_fee_percent/100) for lead in leads_list if lead['pipeline_id'] == pipeline_id])), group, label=group+"_money") 
+                Metrica(entity_name + " продано", len([lead for lead in leads_list if lead['pipeline_id'] in pipeline_id_list]), group),
+                Metrica(entity_name + " продано на сумму", sum([lead['price'] for lead in leads_list if lead['pipeline_id'] in pipeline_id_list]), group),
+                Metrica("Денег за " + entity_name_plural, math.floor(sum([lead_price_processor(lead['price'])*(employee.sale_fee_percent/100) for lead in leads_list if lead['pipeline_id'] in pipeline_id_list])), group, label=group+"_money") 
             ]
