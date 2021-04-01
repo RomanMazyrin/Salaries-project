@@ -99,10 +99,12 @@ class SalaryCounter:
                 **request_projects_with_worktime
             })
 
-            self.__report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], 1212574, "licenses", 'лицензий', 'лицензии', lambda x: x/2))
-            self.__report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], 1693720, "widgets", 'Виджетов', 'виджеты'))
-            self.__report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], [1693621, 3346951], "projects", 'Проектов', 'проекты'))
-            self.__report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], 3941655, "courses", 'Курсов', 'курсы'))
+            std_price_processor = lambda price, lead: self.__standart_price_processor(price, lead)
+
+            self.__report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], 1212574, "licenses", 'лицензий', 'лицензии', lambda price, lead: self.__standart_price_processor(price/2, lead)))
+            self.__report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], 1693720, "widgets", 'Виджетов', 'виджеты', std_price_processor))
+            self.__report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], [1693621, 3346951], "projects", 'Проектов', 'проекты', std_price_processor))
+            self.__report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], 3941655, "courses", 'Курсов', 'курсы', std_price_processor))
 
             self.__report.add_metrica(Metrica("Аудитов продано", len(audits_leads_res.json()['leads']), 'audits'))
             self.__report.add_metrica(Metrica("Денег за аудиты", 500 * len(audits_leads_res.json()['leads']), 'audits', label='audits_money'))
@@ -160,6 +162,12 @@ class SalaryCounter:
         self.__report.add_metrica(Metrica("Денег всего", money_amount))
 
         return self.__report
+    
+    def __standart_price_processor(self, price, lead):
+        lead_outcome = self.__find_custom_field_value_in_lead(lead, 683324)
+        if lead_outcome:
+            return price - int(lead_outcome)
+        return price
 
     def get_metrics_from_leads(
         self,
@@ -168,7 +176,7 @@ class SalaryCounter:
         group,
         entity_name,
         entity_name_plural,
-        lead_price_processor = lambda x: x):
+        lead_price_processor = lambda price, lead: price):
 
             if not isinstance(pipeline_id_list, list):
                 pipeline_id_list = [pipeline_id_list]
@@ -176,5 +184,5 @@ class SalaryCounter:
             return [
                 Metrica(entity_name + " продано", len([lead for lead in leads_list if lead['pipeline_id'] in pipeline_id_list]), group),
                 Metrica(entity_name + " продано на сумму", sum([lead['price'] for lead in leads_list if lead['pipeline_id'] in pipeline_id_list]), group),
-                Metrica("Денег за " + entity_name_plural, math.floor(sum([lead_price_processor(lead['price'])*((self.__employee.sale_fee_percent if self.__employee.sale_fee_percent else 0)/100) for lead in leads_list if lead['pipeline_id'] in pipeline_id_list])), group, label=group+"_money") 
+                Metrica("Денег за " + entity_name_plural, math.floor(sum([lead_price_processor(lead['price'], lead)*((self.__employee.sale_fee_percent if self.__employee.sale_fee_percent else 0)/100) for lead in leads_list if lead['pipeline_id'] in pipeline_id_list])), group, label=group+"_money") 
             ]
