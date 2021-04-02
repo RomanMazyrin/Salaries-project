@@ -9,6 +9,8 @@ class Employee(models.Model):
     amocrm_id = models.IntegerField(blank=True, null=True)
     name = models.CharField('Имя', max_length=255)
     onpbx_account = models.ForeignKey(OnpbxAccount, on_delete=models.SET_NULL, null=True)
+    daily_salary_amount = models.IntegerField("Дневной оклад", blank=True, null=True)
+    one_hour_salary_amount = models.IntegerField("Стоимость часа работы", blank=True, null=True)
 
     one_call_cost = models.FloatField('Стоимость одного звонка (рублей)', blank=True, null=True, default=None)
 

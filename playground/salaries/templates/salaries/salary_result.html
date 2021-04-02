@@ -3,16 +3,20 @@
 {% block title %} {{ employee.name }} с {{ from }} по {{ to }} {% endblock title %}
 {% block content%}
 
-<h3>{{ employee.name }} с {{ from }} по {{ to }}</h1>
+<div class="row mt-4 mb-4">
+    <div class="col-xs-12">
+        <h3 class="text-center">{{ employee.name }} с {{ from }} по {{ to }}</h3>
+    </div>
+</div>
 
 {% for key, group in report.get_grouped_metrics.items %}
-<div class="row mb-5">
+<div class="row mb-4 justify-content-center">
     {% for metrica in group %}
         <div class="card col-md-2 rounded me-2 text-white" style='background-color: rgba(12,37,61,.95)'>
             <div class="card-body">
-                <h5 class="card-title">{{ metrica.name }}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">{{ metrica.description|default_if_none:"" }}</h6>
-                <p class="card-text">{{ metrica.value }}</p>
+                <div class="card-title">{{ metrica.name }}</div>
+                <div class="card-subtitle mb-2 text-muted">{{ metrica.description|default_if_none:"" }}</div>
+                <p class="card-text metrica-value">{{ metrica.value }}</p>
             </div>
         </div>
     {% endfor %}

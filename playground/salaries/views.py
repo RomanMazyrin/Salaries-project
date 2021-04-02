@@ -5,6 +5,7 @@ from .models import Employee
 from datetime import datetime
 from packages.Onlinepbx.Client import Client
 from .services.SalaryCounter.SalaryCounter import SalaryCounter
+from .services.SalaryCounter.Report import Report
 
 
 class IndexView(generic.ListView):
@@ -24,8 +25,8 @@ class SalaryResultView(View):
             .timestamp()
 
         client = Client(employee.onpbx_account.subdomain, employee.onpbx_account.api_key)
-        calculator = SalaryCounter(client)
-        report = calculator.get_detailed_report(employee, timestamp_from, timestamp_to)
+        calculator = SalaryCounter(employee, client, Report())
+        report = calculator.get_detailed_report(timestamp_from, timestamp_to)
 
         return render(request, "salaries/salary_result.html", {
             "report": report,

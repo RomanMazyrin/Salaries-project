@@ -13,4 +13,6 @@ class CallHistory:
         ))
 
     def create_collection(self, response):
-        return [Call.from_dict(a) for a in response['data']]
+        if 'data' in response:
+            return [Call.from_dict(a) for a in response['data']]
+        return []
