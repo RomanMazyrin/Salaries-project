@@ -11,7 +11,7 @@ from .services.SalaryCounter.Report import Report
 class IndexView(generic.ListView):
 
     def get_queryset(self):
-        return Employee.objects.all()
+        return Employee.objects.order_by("pk").all()
 
 
 class SalaryResultView(View):
