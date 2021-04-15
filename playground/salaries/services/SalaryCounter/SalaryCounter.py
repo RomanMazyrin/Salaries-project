@@ -55,6 +55,7 @@ class SalaryCounter:
                         {"status_id": 142, "pipeline_id": 1693720},
                         {"status_id": 142, "pipeline_id": 3941655},
                         {"status_id": 142, "pipeline_id": 3346951},
+                        {"status_id": 142, "pipeline_id": 3964107}
                     ]
                 })
             }
@@ -88,6 +89,8 @@ class SalaryCounter:
                 **request_base_params,
                 **request_closed_leads_params
             })
+
+            success_leads = res.json()['leads']
 
             audits_leads_res = requests.get(base_url, params={
                 **request_base_params,
@@ -127,6 +130,25 @@ class SalaryCounter:
                     label='work_hours_money'
                 ))
 
+            if self.__employee.one_feedback_cost:
+
+                feedback_count = [self.__find_custom_field_value_in_lead(lead, 683742) for lead in success_leads if lead['pipeline_id'] == 3964107]
+                feedback_count = [int(a) if a else 1 for a in feedback_count]
+                
+                self.__report.add_metrica(Metrica(
+                    "Отзывов собрано",
+                    sum(feedback_count),
+                    'feedbacks',
+                    label='feedbacks_count'
+                ))
+
+                self.__report.add_metrica(Metrica(
+                    "Денег за отзывы",
+                    self.__employee.one_feedback_cost * self.__report.get_metrica_by_label('feedbacks_count').value,
+                    'feedbacks',
+                    label='feedbacks_money'
+                ))
+
 
     def __find_custom_field_value_in_lead(self, lead_obj, field_id):
         cf_values = lead_obj.get('custom_fields_values', None)
@@ -154,7 +176,8 @@ class SalaryCounter:
             'courses_money',
             'audits_money',
             'salary',
-            'work_hours_money'
+            'work_hours_money',
+            'feedbacks_money'
         ]
 
         money_amount = sum([self.__report.get_metrica_by_label(label).value for label in labels_to_sum if self.__report.get_metrica_by_label(label)])
