@@ -6,6 +6,7 @@ from datetime import datetime
 from packages.Onlinepbx.Client import Client
 from .services.SalaryCounter.SalaryCounter import SalaryCounter
 from .services.SalaryCounter.Report import Report
+import pytz
 
 
 class IndexView(generic.ListView):
@@ -17,12 +18,20 @@ class IndexView(generic.ListView):
 class SalaryResultView(View):
 
     def post(self, request, *args, **kwargs):
+
         employee = get_object_or_404(Employee, pk=kwargs['employee_id'])
-        timestamp_from = datetime.fromisoformat(request.POST['date_from']).timestamp()
-        timestamp_to = datetime\
+
+        timezone = pytz.timezone("Europe/Moscow")
+
+        timestamp_from = timezone.localize(datetime\
+            .fromisoformat(request.POST['date_from'])\
+            .replace(hour=0, minute=0, second=0)\
+        ).timestamp()
+
+        timestamp_to = timezone.localize(datetime\
             .fromisoformat(request.POST['date_to'])\
             .replace(hour=23, minute=59, second=59)\
-            .timestamp()
+        ).timestamp()
 
         client = Client(employee.onpbx_account.subdomain, employee.onpbx_account.api_key)
         calculator = SalaryCounter(employee, client, Report())
