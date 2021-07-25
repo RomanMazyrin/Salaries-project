@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'salaries.apps.SalariesConfig'
+    'salaries.apps.SalariesConfig',
+    'auth_pages.apps.AuthPagesConfig'
 ]
 
 MIDDLEWARE = [
@@ -128,3 +129,6 @@ STATIC_ROOT = BASE_DIR / "static"
 STATIC_URL = '/static/'
 MEDIA_ROOT = BASE_DIR / "uploads"
 MEDIA_URL = "/uploads/"
+LOGIN_URL = "/auth/login"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"

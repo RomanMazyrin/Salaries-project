@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from django.views import generic, View
 from django.shortcuts import render, get_object_or_404
 from .models import Employee
@@ -7,15 +6,16 @@ from packages.Onlinepbx.Client import Client
 from .services.SalaryCounter.SalaryCounter import SalaryCounter
 from .services.SalaryCounter.Report import Report
 import pytz
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-class IndexView(generic.ListView):
+class IndexView(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self):
         return Employee.objects.order_by("pk").all()
 
 
-class SalaryResultView(View):
+class SalaryResultView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
 
