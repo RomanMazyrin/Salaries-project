@@ -55,7 +55,8 @@ class SalaryCounter:
                         {"status_id": 142, "pipeline_id": 1693720},
                         {"status_id": 142, "pipeline_id": 3941655},
                         {"status_id": 142, "pipeline_id": 3346951},
-                        {"status_id": 142, "pipeline_id": 3964107}
+                        {"status_id": 142, "pipeline_id": 3964107},
+                        {"status_id": 142, "pipeline_id": 3678177}
                     ]
                 })
             }
@@ -132,7 +133,7 @@ class SalaryCounter:
 
             if self.__employee.one_feedback_cost:
 
-                feedback_count = [self.__find_custom_field_value_in_lead(lead, 683742) for lead in success_leads if lead['pipeline_id'] == 3964107]
+                feedback_count = [self.__find_custom_field_value_in_lead(lead, 683742) for lead in success_leads if lead['pipeline_id'] in [3964107, 3678177]]
                 feedback_count = [int(a) if a else 1 for a in feedback_count]
                 
                 self.__report.add_metrica(Metrica(
