@@ -56,7 +56,8 @@ class SalaryCounter:
                         {"status_id": 142, "pipeline_id": 3941655},
                         {"status_id": 142, "pipeline_id": 3346951},
                         {"status_id": 142, "pipeline_id": 3964107},
-                        {"status_id": 142, "pipeline_id": 3678177}
+                        {"status_id": 142, "pipeline_id": 3678177},
+                        {"status_id": 142, "pipeline_id": 4669350}
                     ]
                 })
             }
@@ -106,7 +107,7 @@ class SalaryCounter:
             std_price_processor = lambda price, lead: self.__standart_price_processor(price, lead)
 
             self.__report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], 1212574, "licenses", 'лицензий', 'лицензии', lambda price, lead: self.__standart_price_processor(price/2, lead)))
-            self.__report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], 1693720, "widgets", 'Виджетов', 'виджеты', std_price_processor))
+            self.__report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], [1693720, 4669350], "widgets", 'Виджетов', 'виджеты', std_price_processor))
             self.__report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], [1693621, 3346951], "projects", 'Проектов', 'проекты', std_price_processor))
             self.__report.add_metrics(self.get_metrics_from_leads(res.json()['leads'], 3941655, "courses", 'Курсов', 'курсы', std_price_processor))
 
