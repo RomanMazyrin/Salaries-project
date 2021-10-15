@@ -18,7 +18,7 @@ class SalaryCounter:
                 caller_id_number=str(self.__employee.onpbx_id),
                 start_stamp_from=int(timestamp_from),
                 start_stamp_to=int(timestamp_to),
-                duration_from=21
+                duration_from=self.__employee.min_call_length+1
             )
 
             res_inbound = self.__onpbx_client.call_history.get(
@@ -26,7 +26,7 @@ class SalaryCounter:
                 destination_number=str(self.__employee.onpbx_id),
                 start_stamp_from=int(timestamp_from),
                 start_stamp_to=int(timestamp_to),
-                user_talk_time_from=21
+                user_talk_time_from=self.__employee.min_call_length+1
             )
 
             self.__report.add_metrica(Metrica("Кол-во исходящих звонков", len(res_outbound), 'calls'))

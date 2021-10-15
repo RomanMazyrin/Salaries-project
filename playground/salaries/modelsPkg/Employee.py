@@ -13,6 +13,7 @@ class Employee(models.Model):
     one_hour_salary_amount = models.IntegerField("Стоимость часа работы", blank=True, null=True)
     one_call_cost = models.FloatField('Стоимость одного звонка (рублей)', blank=True, null=True, default=None)
     one_feedback_cost = models.IntegerField("Стоимость одного отзыва", blank=True, null=True)
+    min_call_length = models.IntegerField("Минимальная длина звонка", blank=True, null=True, default=20)
 
     sale_fee_percent = models.FloatField(
         'Процент с продаж',
