@@ -2,6 +2,7 @@ import json
 import requests
 import math
 from .Metrica import Metrica
+from amocrm_components.ApiIterator import ApiIterator
 
 
 class SalaryCounter:
@@ -151,7 +152,6 @@ class SalaryCounter:
                     label='feedbacks_money'
                 ))
 
-
     def __find_custom_field_value_in_lead(self, lead_obj, field_id):
         cf_values = lead_obj.get('custom_fields_values', None)
         if cf_values:
@@ -163,12 +163,38 @@ class SalaryCounter:
     def __fill_report_with_salary(self, timestamp_from, timestamp_to):
         if self.__employee.daily_salary_amount:
             self.__report.add_metrica(Metrica("Оклад", math.ceil(self.__employee.daily_salary_amount*((timestamp_to-timestamp_from)/(3600 * 24))), 'salary', label='salary'))
+    
+    def __fill_report_with_outcome_messages(self, timestamp_from, timestamp_to):
+        
+        if self.__employee.outcome_message_cost:
+            base_url = "https://mazdata.ru/deltasales/get-events-by-filter"
+            request_base_params = {
+                'auth_key': 'oweiurghw85gh74o8m7h48',
+                "filter": {
+                    "created_at": {
+                        "from": timestamp_from,
+                        "to": timestamp_to
+                    },
+                    "created_by": self.__employee.amocrm_id,
+                    "types": ['outgoing_chat_message']
+                }
+            }
+
+            f = ApiIterator(base_url, params=request_base_params, entity_type='events', fetch_limit=50)
+            
+            num_of_messages = 0
+            for msg in f.get_next():
+                num_of_messages += 1
+
+            self.__report.add_metrica(Metrica("Количество отправленных сообщений", num_of_messages, 'outcome_messages', label='outcome_messages_count'))
+            self.__report.add_metrica(Metrica("Денег за отправленные сообщения", num_of_messages * self.__employee.outcome_message_cost, 'outcome_messages', label='outcome_messages_money'))
 
     def get_detailed_report(self, timestamp_from, timestamp_to):
 
         self.__fill_report_with_calls(timestamp_from, timestamp_to)
         self.__fill_report_with_amo_leads(timestamp_from, timestamp_to)
         self.__fill_report_with_salary(timestamp_from, timestamp_to)
+        self.__fill_report_with_outcome_messages(timestamp_from, timestamp_to)
 
         labels_to_sum = [
             'calls_money',
