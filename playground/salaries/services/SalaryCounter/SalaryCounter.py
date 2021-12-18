@@ -205,7 +205,8 @@ class SalaryCounter:
             'audits_money',
             'salary',
             'work_hours_money',
-            'feedbacks_money'
+            'feedbacks_money',
+            'outcome_messages_money'
         ]
 
         money_amount = sum([self.__report.get_metrica_by_label(label).value for label in labels_to_sum if self.__report.get_metrica_by_label(label)])
