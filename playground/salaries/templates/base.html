@@ -16,6 +16,8 @@
     <div class="col-xs-12">
         <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
         <a href="{% url 'admin:index' %}" class="btn btn-warning">Admin</a>
+        {% block nav_buttons %}
+        {% endblock nav_buttons %}
     </div>
 </div>
 {% endif %}

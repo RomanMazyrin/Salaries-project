@@ -1,6 +1,11 @@
 {% extends './../base.html' %}
 
 {% block title %} {{ employee.name }} с {{ from }} по {{ to }} {% endblock title %}
+
+{% block nav_buttons %}
+<a href="{% url 'salaries:index' %}" class="btn btn-success">Список сотрудников</a>
+{% endblock nav_buttons %}
+
 {% block content%}
 
 <div class="row mt-4 mb-4">
@@ -9,18 +14,27 @@
     </div>
 </div>
 
-{% for key, group in report.get_grouped_metrics.items %}
 <div class="row mb-4 justify-content-center">
-    {% for metrica in group %}
-        <div class="card col-md-2 rounded me-2 text-white" style='background-color: rgba(12,37,61,.95)'>
-            <div class="card-body">
-                <div class="card-title">{{ metrica.name }}</div>
-                <div class="card-subtitle mb-2 text-muted">{{ metrica.description|default_if_none:"" }}</div>
-                <p class="card-text metrica-value">{{ metrica.value }}</p>
-            </div>
-        </div>
-    {% endfor %}
+    <div class="col-xs-12 col-md-6">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col" class="text-center align-middle">Показатель</th>
+                <th scope="col" class="text-center align-middle">Значение</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for key, group in report.get_grouped_metrics.items %}
+                    {% for metrica in group %}
+                        <tr>
+                            <td class="text-center align-middle">{{ metrica.name }}</td>
+                            <td class="text-center align-middle">{{ metrica.value }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
-{% endfor %}
 
 {% endblock content %}
