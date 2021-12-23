@@ -4,7 +4,6 @@ from .models import Employee
 from datetime import datetime
 from packages.Onlinepbx.Client import Client
 from .services.SalaryCounter.SalaryCounter import SalaryCounter
-from .services.SalaryCounter.Report import Report
 import pytz
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -34,7 +33,7 @@ class SalaryResultView(LoginRequiredMixin, View):
         ).timestamp()
 
         client = Client(employee.onpbx_account.subdomain, employee.onpbx_account.api_key)
-        calculator = SalaryCounter(employee, client, Report())
+        calculator = SalaryCounter(employee, client)
         report = calculator.get_detailed_report(timestamp_from, timestamp_to)
 
         return render(request, "salaries/salary_result.html", {
