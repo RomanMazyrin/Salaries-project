@@ -3,9 +3,12 @@ import requests
 import math
 from .Metrica import Metrica
 from .Report import Report
+from amocrm_components.ApiIterator import ApiIterator
 
 
 class SalaryCounter:
+
+    META_PARAM_COUNT_IN_TOTAL_SUM = 'COUNT_IN_TOTAL_SUM'
 
     def __init__(self, employee, onpbx_client):
         self.__employee = employee
@@ -43,7 +46,7 @@ class SalaryCounter:
             int((len(res_outbound) + len(res_inbound)) * (self.__employee.one_call_cost if self.__employee.one_call_cost else 0)),
             group = 'calls',
             label = 'calls_money',
-            meta_params = {'count_in_total_sum': True}
+            meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True}
         ))
 
         return metrics
@@ -137,7 +140,7 @@ class SalaryCounter:
             500 * len(audits_leads_res.json()['leads']),
             group = 'audits',
             label='audits_money',
-            meta_params = {'count_in_total_sum': True}
+            meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True}
         ))
 
         hours_list = [self.__find_custom_field_value_in_lead(lead, 682570) for lead in projects_worktime_leads.json()['leads']]
@@ -156,7 +159,7 @@ class SalaryCounter:
                 self.__employee.one_hour_salary_amount * self.__report.get_metrica_by_label('work_hours_amount').value,
                 group = 'work_hours',
                 label = 'work_hours_money',
-                meta_params = {'count_in_total_sum': True}
+                meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True}
             ))
 
         if self.__employee.one_feedback_cost:
@@ -176,11 +179,10 @@ class SalaryCounter:
                 self.__employee.one_feedback_cost * self.__report.get_metrica_by_label('feedbacks_count').value,
                 group = 'feedbacks',
                 label = 'feedbacks_money',
-                meta_params = {'count_in_total_sum': True}
+                meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True}
             ))
 
         return metrics
-
 
     def __find_custom_field_value_in_lead(self, lead_obj, field_id):
         cf_values = lead_obj.get('custom_fields_values', None)
@@ -191,34 +193,68 @@ class SalaryCounter:
         return None
 
     def __get_metrics_for_salary(self, timestamp_from, timestamp_to):
-
         metrics = []
-
         if not self.__employee.daily_salary_amount:
             return metrics
-        
         metrics.append(Metrica(
             "Оклад",
             math.ceil(self.__employee.daily_salary_amount*((timestamp_to-timestamp_from)/(3600 * 24))),
             group = 'salary',
             label = 'salary',
-            meta_params = {'count_in_total_sum': True}
+            meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True}
+        ))
+        return metrics
+    
+    def __get_metrics_for_outcome_messages(self, timestamp_from, timestamp_to):
+        metrics = []
+        if not self.__employee.outcome_message_cost:
+            return metrics
+
+        base_url = "https://mazdata.ru/deltasales/get-events-by-filter"
+
+        request_base_params = {
+            'auth_key': 'oweiurghw85gh74o8m7h48',
+            "filter": {
+                "created_at": {
+                    "from": timestamp_from,
+                    "to": timestamp_to
+                },
+                "created_by": self.__employee.amocrm_id,
+                "types": ['outgoing_chat_message']
+            }
+        }
+
+        f = ApiIterator(base_url, params=request_base_params, entity_type='events', fetch_limit=50)
+        num_of_messages = 0
+        for msg in f.get_next():
+            num_of_messages += 1
+
+        metrics.append(Metrica(
+            "Количество отправленных сообщений",
+            num_of_messages,
+            group = 'outcome_messages',
+            label = 'outcome_messages_count'
+        ))
+
+        metrics.append(Metrica(
+            "Денег за отправленные сообщения",
+            num_of_messages * self.__employee.outcome_message_cost,
+            group = 'outcome_messages',
+            label='outcome_messages_money',
+            meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True}
         ))
 
         return metrics
 
+
     def get_detailed_report(self, timestamp_from, timestamp_to):
-
         report = Report()
-
         report.add_metrics(self.__get_metrics_for_calls(timestamp_from, timestamp_to))
         report.add_metrics(self.__get_metrics_for_amo_leads(timestamp_from, timestamp_to))
         report.add_metrics(self.__get_metrics_for_salary(timestamp_from, timestamp_to))
-
-        money_amount = sum([metrica.value for metrica in report.get_metrics_by_meta_param('count_in_total_sum', True)])
-
+        report.add_metrics(self.__get_metrics_for_outcome_messages(timestamp_from, timestamp_to))
+        money_amount = sum([metrica.value for metrica in report.get_metrics_by_meta_param(self.META_PARAM_COUNT_IN_TOTAL_SUM, True)])
         report.add_metrica(Metrica("Денег всего", money_amount))
-
         return report
     
     def __standart_price_processor(self, price, lead):
@@ -248,6 +284,6 @@ class SalaryCounter:
                     math.floor(sum([lead_price_processor(lead['price'], lead)*((self.__employee.sale_fee_percent if self.__employee.sale_fee_percent else 0)/100) for lead in leads_list if lead['pipeline_id'] in pipeline_id_list])),
                     group = group,
                     label = group+"_money",
-                    meta_params = {'count_in_total_sum': True}
+                    meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True}
                 ) 
             ]
