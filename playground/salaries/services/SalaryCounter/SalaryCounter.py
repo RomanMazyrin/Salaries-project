@@ -4,6 +4,7 @@ from .Metrica import Metrica
 from .Report import Report
 from amocrm_components.ApiIterator import ApiIterator
 
+ONE_WEEK_IN_SECONDS = 604800
 
 class SalaryCounter:
 
@@ -25,29 +26,50 @@ class SalaryCounter:
         if not self.__employee.onpbx_id:
             return metrics
 
-        res_outbound = self.__onpbx_client.call_history.get(
-            accountcode='outbound',
-            caller_id_number=str(self.__employee.onpbx_id),
-            start_stamp_from=int(timestamp_from),
-            start_stamp_to=int(timestamp_to),
-            duration_from=self.__employee.min_call_length+1
-        )
+        calls_outbound = []
+        calls_inbound = []
 
-        res_inbound = self.__onpbx_client.call_history.get(
-            accountcode='inbound',
-            destination_number=str(self.__employee.onpbx_id),
-            start_stamp_from=int(timestamp_from),
-            start_stamp_to=int(timestamp_to),
-            user_talk_time_from=self.__employee.min_call_length+1
-        )
+        week_boundary_from = timestamp_from
+        week_boundary_to = week_boundary_from + ONE_WEEK_IN_SECONDS
 
-        metrics.append(Metrica("Кол-во исходящих звонков", len(res_outbound), 'calls'))
-        metrics.append(Metrica("Кол-во входящих звонков", len(res_inbound), 'calls'))
-        metrics.append(Metrica("Кол-во звонков всего", len(res_inbound) + len(res_outbound), 'calls'))
+        if week_boundary_to > timestamp_to:
+            week_boundary_to = timestamp_to
+
+        while True:
+
+            calls_outbound.extend(self.__onpbx_client.call_history.get(
+                accountcode='outbound',
+                caller_id_number=str(self.__employee.onpbx_id),
+                start_stamp_from=int(week_boundary_from),
+                start_stamp_to=int(week_boundary_to),
+                duration_from=self.__employee.min_call_length+1
+            ))
+
+            calls_inbound.extend(self.__onpbx_client.call_history.get(
+                accountcode='inbound',
+                destination_number=str(self.__employee.onpbx_id),
+                start_stamp_from=int(week_boundary_from),
+                start_stamp_to=int(week_boundary_to),
+                user_talk_time_from=self.__employee.min_call_length+1
+            ))
+
+            week_boundary_from += ONE_WEEK_IN_SECONDS
+            week_boundary_to += ONE_WEEK_IN_SECONDS
+
+            if week_boundary_to > timestamp_to:
+                week_boundary_to = timestamp_to
+                
+            if week_boundary_from >= timestamp_to:
+                break
+
+
+        metrics.append(Metrica("Кол-во исходящих звонков", len(calls_outbound), 'calls'))
+        metrics.append(Metrica("Кол-во входящих звонков", len(calls_inbound), 'calls'))
+        metrics.append(Metrica("Кол-во звонков всего", len(calls_inbound) + len(calls_outbound), 'calls'))
 
         metrics.append(Metrica(
             "Денег за звонки",
-            int((len(res_outbound) + len(res_inbound)) * (self.__employee.one_call_cost if self.__employee.one_call_cost else 0)),
+            int((len(calls_outbound) + len(calls_inbound)) * (self.__employee.one_call_cost if self.__employee.one_call_cost else 0)),
             group = 'calls',
             label = 'calls_money',
             meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True},
