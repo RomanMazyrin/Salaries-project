@@ -11,6 +11,8 @@ class SalaryCounter:
     AUTH_KEY = 'oweiurghw85gh74o8m7h48'
     LEADS_FETCH_URL = 'https://mazdata.ru/deltasales/get-leads-by-filter'
     EVENTS_FETCH_URL = 'https://mazdata.ru/deltasales/get-events-by-filter'
+    TOTAL_MONEY_CLASS_NAME = 'success'
+    METRICA_MONEY_CLASS_NAME = 'warning'
 
     def __init__(self, employee, onpbx_client):
         self.__employee = employee
@@ -48,7 +50,8 @@ class SalaryCounter:
             int((len(res_outbound) + len(res_inbound)) * (self.__employee.one_call_cost if self.__employee.one_call_cost else 0)),
             group = 'calls',
             label = 'calls_money',
-            meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True}
+            meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True},
+            class_name = self.METRICA_MONEY_CLASS_NAME
         ))
 
         return metrics
@@ -110,7 +113,8 @@ class SalaryCounter:
                 self.__employee.one_hour_salary_amount * total_hours_sum,
                 group = 'work_hours',
                 label = 'work_hours_money',
-                meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True}
+                meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True},
+                class_name = self.METRICA_MONEY_CLASS_NAME
             ))
 
         if self.__employee.one_feedback_cost:
@@ -130,7 +134,8 @@ class SalaryCounter:
                 self.__employee.one_feedback_cost * self.__report.get_metrica_by_label('feedbacks_count').value,
                 group = 'feedbacks',
                 label = 'feedbacks_money',
-                meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True}
+                meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True},
+                class_name = self.METRICA_MONEY_CLASS_NAME
             ))
 
         return metrics
@@ -168,7 +173,8 @@ class SalaryCounter:
             500 * len(leads),
             group = 'audits',
             label='audits_money',
-            meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True}
+            meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True},
+            class_name = self.METRICA_MONEY_CLASS_NAME
         ))
 
         return metrics
@@ -190,7 +196,8 @@ class SalaryCounter:
             math.ceil(self.__employee.daily_salary_amount*((timestamp_to-timestamp_from)/(3600 * 24))),
             group = 'salary',
             label = 'salary',
-            meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True}
+            meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True},
+            class_name = self.METRICA_MONEY_CLASS_NAME
         ))
         return metrics
     
@@ -230,8 +237,9 @@ class SalaryCounter:
             "Денег за отправленные сообщения",
             num_of_messages * self.__employee.outcome_message_cost,
             group = 'outcome_messages',
-            label='outcome_messages_money',
-            meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True}
+            label = 'outcome_messages_money',
+            meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True},
+            class_name = self.METRICA_MONEY_CLASS_NAME
         ))
 
         return metrics
@@ -245,7 +253,13 @@ class SalaryCounter:
         report.add_metrics(self.__get_metrics_for_salary(timestamp_from, timestamp_to))
         report.add_metrics(self.__get_metrics_for_outcome_messages(timestamp_from, timestamp_to))
         money_amount = sum([metrica.value for metrica in report.get_metrics_by_meta_param(self.META_PARAM_COUNT_IN_TOTAL_SUM, True)])
-        report.add_metrica(Metrica("Денег всего", money_amount))
+        
+        report.add_metrica(Metrica(
+            "Денег всего",
+            money_amount,
+            class_name = self.TOTAL_MONEY_CLASS_NAME
+        ))
+
         return report
     
     def __standart_price_processor(self, price, lead):
@@ -275,7 +289,8 @@ class SalaryCounter:
                     math.floor(sum([lead_price_processor(lead['price'], lead)*((self.__employee.sale_fee_percent if self.__employee.sale_fee_percent else 0)/100) for lead in leads_list if lead['pipeline_id'] in pipeline_id_list])),
                     group = group,
                     label = group+"_money",
-                    meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True}
+                    meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True},
+                    class_name = self.METRICA_MONEY_CLASS_NAME
                 ) 
             ]
 
