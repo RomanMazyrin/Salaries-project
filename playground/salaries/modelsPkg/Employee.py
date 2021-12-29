@@ -14,6 +14,15 @@ class Employee(models.Model):
     one_call_cost = models.FloatField('Стоимость одного звонка (рублей)', blank=True, null=True, default=None)
     one_feedback_cost = models.IntegerField("Стоимость одного отзыва", blank=True, null=True)
     min_call_length = models.IntegerField("Минимальная длина звонка", blank=True, null=True, default=20)
+    sales_plan = models.IntegerField("План продаж (в рублях)", blank=True, null=True)
+    
+    sale_fee_percent_above_plan = models.FloatField(
+        'Процент с продаж сверх плана',
+        blank=True,
+        null=True,
+        default=None,
+        validators=[MinValueValidator(0), MaxValueValidator(100)]
+    )
     
     outcome_message_cost = models.IntegerField(
         "Стоимость исходящего сообщения",
