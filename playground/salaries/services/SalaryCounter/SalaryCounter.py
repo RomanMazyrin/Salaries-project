@@ -153,7 +153,7 @@ class SalaryCounter:
 
             metrics.append(Metrica(
                 "Денег за отзывы",
-                self.__employee.one_feedback_cost * self.__report.get_metrica_by_label('feedbacks_count').value,
+                self.__employee.one_feedback_cost * sum(feedback_count),
                 group = 'feedbacks',
                 label = 'feedbacks_money',
                 meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True},
