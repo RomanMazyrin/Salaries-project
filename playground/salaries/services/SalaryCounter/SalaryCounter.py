@@ -3,6 +3,8 @@ import math
 from .Metrica import Metrica
 from .Report import Report
 from amocrm_components.ApiIterator import ApiIterator
+from datetime import datetime
+import pytz
 
 ONE_WEEK_IN_SECONDS = 604800
 
@@ -84,40 +86,16 @@ class SalaryCounter:
         if not self.__employee.amocrm_id:
             return metrics
 
-        leads = self.__fetch_all_entities(
-            url = self.LEADS_FETCH_URL,
-            params = {
-                'auth_key': self.AUTH_KEY,
-                "filter": json.dumps({
-                    "closed_at": {
-                        "from": timestamp_from,
-                        "to": timestamp_to
-                    },
-                    "responsible_user_id": self.__employee.amocrm_id,
-                    "statuses": [
-                        {"status_id": 142, "pipeline_id": 1212574},
-                        {"status_id": 142, "pipeline_id": 1693621},
-                        {"status_id": 142, "pipeline_id": 1693720},
-                        {"status_id": 142, "pipeline_id": 3941655},
-                        {"status_id": 142, "pipeline_id": 3346951},
-                        {"status_id": 142, "pipeline_id": 3964107},
-                        {"status_id": 142, "pipeline_id": 3678177},
-                        {"status_id": 142, "pipeline_id": 4669350}
-                    ]
-                })
-            },
-            entity_type='leads',
-            fetch_limit=50
-        )
-        
-        std_price_processor = lambda price, lead: self.__standart_price_processor(price, lead)
+        lead_price_getter = lambda lead: self.__standart_price_processor(lead)
 
-        metrics.extend(self.get_metrics_from_leads(leads, 1212574, "licenses", 'лицензий', 'лицензии', lambda price, lead: self.__standart_price_processor(price/2, lead)))
-        metrics.extend(self.get_metrics_from_leads(leads, [1693720, 4669350], "widgets", 'Виджетов', 'виджеты', std_price_processor))
-        metrics.extend(self.get_metrics_from_leads(leads, [1693621, 3346951], "projects", 'Проектов', 'проекты', std_price_processor))
-        metrics.extend(self.get_metrics_from_leads(leads, 3941655, "courses", 'Курсов', 'курсы', std_price_processor))
+        leads = self.__get_closed_leads_with_payments_amounts(timestamp_from, timestamp_to, lead_price_getter)
 
-        hours_list = [self.__find_custom_field_value_in_lead(lead, 682570) for lead in leads if lead['pipeline_id'] in [3346951]]
+        metrics.extend(self.get_metrics_from_leads(leads, 1212574, "licenses", 'лицензий', 'лицензии'))
+        metrics.extend(self.get_metrics_from_leads(leads, [1693720, 4669350], "widgets", 'Виджетов', 'виджеты'))
+        metrics.extend(self.get_metrics_from_leads(leads, [1693621, 3346951], "projects", 'Проектов', 'проекты'))
+        metrics.extend(self.get_metrics_from_leads(leads, 3941655, "courses", 'Курсов', 'курсы'))
+
+        hours_list = [self.__find_custom_field_value_in_lead(lead, 682570) for (lead, payment) in leads if lead['pipeline_id'] in [3346951]]
         hours_list = [int(a) for a in hours_list if a is not None]
 
         total_hours_sum = sum(hours_list)
@@ -141,7 +119,7 @@ class SalaryCounter:
 
         if self.__employee.one_feedback_cost:
     
-            feedback_count = [self.__find_custom_field_value_in_lead(lead, 683742) for lead in leads if lead['pipeline_id'] in [3964107, 3678177]]
+            feedback_count = [self.__find_custom_field_value_in_lead(lead, 683742) for (lead, payment) in leads if lead['pipeline_id'] in [3964107, 3678177]]
             feedback_count = [int(a) if a else 1 for a in feedback_count]
             
             metrics.append(Metrica(
@@ -284,11 +262,12 @@ class SalaryCounter:
 
         return report
     
-    def __standart_price_processor(self, price, lead):
+    def __standart_price_processor(self, lead):
+        res = {"plan": lead['price'], "payment": lead['price']}
         lead_outcome = self.__find_custom_field_value_in_lead(lead, 683324)
         if lead_outcome:
-            return price - int(lead_outcome)
-        return price
+            res['payment'] -= int(lead_outcome)
+        return res
 
     def get_metrics_from_leads(
         self,
@@ -296,24 +275,23 @@ class SalaryCounter:
         pipeline_id_list,
         group,
         entity_name,
-        entity_name_plural,
-        lead_price_processor = lambda price, lead: price):
+        entity_name_plural):
 
             if not isinstance(pipeline_id_list, list):
                 pipeline_id_list = [pipeline_id_list]
                 
             return [
-                Metrica(entity_name + " продано", len([lead for lead in leads_list if lead['pipeline_id'] in pipeline_id_list]), group),
-                Metrica(entity_name + " продано на сумму", sum([lead['price'] for lead in leads_list if lead['pipeline_id'] in pipeline_id_list]), group),
+                Metrica(entity_name + " продано", len([lead for (lead, payment) in leads_list if lead['pipeline_id'] in pipeline_id_list]), group),
+                Metrica(entity_name + " продано на сумму", sum([lead['price'] for (lead, payment) in leads_list if lead['pipeline_id'] in pipeline_id_list]), group),
                 
                 Metrica(
                     "Денег за " + entity_name_plural,
-                    math.floor(sum([lead_price_processor(lead['price'], lead)*((self.__employee.sale_fee_percent if self.__employee.sale_fee_percent else 0)/100) for lead in leads_list if lead['pipeline_id'] in pipeline_id_list])),
+                    math.floor(sum([payment_amount for (lead, payment_amount) in leads_list if lead['pipeline_id'] in pipeline_id_list])),
                     group = group,
                     label = group+"_money",
                     meta_params = {self.META_PARAM_COUNT_IN_TOTAL_SUM: True},
                     class_name = self.METRICA_MONEY_CLASS_NAME
-                ) 
+                )
             ]
 
     def __fetch_all_entities(self, **kwargs):
@@ -322,3 +300,76 @@ class SalaryCounter:
         for entity in f.get_next():
             entities.append(entity)
         return entities
+
+    def __split_closed_leads_by_months(self, leads_list):
+        result_map = {}
+        for lead in leads_list:
+            lead_closed_timestamp = lead['closed_at']
+            closed_datetime = datetime.fromtimestamp(lead_closed_timestamp)
+            lead_closed_month_key = (closed_datetime.month, closed_datetime.year)
+            
+            if not result_map.get(lead_closed_month_key):
+                result_map[lead_closed_month_key] = []
+
+            result_map[lead_closed_month_key].append(lead)
+
+        return result_map
+
+    def __get_closed_leads_with_payments_amounts(self, timestamp_from, timestamp_to, 
+                              lead_price_getter = lambda lead: {"plan": lead['price'], "payment": lead['price']}):
+
+        timezone = pytz.timezone("Europe/Moscow")
+        
+        left_timestamp_border = datetime.fromtimestamp(timestamp_from, timezone).replace(day=1, hour=0, minute=0, second=0).timestamp()
+        right_timestamp_border = datetime.fromtimestamp(timestamp_to).replace(hour=23, minute=59, second=59).timestamp()
+        
+        print("from time", datetime.fromtimestamp(left_timestamp_border, timezone))
+        print("to time", datetime.fromtimestamp(right_timestamp_border))
+
+        leads = self.__fetch_all_entities(
+            url = self.LEADS_FETCH_URL,
+            params = {
+                'auth_key': self.AUTH_KEY,
+                "filter": json.dumps({
+                    "closed_at": {
+                        "from": left_timestamp_border,
+                        "to": right_timestamp_border
+                    },
+                    "responsible_user_id": self.__employee.amocrm_id,
+                    "statuses": [
+                        {"status_id": 142, "pipeline_id": 1212574},
+                        {"status_id": 142, "pipeline_id": 1693621},
+                        {"status_id": 142, "pipeline_id": 1693720},
+                        {"status_id": 142, "pipeline_id": 3941655},
+                        {"status_id": 142, "pipeline_id": 3346951},
+                        {"status_id": 142, "pipeline_id": 3964107},
+                        {"status_id": 142, "pipeline_id": 3678177},
+                        {"status_id": 142, "pipeline_id": 4669350}
+                    ]
+                })
+            },
+            entity_type='leads',
+            fetch_limit=50
+        )
+
+        leads.sort(key = lambda lead: lead['closed_at'])
+
+        splited_leads = self.__split_closed_leads_by_months(leads)
+
+        result_list = []
+
+        for (month_key, month_leads) in splited_leads.items():
+            month_sum = 0
+            for lead in month_leads:
+                lead_price = lead_price_getter(lead)
+                month_sum += lead_price['plan']
+                if lead['closed_at'] >= timestamp_from:
+                    lead_percent = self.__employee.sale_fee_percent
+                    if self.__employee.sales_plan is not None:
+                        lead_percent = self.__employee.sale_fee_percent if month_sum <= self.__employee.sales_plan else self.__employee.sale_fee_percent_above_plan
+                        if not lead_percent:
+                            lead_percent = self.__employee.sale_fee_percent
+
+                    result_list.append((lead, lead_price['payment'] * (lead_percent / 100)))
+            
+        return result_list
