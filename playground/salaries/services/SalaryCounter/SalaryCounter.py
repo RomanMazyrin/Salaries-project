@@ -247,15 +247,10 @@ class SalaryCounter:
 
     def get_detailed_report(self, timestamp_from, timestamp_to):
         report = Report()
-        print("Calculating calls")
         report.add_metrics(self.__get_metrics_for_calls(timestamp_from, timestamp_to))
-        print("Calculating sales")
         report.add_metrics(self.__get_metrics_for_sales(timestamp_from, timestamp_to))
-        print("Calculating audits")
         report.add_metrics(self.__get_metrics_for_audits(timestamp_from, timestamp_to))
-        print("Calculating salary")
         report.add_metrics(self.__get_metrics_for_salary(timestamp_from, timestamp_to))
-        print("Calculating messages")
         report.add_metrics(self.__get_metrics_for_outcome_messages(timestamp_from, timestamp_to))
         money_amount = sum([metrica.value for metrica in report.get_metrics_by_meta_param(self.META_PARAM_COUNT_IN_TOTAL_SUM, True)])
         
