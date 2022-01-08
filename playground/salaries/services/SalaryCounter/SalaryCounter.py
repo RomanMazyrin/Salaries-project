@@ -88,11 +88,7 @@ class SalaryCounter:
 
         lead_price_getter = lambda lead: self.__standart_price_processor(lead)
 
-        print("Fetching leads")
-
         leads = self.__get_closed_leads_with_payments_amounts(timestamp_from, timestamp_to, lead_price_getter)
-
-        print("Leads count", len(leads))
 
         metrics.extend(self.get_metrics_from_leads(leads, 1212574, "licenses", 'лицензий', 'лицензии'))
         metrics.extend(self.get_metrics_from_leads(leads, [1693720, 4669350], "widgets", 'Виджетов', 'виджеты'))
@@ -273,8 +269,6 @@ class SalaryCounter:
     
     def __standart_price_processor(self, lead):
         res = {"plan": lead['price'], "payment": lead['price']}
-        if lead['pipeline_id'] == 1212574:
-            res['payment'] /= 2
         lead_outcome = self.__find_custom_field_value_in_lead(lead, 683324)
         if lead_outcome:
             res['payment'] -= int(lead_outcome)
@@ -375,7 +369,12 @@ class SalaryCounter:
                 lead_price = lead_price_getter(lead)
                 month_sum += lead_price['plan']
                 if lead['closed_at'] >= timestamp_from:
-                    lead_percent = self.__employee.sale_fee_percent if month_sum <= self.__employee.sales_plan else self.__employee.sale_fee_percent_above_plan
+                    lead_percent = self.__employee.sale_fee_percent
+                    if self.__employee.sales_plan is not None:
+                        lead_percent = self.__employee.sale_fee_percent if month_sum <= self.__employee.sales_plan else self.__employee.sale_fee_percent_above_plan
+                        if not lead_percent:
+                            lead_percent = self.__employee.sale_fee_percent
+
                     result_list.append((lead, lead_price['payment'] * (lead_percent / 100)))
             
         return result_list
