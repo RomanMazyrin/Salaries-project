@@ -12,6 +12,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 import json
 import math
 from .services.DateIntervals.DashboardDateInterval import create_interval
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 
 class IndexView(LoginRequiredMixin, generic.ListView):
@@ -51,6 +52,7 @@ class SalaryResultView(LoginRequiredMixin, View):
 
 class SalesPlanView(View):
     
+    @xframe_options_exempt
     def get(self, request, *args, **kwargs):
         
         auth_key = request.GET.get('auth_key')
