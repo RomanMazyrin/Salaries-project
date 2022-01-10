@@ -8,14 +8,21 @@
     <link href="{% static 'salaries/css/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'salaries/css/style.css' %}" rel="stylesheet" type="text/css">
     <title></title>
+
+    <style>
+        body {
+            background-color: rgba(0,0,0,.95);
+            color: white;
+        }
+    </style>
 </head>
 <body>
 
     {% for stat in stats %}
         <div class='row mt-3'>
             <div class="">{{stat.employee.name}}</div>
-            <div class="progress">
-                <div class="progress-bar" role="progressbar" style="width: {{stat.bar_width|default:stat.percent}}%;" aria-valuenow="{{stat.percent}}" aria-valuemin="0" aria-valuemax="100"> 
+            <div class="progress" style="height: 25px; font-size:16px;">
+                <div class="progress-bar bg-warning" role="progressbar" style="width: {{stat.bar_width|default:stat.percent}}%; color: black" aria-valuenow="{{stat.percent}}" aria-valuemin="0" aria-valuemax="100"> 
                     {{stat.label}}
                 </div>
             </div>
