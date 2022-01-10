@@ -1,0 +1,28 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="{% static 'salaries/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'salaries/css/style.css' %}" rel="stylesheet" type="text/css">
+    <title></title>
+</head>
+<body>
+
+    {% for stat in stats %}
+        <div class='row mt-3'>
+            <div class="">{{stat.employee.name}}</div>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: {{stat.percent}}%;" aria-valuenow="{{stat.percent}}" aria-valuemin="0" aria-valuemax="100"> 
+                    {{stat.actual}} / {{stat.plan}} ({{stat.percent}}%)
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <script src="{% static 'salaries/js/bootstrap.min.js' %}"></script>
+    
+</body>
+</html>
