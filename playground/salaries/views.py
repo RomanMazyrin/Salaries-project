@@ -102,7 +102,7 @@ class SalesPlanView(View):
         display_mods = {
             'percent': lambda actual, plan, percent: {
                 'label': f"{percent}%",
-                'bar_width': percent
+                'bar_width': math.ceil(percent)
             },
 
             'money': lambda actual, plan, percent: {
@@ -112,13 +112,13 @@ class SalesPlanView(View):
 
             'all': lambda actual, plan, percent: {
                 "label": f"{actual:,} руб. / {plan:,} руб. ({percent}%)",
-                'bar_width': percent
+                'bar_width': math.ceil(percent)
             }
         }
 
         for employee in employees:
             plan = employee.sales_plan if employee.sales_plan is not None else 0
-            percent = 0 if plan == 0 else math.floor((leads_total_sales.get(employee.amocrm_id, 0) / plan) * 100)
+            percent = 0 if plan == 0 else round((leads_total_sales.get(employee.amocrm_id, 0) / plan) * 100, 2)
             actual = leads_total_sales.get(employee.amocrm_id, 0)
             stat = {
                 'employee': employee,
@@ -126,7 +126,12 @@ class SalesPlanView(View):
                 'plan': plan,
                 'percent': percent, 
             }
-            stat.update(display_mods[request.GET.get('display_mode', 'all')](actual, plan, percent))
+            
+            display_stat_options = display_mods[request.GET.get('display_mode', 'all')](actual, plan, percent)
+            if display_stat_options['bar_width'] < 20:
+                display_stat_options['bar_width'] = 20
+
+            stat.update(display_stat_options)
             stats.append(stat)
 
         return render(request, "amo_dashboards/sales_plan_progress.html", {
