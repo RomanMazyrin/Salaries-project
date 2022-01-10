@@ -58,7 +58,7 @@ class SalesPlanView(View):
             return HttpResponse("Access denied!")
         
         get_params = request.GET.dict()
-        
+
         interval = create_interval(**get_params)
 
         f = ApiIterator(
@@ -97,15 +97,35 @@ class SalesPlanView(View):
 
         stats = []
 
+        display_mods = {
+            'percent': lambda actual, plan, percent: {
+                'label': f"{percent}%",
+                'bar_width': percent
+            },
+
+            'money': lambda actual, plan, percent: {
+                'label': f"{actual:,} руб.",
+                'bar_width': 100
+            },
+
+            'all': lambda actual, plan, percent: {
+                "label": f"{actual:,} руб. / {plan:,} руб. ({percent}%)",
+                'bar_width': percent
+            }
+        }
+
         for employee in employees:
             plan = employee.sales_plan if employee.sales_plan is not None else 0
             percent = 0 if plan == 0 else math.floor((leads_total_sales.get(employee.amocrm_id, 0) / plan) * 100)
-            stats.append({
+            actual = leads_total_sales.get(employee.amocrm_id, 0)
+            stat = {
                 'employee': employee,
-                'actual': leads_total_sales.get(employee.amocrm_id, 0),
+                'actual': actual,
                 'plan': plan,
-                'percent': percent
-            })
+                'percent': percent, 
+            }
+            stat.update(display_mods[request.GET.get('display_mode', 'all')](actual, plan, percent))
+            stats.append(stat)
 
         return render(request, "amo_dashboards/sales_plan_progress.html", {
             'stats': stats

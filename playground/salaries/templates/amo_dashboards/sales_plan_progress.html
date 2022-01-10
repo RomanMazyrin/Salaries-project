@@ -15,8 +15,8 @@
         <div class='row mt-3'>
             <div class="">{{stat.employee.name}}</div>
             <div class="progress">
-                <div class="progress-bar" role="progressbar" style="width: {{stat.percent}}%;" aria-valuenow="{{stat.percent}}" aria-valuemin="0" aria-valuemax="100"> 
-                    {{stat.actual}} / {{stat.plan}} ({{stat.percent}}%)
+                <div class="progress-bar" role="progressbar" style="width: {{stat.bar_width|default:stat.percent}}%;" aria-valuenow="{{stat.percent}}" aria-valuemin="0" aria-valuemax="100"> 
+                    {{stat.label}}
                 </div>
             </div>
         </div>
