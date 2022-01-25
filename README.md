@@ -8,3 +8,71 @@
 - **`DB_PASSWORD`** - Database user password
 - **`DB_HOST`** - Database host
 - **`DB_PORT`** - Database port
+- **`PORT`** - Port listened by server (gunicorn)
+
+# Preparing before first launch on local machine
+
+## Install dependencies
+
+```
+$ pipenv sync
+``` 
+
+## Activate virtual environment shell
+
+```
+$ pipenv shell
+```
+
+## Set environment variables
+
+<br>
+Create .env file in src/ folder and set necessary values for env variables
+<br><br>
+
+## Collect static and make migrations
+
+```
+$ cd src
+$ python3 manage.py collectstatic --no-input
+$ python3 manage.py migrate --no-input
+$ python3 manage.py createsuperuser
+``` 
+
+# Starting server
+
+```
+$ make runserver
+```
+
+# Linting
+
+```
+$ make lint
+```
+
+<br>
+
+# Docker run
+
+## Before run
+
+Here is a [docker-compose.yml](docker-compose.yml) config example, which is actually ready for local machine launch. 
+
+Before launch you need to do next. It's optional, but you should know about it:
+
+*Set env variables in docker-compose.yml (parameter [**environment**](https://docs.docker.com/compose/compose-file/compose-file-v3/#environment)), or create .env file in the root of project and fill it with actual env variables for docker containers. Don't forget about changing docker-compose.yml config for successfully apply .env file params (parameter [**env_file**](https://docs.docker.com/compose/compose-file/compose-file-v3/#env_file)) for each service*
+
+## Run
+```
+$ docker-compose up
+```
+
+<br>
+
+# Docker build
+
+To rebuilding image to the last code version, you have to:
+
+1. Run `docker-compose build` command. Wait for rebuilding.
+1. `docker-compose up` again to up services with new images.

@@ -2,21 +2,23 @@ version: "3.8"
 
 services:
   web:
-    image: django_playground_web:latest
+    image: django_playground:latest
     build:
       context: ./
       dockerfile: docker/Dockerfile
     ports:
-      - 80:80
-    env_file: .env
-    restart: unless-stopped
+      - 80:8000
     volumes:
       - "./src:/app/src/"
+    restart: unless-stopped
     depends_on:
       - migration
 
   migration:
-    image: django_playground_web:latest
+    image: django_playground:latest
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile
     entrypoint: python3 manage.py migrate --no-input
     volumes:
-      - "./src:/app/src/"
+        - "./src:/app/src/"
