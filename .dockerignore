@@ -4,9 +4,9 @@ test.py
 .DS_Store
 .pytest_cache
 __pycache__
-playground/db.sqlite3
-playground/uploads/
-playground/static/
+src/db.sqlite3
+src/uploads/
+src/static/
 .dockerignore
 docker-compose.yml
 docker-compose.dev.yml

@@ -2,29 +2,23 @@ version: "3.8"
 
 services:
   web:
-    image: ghcr.io/romanmazyrin/django_playground_web:latest
+    image: salaries_project:latest
     build:
       context: ./
-      dockerfile: docker/app/Dockerfile
-    env_file: .env
-    environment:
-      DEBUG: 0
+      dockerfile: docker/Dockerfile
+    ports:
+      - 80:8000
+    volumes:
+      - "./src:/app/src/"
     restart: unless-stopped
     depends_on:
       - migration
 
-
-  nginx:
-    image: ghcr.io/romanmazyrin/django_playground_nginx:latest
+  migration:
+    image: salaries_project:latest
     build:
       context: ./
-      dockerfile: docker/nginx/Dockerfile
-    ports:
-      - 8000:80
-    depends_on:
-      - web
-    restart: unless-stopped
-  
-  migration:
-    image: ghcr.io/romanmazyrin/django_playground_web:latest
-    entrypoint: pipenv run python3 manage.py migrate --no-input
+      dockerfile: docker/Dockerfile
+    entrypoint: python3 manage.py migrate --no-input
+    volumes:
+        - "./src:/app/src/"
