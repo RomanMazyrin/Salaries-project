@@ -38,7 +38,7 @@ jobs:
           file: ./docker/Dockerfile
           push: true
           tags: |
-            ghcr.io/romanmazyrin/django_playground_web:latest
+            ghcr.io/romanmazyrin/salaries_project:latest
           cache-from: type=local,src=/tmp/.buildx-cache-web
           cache-to: type=local,dest=/tmp/.buildx-cache-web-new
       -
@@ -59,6 +59,6 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           script: |
-            docker pull ghcr.io/romanmazyrin/django_playground_web:latest
+            docker pull ghcr.io/romanmazyrin/salaries_project:latest
             docker stack deploy -c salary_service/docker-compose.yml --with-registry-auth django_salaries
     

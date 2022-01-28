@@ -1,5 +1,7 @@
 FROM python:3.7-alpine
 
+LABEL org.opencontainers.image.source="https://github.com/RomanMazyrin/django_playground"
+
 RUN mkdir /app
 WORKDIR /app
 

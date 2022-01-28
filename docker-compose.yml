@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   web:
-    image: django_playground:latest
+    image: salaries_project:latest
     build:
       context: ./
       dockerfile: docker/Dockerfile
@@ -15,7 +15,7 @@ services:
       - migration
 
   migration:
-    image: django_playground:latest
+    image: salaries_project:latest
     build:
       context: ./
       dockerfile: docker/Dockerfile
