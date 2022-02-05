@@ -274,9 +274,6 @@ class SalaryCounter:
 
     def __standart_price_processor(self, lead):
         res = {"plan": lead['price'], "payment": lead['price']}
-        lead_outcome = self.__find_custom_field_value_in_lead(lead, 683324)
-        if lead_outcome:
-            res['payment'] -= int(lead_outcome)
         return res
 
     def get_metrics_from_leads(
