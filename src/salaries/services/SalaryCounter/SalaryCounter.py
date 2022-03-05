@@ -18,6 +18,8 @@ class SalaryCounter:
     TOTAL_MONEY_CLASS_NAME = 'success'
     METRICA_MONEY_CLASS_NAME = 'warning'
 
+    COLD_CALLS_PIPELINE_ID = 3636822
+
     def __init__(self, employee, onpbx_client):
         self.__employee = employee
         self.__onpbx_client = onpbx_client
@@ -92,28 +94,30 @@ class SalaryCounter:
 
         leads = self.__get_closed_leads_with_payments_amounts(timestamp_from, timestamp_to)
 
-        metrics.extend(self.get_metrics_from_leads(
-            leads, 1212574, "licenses", 'лицензий', 'лицензии'))
-        metrics.extend(self.get_metrics_from_leads(
-            leads, [1693720, 4669350], "widgets", 'Виджетов', 'виджеты'))
-        metrics.extend(self.get_metrics_from_leads(
-            leads, [1693621, 3346951], "projects", 'Проектов', 'проекты'))
-        metrics.extend(self.get_metrics_from_leads(leads, 3941655, "courses", 'Курсов', 'курсы'))
+        if self.__employee.sale_fee_percent:
 
-        hours_list = [self.__find_custom_field_value_in_lead(lead, 682570) for (
-            lead, payment) in leads if lead['pipeline_id'] in [3346951]]
-        hours_list = [int(a) for a in hours_list if a is not None]
-
-        total_hours_sum = sum(hours_list)
-
-        metrics.append(Metrica(
-            "Часов на реализацию проектов затрачено",
-            total_hours_sum,
-            group='work_hours',
-            label='work_hours_amount'
-        ))
+            metrics.extend(self.get_metrics_from_leads(
+                leads, 1212574, "licenses", 'лицензий', 'лицензии'))
+            metrics.extend(self.get_metrics_from_leads(
+                leads, [1693720, 4669350], "widgets", 'Виджетов', 'виджеты'))
+            metrics.extend(self.get_metrics_from_leads(
+                leads, [1693621, 3346951], "projects", 'Проектов', 'проекты'))
+            metrics.extend(self.get_metrics_from_leads(leads, 3941655, "courses", 'Курсов', 'курсы'))
 
         if self.__employee.one_hour_salary_amount:
+            hours_list = [self.__find_custom_field_value_in_lead(lead, 682570) for (
+                lead, payment) in leads if lead['pipeline_id'] in [3346951]]
+            hours_list = [int(a) for a in hours_list if a is not None]
+
+            total_hours_sum = sum(hours_list)
+
+            metrics.append(Metrica(
+                "Часов на реализацию проектов затрачено",
+                total_hours_sum,
+                group='work_hours',
+                label='work_hours_amount'
+            ))
+
             metrics.append(Metrica(
                 "Денег за рабочие часы по проектам",
                 self.__employee.one_hour_salary_amount * total_hours_sum,
@@ -145,6 +149,23 @@ class SalaryCounter:
                 class_name=self.METRICA_MONEY_CLASS_NAME
             ))
 
+        if self.__employee.cold_call_success_lead_cost:
+            cold_calls_success_leads_count = len([lead for (lead, payment) in leads if lead['pipeline_id'] == self.COLD_CALLS_PIPELINE_ID])
+            metrics.append(Metrica(
+                "Успешных сделок по прозвону",
+                cold_calls_success_leads_count,
+                group='cold_calls',
+                label='cold_calls_count'
+            ))
+            metrics.append(Metrica(
+                "Денег за успешные сделки по прозвону",
+                cold_calls_success_leads_count * self.__employee.cold_call_success_lead_cost,
+                group='cold_calls',
+                label='cold_calls_money',
+                meta_params={self.META_PARAM_COUNT_IN_TOTAL_SUM: True},
+                class_name=self.METRICA_MONEY_CLASS_NAME
+            ))
+
         return metrics
 
     def __get_metrics_for_audits(self, timestamp_from, timestamp_to):
@@ -152,6 +173,9 @@ class SalaryCounter:
         metrics = []
 
         if not self.__employee.amocrm_id:
+            return metrics
+
+        if not self.__employee.audit_cost:
             return metrics
 
         leads = self.__fetch_all_entities(
@@ -176,7 +200,7 @@ class SalaryCounter:
 
         metrics.append(Metrica(
             "Денег за аудиты",
-            500 * len(leads),
+            self.__employee.audit_cost * len(leads),
             group='audits',
             label='audits_money',
             meta_params={self.META_PARAM_COUNT_IN_TOTAL_SUM: True},
@@ -355,7 +379,8 @@ class SalaryCounter:
                         {"status_id": 142, "pipeline_id": 3346951},
                         {"status_id": 142, "pipeline_id": 3964107},
                         {"status_id": 142, "pipeline_id": 3678177},
-                        {"status_id": 142, "pipeline_id": 4669350}
+                        {"status_id": 142, "pipeline_id": 4669350},
+                        {"status_id": 142, "pipeline_id": self.COLD_CALLS_PIPELINE_ID}
                     ]
                 })
             },
@@ -386,6 +411,9 @@ class SalaryCounter:
 
                         if not lead_percent:
                             lead_percent = self.__employee.sale_fee_percent
+
+                    if not lead_percent:
+                        lead_percent = 0
 
                     result_list.append((lead, lead_price['payment'] * (lead_percent / 100)))
 

@@ -44,6 +44,22 @@ class Employee(models.Model):
         validators=[MinValueValidator(0)]
     )
 
+    cold_call_success_lead_cost = models.IntegerField(
+        'Стоимость за успешную сделку по холодному обзвону',
+        blank=True,
+        null=True,
+        default=0,
+        validators=[MinValueValidator(0)]
+    )
+
+    audit_cost = models.IntegerField(
+        'Стоимость аудита',
+        blank=True,
+        null=True,
+        default=0,
+        validators=[MinValueValidator(0)]
+    )
+
     class Meta:
         verbose_name = 'Сотрудник'
         verbose_name_plural = 'Сотрудники'
