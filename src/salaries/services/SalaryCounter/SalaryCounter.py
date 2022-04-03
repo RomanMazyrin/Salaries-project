@@ -5,6 +5,7 @@ from .Report import Report
 from amocrm_components.ApiIterator import ApiIterator
 from datetime import datetime
 import pytz
+import imaplib
 
 ONE_WEEK_IN_SECONDS = 604800
 
@@ -17,6 +18,7 @@ class SalaryCounter:
     EVENTS_FETCH_URL = 'https://mazdata.ru/deltasales/get-events-by-filter'
     TOTAL_MONEY_CLASS_NAME = 'success'
     METRICA_MONEY_CLASS_NAME = 'warning'
+    METRICA_ERROR_CLASS_NAME = 'danger'
 
     COLD_CALLS_PIPELINE_ID = 3636822
 
@@ -102,7 +104,8 @@ class SalaryCounter:
                 leads, [1693720, 4669350], "widgets", 'Виджетов', 'виджеты'))
             metrics.extend(self.get_metrics_from_leads(
                 leads, [1693621, 3346951], "projects", 'Проектов', 'проекты'))
-            metrics.extend(self.get_metrics_from_leads(leads, 3941655, "courses", 'Курсов', 'курсы'))
+            metrics.extend(self.get_metrics_from_leads(
+                leads, 3941655, "courses", 'Курсов', 'курсы'))
 
         if self.__employee.one_hour_salary_amount:
             hours_list = [self.__find_custom_field_value_in_lead(lead, 682570) for (
@@ -150,7 +153,10 @@ class SalaryCounter:
             ))
 
         if self.__employee.cold_call_success_lead_cost:
-            cold_calls_success_leads_count = len([lead for (lead, payment) in leads if lead['pipeline_id'] == self.COLD_CALLS_PIPELINE_ID])
+            cold_calls_success_leads = [
+                lead for (lead, ) in leads if lead['pipeline_id'] == self.COLD_CALLS_PIPELINE_ID
+            ]
+            cold_calls_success_leads_count = len(cold_calls_success_leads)
             metrics.append(Metrica(
                 "Успешных сделок по прозвону",
                 cold_calls_success_leads_count,
@@ -235,6 +241,73 @@ class SalaryCounter:
         ))
         return metrics
 
+    def __get_metrics_for_outcome_email_messages(self, timestamp_from, timestamp_to):
+
+        metrics = []
+        if not self.__employee.outcome_email_message_cost:
+            return metrics
+
+        try:
+            num_of_messages = self.__get_email_outcome_messages_count_in_period(
+                timestamp_from, timestamp_to)
+            metrics.append(Metrica(
+                "Количество отправленных Email сообщений",
+                num_of_messages,
+                group='outcome_email_messages',
+                label='outcome_email_messages_count'
+            ))
+
+            metrics.append(Metrica(
+                "Денег за отправленные Email сообщения",
+                num_of_messages * self.__employee.outcome_email_message_cost,
+                group='outcome_email_messages',
+                label='outcome_email_messages_money',
+                meta_params={self.META_PARAM_COUNT_IN_TOTAL_SUM: True},
+                class_name=self.METRICA_MONEY_CLASS_NAME
+            ))
+        except BaseException:
+            metrics.append(Metrica(
+                "Не удалось получить информацию об отправленных email сообщениях",
+                '',
+                group='outcome_email_messages',
+                label='outcome_email_messages_error',
+                class_name=self.METRICA_ERROR_CLASS_NAME
+            ))
+
+        return metrics
+
+    def __get_email_outcome_messages_count_in_period(self, timestamp_from, timestamp_to):
+        mail = imaplib.IMAP4_SSL(self.__employee.email_imap_address)
+        mail.login(
+            self.__employee.email_imap_login,
+            self.__employee.email_imap_password
+        )
+        mailbox_list = mail.list()[1]
+
+        for i, box in enumerate(mailbox_list):
+            decoded = box.decode()
+            if '(\\HasNoChildren \\Marked \\Sent)' in decoded:
+                path, box_id = decoded.split(' "|" ')
+                box_id = box_id.strip('"')
+
+        mail.select(box_id)
+
+        timezone = pytz.timezone("Europe/Moscow")
+
+        date_from = datetime.fromtimestamp(timestamp_from, timezone)
+        date_to = datetime.fromtimestamp(timestamp_to, timezone)
+
+        date_format = "%d-%b-%Y"
+
+        result, data = mail.search(None, '(since "{}" before "{}")'.format(
+            date_from.strftime(date_format),
+            date_to.strftime(date_format)
+        ))
+
+        ids = data[0].decode()
+        id_list = ids.split()
+        return len(id_list)
+
     def __get_metrics_for_outcome_messages(self, timestamp_from, timestamp_to):
 
         metrics = []
@@ -285,6 +358,9 @@ class SalaryCounter:
         report.add_metrics(self.__get_metrics_for_audits(timestamp_from, timestamp_to))
         report.add_metrics(self.__get_metrics_for_salary(timestamp_from, timestamp_to))
         report.add_metrics(self.__get_metrics_for_outcome_messages(timestamp_from, timestamp_to))
+        report.add_metrics(
+            self.__get_metrics_for_outcome_email_messages(timestamp_from, timestamp_to)
+        )
         money_amount = sum([metrica.value for metrica in report.get_metrics_by_meta_param(
             self.META_PARAM_COUNT_IN_TOTAL_SUM, True)])
 
