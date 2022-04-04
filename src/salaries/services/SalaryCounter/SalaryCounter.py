@@ -287,9 +287,10 @@ class SalaryCounter:
 
         for i, box in enumerate(mailbox_list):
             decoded = box.decode()
-            if '(\\HasNoChildren \\Marked \\Sent)' in decoded:
+            if 'Sent' in decoded:
                 path, box_id = decoded.split(' "|" ')
                 box_id = box_id.strip('"')
+                break
 
         mail.select(box_id)
 
