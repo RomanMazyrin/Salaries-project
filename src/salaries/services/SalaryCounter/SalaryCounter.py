@@ -154,7 +154,8 @@ class SalaryCounter:
 
         if self.__employee.cold_call_success_lead_cost:
             cold_calls_success_leads = [
-                lead for (lead, ) in leads if lead['pipeline_id'] == self.COLD_CALLS_PIPELINE_ID
+                lead for (lead, payment) in leads
+                if lead['pipeline_id'] == self.COLD_CALLS_PIPELINE_ID
             ]
             cold_calls_success_leads_count = len(cold_calls_success_leads)
             metrics.append(Metrica(
