@@ -1,6 +1,7 @@
 import hashlib
 from ..Constants import BASE_API_URL
 
+
 class BaseService:
 
     SERVICE_URL_NAME = None

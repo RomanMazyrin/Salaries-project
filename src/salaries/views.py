@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404
 from amocrm_components.ApiIterator import ApiIterator
 from .models import Employee
 from datetime import datetime
-from packages.Onlinepbx.Client import Client
+from packages.Onlinepbx.Client import Client as OnpbxClient
 from .services.SalaryCounter.SalaryCounter import SalaryCounter
 import pytz
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -39,8 +39,9 @@ class SalaryResultView(LoginRequiredMixin, View):
                                          .replace(hour=23, minute=59, second=59)
                                          ).timestamp()
 
-        client = Client(employee.onpbx_account.subdomain, employee.onpbx_account.api_key)
-        calculator = SalaryCounter(employee, client)
+        onpbx_client = OnpbxClient(employee.onpbx_account.subdomain, employee.onpbx_account.api_key)
+        sipuni_client = employee.sipuni_account.client
+        calculator = SalaryCounter(employee, onpbx_client, sipuni_client)
         report = calculator.get_detailed_report(timestamp_from, timestamp_to)
 
         return render(request, "salaries/salary_result.html", {

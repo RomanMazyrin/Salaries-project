@@ -8,9 +8,9 @@ class CallStatisticService(BaseService):
     SERVICE_URL_NAME = 'statistic'
 
     def get(self, anonymous='', dtmf_user_answer='', first_time='', from_date='', from_number='',
-            numbers_ringed='', outgoing_line='', show_tree_id='', state='', to_date='', to_answer='',
-            to_number='', tree='', call_type=''):
-        
+            numbers_ringed='', outgoing_line='', show_tree_id='', state='', to_date='',
+            to_answer='', to_number='', tree='', call_type=''):
+
         hashString = self._make_hash(
             anonymous,
             dtmf_user_answer,

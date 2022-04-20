@@ -1,4 +1,4 @@
-from packages.Sipuni.services.CallsStatistic.CallStaticticService import CallStatisticService
+from .services.CallsStatistic.CallStaticticService import CallStatisticService
 
 
 class Client:
@@ -13,3 +13,7 @@ class Client:
 
     def __getattr__(self, item):
         return self.services_map[item](self.__user_id, self.__secret_key)
+
+    @property
+    def calls_stats(self):
+        return self.services_map['calls_stats'](self.__user_id, self.__secret_key)
