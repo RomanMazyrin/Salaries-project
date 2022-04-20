@@ -44,6 +44,45 @@ class Employee(models.Model):
         validators=[MinValueValidator(0)]
     )
 
+    cold_call_success_lead_cost = models.IntegerField(
+        'Стоимость за успешную сделку по холодному обзвону',
+        blank=True,
+        null=True,
+        default=0,
+        validators=[MinValueValidator(0)]
+    )
+
+    audit_cost = models.IntegerField(
+        'Стоимость аудита',
+        blank=True,
+        null=True,
+        default=0,
+        validators=[MinValueValidator(0)]
+    )
+
+    email_imap_address = models.CharField(
+        "IMAP address", max_length=255, default='',
+        blank=True, null=True
+    )
+
+    email_imap_login = models.CharField(
+        'IMAP login', max_length=255, default='',
+        blank=True, null=True
+    )
+
+    email_imap_password = models.CharField(
+        'IMAP password', max_length=255, default='',
+        blank=True, null=True
+    )
+
+    outcome_email_message_cost = models.IntegerField(
+        "Стоимость исходящего email сообщения",
+        blank=True,
+        null=True,
+        default=0,
+        validators=[MinValueValidator(0)]
+    )
+
     class Meta:
         verbose_name = 'Сотрудник'
         verbose_name_plural = 'Сотрудники'
