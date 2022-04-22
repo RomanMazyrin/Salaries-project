@@ -1,5 +1,7 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+
+from salaries.models.SipuniAccount import SipuniAccount
 from .OnpbxAccount import OnpbxAccount
 
 
@@ -7,9 +9,13 @@ class Employee(models.Model):
 
     onpbx_id = models.IntegerField(blank=True, null=True, validators=[
                                    MaxValueValidator(999), MinValueValidator(100)])
+
+    sipuni_id = models.CharField('ID sipuni', blank=True, null=True, default='', max_length=10)
+
     amocrm_id = models.IntegerField(blank=True, null=True)
     name = models.CharField('Имя', max_length=255)
     onpbx_account = models.ForeignKey(OnpbxAccount, on_delete=models.SET_NULL, null=True)
+    sipuni_account = models.ForeignKey(SipuniAccount, on_delete=models.SET_NULL, null=True)
     daily_salary_amount = models.IntegerField("Дневной оклад", blank=True, null=True)
     one_hour_salary_amount = models.IntegerField("Стоимость часа работы", blank=True, null=True)
     one_call_cost = models.FloatField(

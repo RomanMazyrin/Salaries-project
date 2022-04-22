@@ -1,11 +1,27 @@
 import json
 import math
+
+from packages.Sipuni.Constants import ACCEPTED_CALL_STATE, ANY_CALL_STATE
+from packages.Sipuni.Constants import INBOUND_CALL_TYPE, OUTBOUND_CALL_TYPE
 from .Metrica import Metrica
 from .Report import Report
 from amocrm_components.ApiIterator import ApiIterator
 from datetime import datetime
 import pytz
 import imaplib
+import asyncio
+from functools import wraps, partial
+
+
+def async_wrap(func):
+    @wraps(func)
+    async def run(*args, loop=None, executor=None, **kwargs):
+        if loop is None:
+            loop = asyncio.get_event_loop()
+        pfunc = partial(func, *args, **kwargs)
+        return await loop.run_in_executor(executor, pfunc)
+    return run
+
 
 ONE_WEEK_IN_SECONDS = 604800
 
@@ -22,64 +38,102 @@ class SalaryCounter:
 
     COLD_CALLS_PIPELINE_ID = 3636822
 
-    def __init__(self, employee, onpbx_client):
+    def __init__(self, employee, onpbx_client, sipuni_client=None):
         self.__employee = employee
         self.__onpbx_client = onpbx_client
+        self.__sipuni_client = sipuni_client
 
     def __get_metrics_for_calls(self, timestamp_from, timestamp_to):
 
         metrics = []
 
-        if not self.__employee.onpbx_id:
-            return metrics
+        onpbx_calls_outbound = []
+        onpbx_calls_inbound = []
 
-        calls_outbound = []
-        calls_inbound = []
-
-        week_boundary_from = timestamp_from
-        week_boundary_to = week_boundary_from + ONE_WEEK_IN_SECONDS
-
-        if week_boundary_to > timestamp_to:
-            week_boundary_to = timestamp_to
-
-        while True:
-
-            calls_outbound.extend(self.__onpbx_client.call_history.get(
-                accountcode='outbound',
-                caller_id_number=str(self.__employee.onpbx_id),
-                start_stamp_from=int(week_boundary_from),
-                start_stamp_to=int(week_boundary_to),
-                duration_from=self.__employee.min_call_length + 1
-            ))
-
-            calls_inbound.extend(self.__onpbx_client.call_history.get(
-                accountcode='inbound',
-                destination_number=str(self.__employee.onpbx_id),
-                start_stamp_from=int(week_boundary_from),
-                start_stamp_to=int(week_boundary_to),
-                user_talk_time_from=self.__employee.min_call_length + 1
-            ))
-
-            week_boundary_from += ONE_WEEK_IN_SECONDS
-            week_boundary_to += ONE_WEEK_IN_SECONDS
+        if self.__employee.onpbx_id:
+            week_boundary_from = timestamp_from
+            week_boundary_to = week_boundary_from + ONE_WEEK_IN_SECONDS
 
             if week_boundary_to > timestamp_to:
                 week_boundary_to = timestamp_to
 
-            if week_boundary_from >= timestamp_to:
-                break
+            while True:
 
-        metrics.append(Metrica("Кол-во исходящих звонков", len(calls_outbound), 'calls'))
-        metrics.append(Metrica("Кол-во входящих звонков", len(calls_inbound), 'calls'))
-        metrics.append(Metrica("Кол-во звонков всего",
-                       len(calls_inbound) + len(calls_outbound), 'calls'))
+                onpbx_calls_outbound.extend(self.__onpbx_client.call_history.get(
+                    accountcode='outbound',
+                    caller_id_number=str(self.__employee.onpbx_id),
+                    start_stamp_from=int(week_boundary_from),
+                    start_stamp_to=int(week_boundary_to),
+                    duration_from=self.__employee.min_call_length + 1
+                ))
+
+                onpbx_calls_inbound.extend(self.__onpbx_client.call_history.get(
+                    accountcode='inbound',
+                    destination_number=str(self.__employee.onpbx_id),
+                    start_stamp_from=int(week_boundary_from),
+                    start_stamp_to=int(week_boundary_to),
+                    user_talk_time_from=self.__employee.min_call_length + 1
+                ))
+
+                week_boundary_from += ONE_WEEK_IN_SECONDS
+                week_boundary_to += ONE_WEEK_IN_SECONDS
+
+                if week_boundary_to > timestamp_to:
+                    week_boundary_to = timestamp_to
+
+                if week_boundary_from >= timestamp_to:
+                    break
+
+        sipuni_outbound_calls = []
+        sipuni_inbound_calls = []
+
+        if self.__employee.sipuni_id:
+            timezone = pytz.timezone("Europe/Moscow")
+            date_from = datetime.fromtimestamp(timestamp_from, timezone)
+            date_to = datetime.fromtimestamp(timestamp_to, timezone)
+
+            date_format = "%d.%m.%Y"
+
+            sipuni_outbound_calls.extend(self.__sipuni_client.calls_stats.get(
+                call_type=OUTBOUND_CALL_TYPE,
+                from_number=self.__employee.sipuni_id,
+                state=ANY_CALL_STATE,
+                from_date=date_from.strftime(date_format),
+                to_date=date_to.strftime(date_format)
+            ))
+
+            sipuni_inbound_calls.extend(self.__sipuni_client.calls_stats.get(
+                call_type=INBOUND_CALL_TYPE,
+                from_number=self.__employee.sipuni_id,
+                state=ACCEPTED_CALL_STATE,
+                from_date=date_from.strftime(date_format),
+                to_date=date_to.strftime(date_format)
+            ))
+
+        sipuni_outbound_calls_count = len(list(filter(
+            lambda call: int(call.call_duration) >= 20,
+            sipuni_outbound_calls
+        )))
+
+        sipuni_inbound_calls_count = len(list(filter(
+            lambda call: int(call.talk_duration) >= 20,
+            sipuni_inbound_calls
+        )))
+
+
+        calls_outbound_total_count = len(onpbx_calls_outbound) + sipuni_outbound_calls_count
+        calls_inbound_total_count = len(onpbx_calls_inbound) + sipuni_inbound_calls_count
+        calls_total_count = calls_outbound_total_count + calls_inbound_total_count
+
+        metrics.append(Metrica("Кол-во исходящих звонков", calls_outbound_total_count, 'calls'))
+        metrics.append(Metrica("Кол-во входящих звонков", calls_inbound_total_count, 'calls'))
+        metrics.append(Metrica("Кол-во звонков всего", calls_total_count, 'calls'))
 
         one_call_cost = self.__employee.one_call_cost if self.__employee.one_call_cost else 0
-        calls_total_amount = len(calls_outbound) + len(calls_inbound)
 
         metrics.append(Metrica(
             "Денег за звонки",
-            int(one_call_cost * calls_total_amount),
+            int(one_call_cost * calls_total_count),
             group='calls',
             label='calls_money',
             meta_params={self.META_PARAM_COUNT_IN_TOTAL_SUM: True},
@@ -353,16 +407,29 @@ class SalaryCounter:
 
         return metrics
 
-    def get_detailed_report(self, timestamp_from, timestamp_to):
+    def __get_amocrm_metrics(self, timestamp_from, timestamp_to):
+        metrics = []
+        metrics.extend(self.__get_metrics_for_sales(timestamp_from, timestamp_to))
+        metrics.extend(self.__get_metrics_for_audits(timestamp_from, timestamp_to))
+        metrics.extend(self.__get_metrics_for_outcome_messages(timestamp_from, timestamp_to))
+        return metrics
+
+    async def get_detailed_report(self, timestamp_from, timestamp_to):
         report = Report()
-        report.add_metrics(self.__get_metrics_for_calls(timestamp_from, timestamp_to))
-        report.add_metrics(self.__get_metrics_for_sales(timestamp_from, timestamp_to))
-        report.add_metrics(self.__get_metrics_for_audits(timestamp_from, timestamp_to))
-        report.add_metrics(self.__get_metrics_for_salary(timestamp_from, timestamp_to))
-        report.add_metrics(self.__get_metrics_for_outcome_messages(timestamp_from, timestamp_to))
-        report.add_metrics(
-            self.__get_metrics_for_outcome_email_messages(timestamp_from, timestamp_to)
+        async_requests = [
+            async_wrap(self.__get_metrics_for_calls),
+            async_wrap(self.__get_metrics_for_salary),
+            async_wrap(self.__get_amocrm_metrics),
+            async_wrap(self.__get_metrics_for_outcome_email_messages)
+        ]
+
+        results = await asyncio.gather(
+            *([req(timestamp_from, timestamp_to) for req in async_requests])
         )
+
+        for result in results:
+            report.add_metrics(result)
+
         money_amount = sum([metrica.value for metrica in report.get_metrics_by_meta_param(
             self.META_PARAM_COUNT_IN_TOTAL_SUM, True)])
 
@@ -435,9 +502,6 @@ class SalaryCounter:
             day=1, hour=0, minute=0, second=0).timestamp()
         right_timestamp_border = datetime.fromtimestamp(
             timestamp_to).replace(hour=23, minute=59, second=59).timestamp()
-
-        print("from time", datetime.fromtimestamp(left_timestamp_border, timezone))
-        print("to time", datetime.fromtimestamp(right_timestamp_border))
 
         leads = self.__fetch_all_entities(
             url=self.LEADS_FETCH_URL,
