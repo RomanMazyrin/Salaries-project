@@ -1,4 +1,4 @@
-# Environment variables
+# Application environment variables
 
 - **`SECRET_KEY`** - django SECRET_KEY from settings
 - **`DEBUG`** - 1 or 0. Debug mode in Django
@@ -8,7 +8,8 @@
 - **`DB_PASSWORD`** - Database user password
 - **`DB_HOST`** - Database host
 - **`DB_PORT`** - Database port
-- **`PORT`** - Port listened by server (gunicorn)
+
+For docker environment variables look [Docker section](#Docker-container-environment-variables)
 
 # Preparing before first launch on local machine
 
@@ -62,6 +63,16 @@ Here is a [docker-compose.yml](docker-compose.yml) config example, which is actu
 Before launch you need to do next. It's optional, but you should know about it:
 
 *Set env variables in docker-compose.yml (parameter [**environment**](https://docs.docker.com/compose/compose-file/compose-file-v3/#environment)), or create .env file in the root of project and fill it with actual env variables for docker containers. Don't forget about changing docker-compose.yml config for successfully apply .env file params (parameter [**env_file**](https://docs.docker.com/compose/compose-file/compose-file-v3/#env_file)) for each service*
+
+
+## Docker container environment variables
+
+All application environment variables + below:
+
+- **`NUM_OF_WORKERS`** - Number of workers on gunicorn
+- **`WORKER_TIMEOUT`** - Gunicorn worker request timeout
+- **`WORKER_CONNECTIONS`** - Number of connnections per one gunicorn worker
+- **`PORT`** - Port listened by gunicorn
 
 ## Run
 ```

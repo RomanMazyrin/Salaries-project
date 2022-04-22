@@ -12,7 +12,7 @@ autopep8 = "*"
 django = "*"
 pillow = "*"
 requests = "*"
-gunicorn = "*"
+gunicorn = {extras = ["gevent"], version = "*"}
 psycopg2 = "*"
 whitenoise = "*"
 python-dotenv = "*"
