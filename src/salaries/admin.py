@@ -15,6 +15,7 @@ class EmployeeAdminConfig(admin.ModelAdmin):
 class OnpbxAccountAdminConfig(admin.ModelAdmin):
     pass
 
+
 @admin.register(SipuniAccount)
 class SipuniAccountAdminConfig(admin.ModelAdmin):
     pass

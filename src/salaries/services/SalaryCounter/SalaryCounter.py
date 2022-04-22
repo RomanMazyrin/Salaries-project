@@ -1,7 +1,8 @@
 import json
 import math
 
-from packages.Sipuni.Constants import ACCEPTED_CALL_STATE, ANY_CALL_STATE, INBOUND_CALL_TYPE, OUTBOUND_CALL_TYPE
+from packages.Sipuni.Constants import ACCEPTED_CALL_STATE, ANY_CALL_STATE
+from packages.Sipuni.Constants import INBOUND_CALL_TYPE, OUTBOUND_CALL_TYPE
 from .Metrica import Metrica
 from .Report import Report
 from amocrm_components.ApiIterator import ApiIterator
@@ -11,6 +12,7 @@ import imaplib
 import asyncio
 from functools import wraps, partial
 
+
 def async_wrap(func):
     @wraps(func)
     async def run(*args, loop=None, executor=None, **kwargs):
@@ -18,7 +20,8 @@ def async_wrap(func):
             loop = asyncio.get_event_loop()
         pfunc = partial(func, *args, **kwargs)
         return await loop.run_in_executor(executor, pfunc)
-    return run 
+    return run
+
 
 ONE_WEEK_IN_SECONDS = 604800
 
@@ -98,8 +101,8 @@ class SalaryCounter:
         )
 
         sipuni_outbound_calls_count = len(list(filter(
-                lambda call: int(call.call_duration) >= 20,
-                sipuni_outbound_calls
+            lambda call: int(call.call_duration) >= 20,
+            sipuni_outbound_calls
         )))
 
         sipuni_inbound_calls = self.__sipuni_client.calls_stats.get(
@@ -111,8 +114,8 @@ class SalaryCounter:
         )
 
         sipuni_inbound_calls_count = len(list(filter(
-                lambda call: int(call.talk_duration) >= 20,
-                sipuni_inbound_calls
+            lambda call: int(call.talk_duration) >= 20,
+            sipuni_inbound_calls
         )))
 
         calls_outbound_total_count = len(onpbx_calls_outbound) + sipuni_outbound_calls_count
@@ -417,12 +420,13 @@ class SalaryCounter:
             async_wrap(self.__get_metrics_for_outcome_email_messages)
         ]
 
-        results = await asyncio.gather(*([req(timestamp_from, timestamp_to) for req in async_requests]))
+        results = await asyncio.gather(
+            *([req(timestamp_from, timestamp_to) for req in async_requests])
+        )
 
         for result in results:
             report.add_metrics(result)
-            
-        
+
         money_amount = sum([metrica.value for metrica in report.get_metrics_by_meta_param(
             self.META_PARAM_COUNT_IN_TOTAL_SUM, True)])
 
