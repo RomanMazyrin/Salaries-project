@@ -16,7 +16,6 @@ gunicorn = {extras = ["gevent"], version = "*"}
 psycopg2 = "*"
 whitenoise = "*"
 python-dotenv = "*"
-aiohttp = "*"
 
 [requires]
 python_version = "3.7"
