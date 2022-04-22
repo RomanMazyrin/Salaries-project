@@ -1,3 +1,4 @@
+import asyncio
 from django.http.response import HttpResponse
 from django.views import generic, View
 from django.shortcuts import render, get_object_or_404
@@ -42,8 +43,7 @@ class SalaryResultView(LoginRequiredMixin, View):
         onpbx_client = OnpbxClient(employee.onpbx_account.subdomain, employee.onpbx_account.api_key)
         sipuni_client = employee.sipuni_account.client
         calculator = SalaryCounter(employee, onpbx_client, sipuni_client)
-        report = calculator.get_detailed_report(timestamp_from, timestamp_to)
-
+        report = asyncio.run(calculator.get_detailed_report(timestamp_from, timestamp_to))
         return render(request, "salaries/salary_result.html", {
             "report": report,
             'employee': employee,

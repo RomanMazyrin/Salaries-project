@@ -8,6 +8,17 @@ from amocrm_components.ApiIterator import ApiIterator
 from datetime import datetime
 import pytz
 import imaplib
+import asyncio
+from functools import wraps, partial
+
+def async_wrap(func):
+    @wraps(func)
+    async def run(*args, loop=None, executor=None, **kwargs):
+        if loop is None:
+            loop = asyncio.get_event_loop()
+        pfunc = partial(func, *args, **kwargs)
+        return await loop.run_in_executor(executor, pfunc)
+    return run 
 
 ONE_WEEK_IN_SECONDS = 604800
 
@@ -390,16 +401,28 @@ class SalaryCounter:
 
         return metrics
 
-    def get_detailed_report(self, timestamp_from, timestamp_to):
+    def __get_amocrm_metrics(self, timestamp_from, timestamp_to):
+        metrics = []
+        metrics.extend(self.__get_metrics_for_sales(timestamp_from, timestamp_to))
+        metrics.extend(self.__get_metrics_for_audits(timestamp_from, timestamp_to))
+        metrics.extend(self.__get_metrics_for_outcome_messages(timestamp_from, timestamp_to))
+        return metrics
+
+    async def get_detailed_report(self, timestamp_from, timestamp_to):
         report = Report()
-        report.add_metrics(self.__get_metrics_for_calls(timestamp_from, timestamp_to))
-        report.add_metrics(self.__get_metrics_for_sales(timestamp_from, timestamp_to))
-        report.add_metrics(self.__get_metrics_for_audits(timestamp_from, timestamp_to))
-        report.add_metrics(self.__get_metrics_for_salary(timestamp_from, timestamp_to))
-        report.add_metrics(self.__get_metrics_for_outcome_messages(timestamp_from, timestamp_to))
-        report.add_metrics(
-            self.__get_metrics_for_outcome_email_messages(timestamp_from, timestamp_to)
-        )
+        async_requests = [
+            async_wrap(self.__get_metrics_for_calls),
+            async_wrap(self.__get_metrics_for_salary),
+            async_wrap(self.__get_amocrm_metrics),
+            async_wrap(self.__get_metrics_for_outcome_email_messages)
+        ]
+
+        results = await asyncio.gather(*([req(timestamp_from, timestamp_to) for req in async_requests]))
+
+        for result in results:
+            report.add_metrics(result)
+            
+        
         money_amount = sum([metrica.value for metrica in report.get_metrics_by_meta_param(
             self.META_PARAM_COUNT_IN_TOTAL_SUM, True)])
 
