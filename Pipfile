@@ -9,7 +9,7 @@ flake8 = "*"
 autopep8 = "*"
 
 [packages]
-django = "*"
+django = "==3.2.11"
 pillow = "*"
 requests = "*"
 gunicorn = {extras = ["gevent"], version = "*"}

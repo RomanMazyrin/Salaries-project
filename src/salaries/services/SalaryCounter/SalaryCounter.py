@@ -38,7 +38,7 @@ class SalaryCounter:
 
     COLD_CALLS_PIPELINE_ID = 3636822
 
-    def __init__(self, employee, onpbx_client, sipuni_client):
+    def __init__(self, employee, onpbx_client, sipuni_client=None):
         self.__employee = employee
         self.__onpbx_client = onpbx_client
         self.__sipuni_client = sipuni_client
@@ -47,76 +47,79 @@ class SalaryCounter:
 
         metrics = []
 
-        if not self.__employee.onpbx_id:
-            return metrics
-
         onpbx_calls_outbound = []
         onpbx_calls_inbound = []
 
-        week_boundary_from = timestamp_from
-        week_boundary_to = week_boundary_from + ONE_WEEK_IN_SECONDS
-
-        if week_boundary_to > timestamp_to:
-            week_boundary_to = timestamp_to
-
-        while True:
-
-            onpbx_calls_outbound.extend(self.__onpbx_client.call_history.get(
-                accountcode='outbound',
-                caller_id_number=str(self.__employee.onpbx_id),
-                start_stamp_from=int(week_boundary_from),
-                start_stamp_to=int(week_boundary_to),
-                duration_from=self.__employee.min_call_length + 1
-            ))
-
-            onpbx_calls_inbound.extend(self.__onpbx_client.call_history.get(
-                accountcode='inbound',
-                destination_number=str(self.__employee.onpbx_id),
-                start_stamp_from=int(week_boundary_from),
-                start_stamp_to=int(week_boundary_to),
-                user_talk_time_from=self.__employee.min_call_length + 1
-            ))
-
-            week_boundary_from += ONE_WEEK_IN_SECONDS
-            week_boundary_to += ONE_WEEK_IN_SECONDS
+        if self.__employee.onpbx_id:
+            week_boundary_from = timestamp_from
+            week_boundary_to = week_boundary_from + ONE_WEEK_IN_SECONDS
 
             if week_boundary_to > timestamp_to:
                 week_boundary_to = timestamp_to
 
-            if week_boundary_from >= timestamp_to:
-                break
+            while True:
 
-        timezone = pytz.timezone("Europe/Moscow")
-        date_from = datetime.fromtimestamp(timestamp_from, timezone)
-        date_to = datetime.fromtimestamp(timestamp_to, timezone)
+                onpbx_calls_outbound.extend(self.__onpbx_client.call_history.get(
+                    accountcode='outbound',
+                    caller_id_number=str(self.__employee.onpbx_id),
+                    start_stamp_from=int(week_boundary_from),
+                    start_stamp_to=int(week_boundary_to),
+                    duration_from=self.__employee.min_call_length + 1
+                ))
 
-        date_format = "%d.%m.%Y"
+                onpbx_calls_inbound.extend(self.__onpbx_client.call_history.get(
+                    accountcode='inbound',
+                    destination_number=str(self.__employee.onpbx_id),
+                    start_stamp_from=int(week_boundary_from),
+                    start_stamp_to=int(week_boundary_to),
+                    user_talk_time_from=self.__employee.min_call_length + 1
+                ))
 
-        sipuni_outbound_calls = self.__sipuni_client.calls_stats.get(
-            call_type=OUTBOUND_CALL_TYPE,
-            from_number=self.__employee.sipuni_id,
-            state=ANY_CALL_STATE,
-            from_date=date_from.strftime(date_format),
-            to_date=date_to.strftime(date_format)
-        )
+                week_boundary_from += ONE_WEEK_IN_SECONDS
+                week_boundary_to += ONE_WEEK_IN_SECONDS
+
+                if week_boundary_to > timestamp_to:
+                    week_boundary_to = timestamp_to
+
+                if week_boundary_from >= timestamp_to:
+                    break
+
+        sipuni_outbound_calls = []
+        sipuni_inbound_calls = []
+
+        if self.__employee.sipuni_id:
+            timezone = pytz.timezone("Europe/Moscow")
+            date_from = datetime.fromtimestamp(timestamp_from, timezone)
+            date_to = datetime.fromtimestamp(timestamp_to, timezone)
+
+            date_format = "%d.%m.%Y"
+
+            sipuni_outbound_calls.extend(self.__sipuni_client.calls_stats.get(
+                call_type=OUTBOUND_CALL_TYPE,
+                from_number=self.__employee.sipuni_id,
+                state=ANY_CALL_STATE,
+                from_date=date_from.strftime(date_format),
+                to_date=date_to.strftime(date_format)
+            ))
+
+            sipuni_inbound_calls.extend(self.__sipuni_client.calls_stats.get(
+                call_type=INBOUND_CALL_TYPE,
+                from_number=self.__employee.sipuni_id,
+                state=ACCEPTED_CALL_STATE,
+                from_date=date_from.strftime(date_format),
+                to_date=date_to.strftime(date_format)
+            ))
 
         sipuni_outbound_calls_count = len(list(filter(
             lambda call: int(call.call_duration) >= 20,
             sipuni_outbound_calls
         )))
 
-        sipuni_inbound_calls = self.__sipuni_client.calls_stats.get(
-            call_type=INBOUND_CALL_TYPE,
-            from_number=self.__employee.sipuni_id,
-            state=ACCEPTED_CALL_STATE,
-            from_date=date_from.strftime(date_format),
-            to_date=date_to.strftime(date_format)
-        )
-
         sipuni_inbound_calls_count = len(list(filter(
             lambda call: int(call.talk_duration) >= 20,
             sipuni_inbound_calls
         )))
+
 
         calls_outbound_total_count = len(onpbx_calls_outbound) + sipuni_outbound_calls_count
         calls_inbound_total_count = len(onpbx_calls_inbound) + sipuni_inbound_calls_count

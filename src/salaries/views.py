@@ -41,7 +41,12 @@ class SalaryResultView(LoginRequiredMixin, View):
                                          ).timestamp()
 
         onpbx_client = OnpbxClient(employee.onpbx_account.subdomain, employee.onpbx_account.api_key)
-        sipuni_client = employee.sipuni_account.client
+        
+        sipuni_account = employee.sipuni_account
+        sipuni_client = None
+        if sipuni_account:
+            sipuni_client = sipuni_account.client
+
         calculator = SalaryCounter(employee, onpbx_client, sipuni_client)
         report = asyncio.run(calculator.get_detailed_report(timestamp_from, timestamp_to))
         return render(request, "salaries/salary_result.html", {
