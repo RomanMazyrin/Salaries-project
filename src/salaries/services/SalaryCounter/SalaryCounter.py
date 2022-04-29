@@ -50,6 +50,8 @@ class SalaryCounter:
         onpbx_calls_outbound = []
         onpbx_calls_inbound = []
 
+        min_call_length = self.__employee.min_call_length if self.__employee.min_call_length else 0
+
         if self.__employee.onpbx_id:
             week_boundary_from = timestamp_from
             week_boundary_to = week_boundary_from + ONE_WEEK_IN_SECONDS
@@ -64,7 +66,7 @@ class SalaryCounter:
                     caller_id_number=str(self.__employee.onpbx_id),
                     start_stamp_from=int(week_boundary_from),
                     start_stamp_to=int(week_boundary_to),
-                    duration_from=self.__employee.min_call_length + 1
+                    duration_from=min_call_length + 1
                 ))
 
                 onpbx_calls_inbound.extend(self.__onpbx_client.call_history.get(
@@ -72,7 +74,7 @@ class SalaryCounter:
                     destination_number=str(self.__employee.onpbx_id),
                     start_stamp_from=int(week_boundary_from),
                     start_stamp_to=int(week_boundary_to),
-                    user_talk_time_from=self.__employee.min_call_length + 1
+                    user_talk_time_from=min_call_length + 1
                 ))
 
                 week_boundary_from += ONE_WEEK_IN_SECONDS
@@ -111,15 +113,14 @@ class SalaryCounter:
             ))
 
         sipuni_outbound_calls_count = len(list(filter(
-            lambda call: int(call.call_duration) >= 20,
+            lambda call: int(call.call_duration) >= min_call_length,
             sipuni_outbound_calls
         )))
 
         sipuni_inbound_calls_count = len(list(filter(
-            lambda call: int(call.talk_duration) >= 20,
+            lambda call: int(call.talk_duration) >= min_call_length,
             sipuni_inbound_calls
         )))
-
 
         calls_outbound_total_count = len(onpbx_calls_outbound) + sipuni_outbound_calls_count
         calls_inbound_total_count = len(onpbx_calls_inbound) + sipuni_inbound_calls_count

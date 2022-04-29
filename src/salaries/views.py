@@ -41,7 +41,7 @@ class SalaryResultView(LoginRequiredMixin, View):
                                          ).timestamp()
 
         onpbx_client = OnpbxClient(employee.onpbx_account.subdomain, employee.onpbx_account.api_key)
-        
+
         sipuni_account = employee.sipuni_account
         sipuni_client = None
         if sipuni_account:
