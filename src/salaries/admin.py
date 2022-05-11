@@ -8,7 +8,8 @@ from .models import Setting
 
 @admin.register(Employee)
 class EmployeeAdminConfig(admin.ModelAdmin):
-    list_display = ('name',)
+    list_display = ('name', 'is_active')
+    list_editable = ('is_active',)
 
 
 @admin.register(OnpbxAccount)

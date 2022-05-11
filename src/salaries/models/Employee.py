@@ -89,6 +89,13 @@ class Employee(models.Model):
         validators=[MinValueValidator(0)]
     )
 
+    is_active = models.BooleanField(
+        'Активен',
+        blank=False,
+        null=False,
+        default=True
+    )
+
     class Meta:
         verbose_name = 'Сотрудник'
         verbose_name_plural = 'Сотрудники'
