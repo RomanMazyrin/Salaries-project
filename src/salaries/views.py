@@ -16,10 +16,14 @@ from .services.DateIntervals.DashboardDateInterval import create_interval
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 
+def get_all_active_employees():
+    return Employee.objects.filter(is_active=True).order_by("pk").all()
+
+
 class IndexView(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self):
-        return Employee.objects.order_by("pk").all()
+        return get_all_active_employees()
 
 
 class SalaryResultView(LoginRequiredMixin, View):
@@ -96,7 +100,7 @@ class SalesPlanView(View):
         )
 
         leads_total_sales = {}
-        employees = Employee.objects.order_by("pk").all()
+        employees = get_all_active_employees()
 
         for lead in f.get_next():
             employee_id = lead['responsible_user_id']
