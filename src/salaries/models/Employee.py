@@ -96,6 +96,13 @@ class Employee(models.Model):
         default=True
     )
 
+    show_in_sales_plan = models.BooleanField(
+        'Показывать в плане продаж',
+        blank=False,
+        null=False,
+        default=True
+    )
+
     class Meta:
         verbose_name = 'Сотрудник'
         verbose_name_plural = 'Сотрудники'
