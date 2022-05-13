@@ -17,13 +17,13 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 
 
 def get_all_active_employees():
-    return Employee.objects.filter(is_active=True).order_by("pk").all()
+    return Employee.objects.filter(is_active=True).order_by("pk")
 
 
 class IndexView(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self):
-        return get_all_active_employees()
+        return get_all_active_employees().all()
 
 
 class SalaryResultView(LoginRequiredMixin, View):
@@ -100,7 +100,7 @@ class SalesPlanView(View):
         )
 
         leads_total_sales = {}
-        employees = get_all_active_employees()
+        employees = get_all_active_employees().filter(show_in_sales_plan=True).all()
 
         for lead in f.get_next():
             employee_id = lead['responsible_user_id']
