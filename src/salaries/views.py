@@ -1,15 +1,19 @@
 import asyncio
+from django.forms import ModelForm
 from django.http.response import HttpResponse
 from django.views import generic, View
+from django.views.generic import DetailView
+from django.views.generic.edit import CreateView
 from django.shortcuts import render, get_object_or_404
 
 from amocrm_components.ApiIterator import ApiIterator
+from salaries.models.SalaryReport import SalaryReport
 from .models import Employee
 from datetime import datetime
 from packages.Onlinepbx.Client import Client as OnpbxClient
-from .services.SalaryCounter.SalaryCounter import SalaryCounter
+from salaries.services.SalaryCounter import SalaryCounter
 import pytz
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 import json
 import math
 from .services.DateIntervals.DashboardDateInterval import create_interval
@@ -21,28 +25,119 @@ def get_all_active_employees():
 
 
 class IndexView(LoginRequiredMixin, generic.ListView):
-
     def get_queryset(self):
         return get_all_active_employees().all()
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        print(context)
+        if self.request.user.is_superuser or self.request.user.is_staff:
+            if context['object_list']:
+                context['show_employees_calculate_form'] = True
 
-class SalaryResultView(LoginRequiredMixin, View):
+        return context
+
+
+class MyReportsListView(LoginRequiredMixin, generic.ListView):
+
+    template_name = 'salaries/salary_report_list.html'
+    table_fields = ('__str__', 'created_at', 'status')
+    context_object_name = 'reports_list'
+
+    def get_queryset(self):
+        return (
+            SalaryReport.objects
+            .filter(employee=self.request.user.employee)
+            .order_by('created_at')
+            .all()
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['table_fields'] = self.table_fields
+        return context
+
+
+class SalaryReportCreateView(LoginRequiredMixin, CreateView):
+    model = SalaryReport
+
+    fields = [
+        field.name for field in SalaryReport._meta.get_fields()
+        if field.name not in ['slug_id', 'id'] and field.editable
+    ]
+
+    template_name = 'salaries/salary_report_detail.html'
+
+
+class SalaryReportView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+
+    model = SalaryReport
+    template_name = 'salaries/salary_report_detail.html'
+    slug_field = 'slug_id'
+    slug_url_kwarg = 'report_slug'
+    context_object_name = 'report'
+
+    def test_func(self):
+        user = self.request.user
+        report_query = {}
+        report_query[self.slug_field] = self.kwargs[self.slug_url_kwarg]
+        report = SalaryReport.objects.get(**report_query)
+        result_condition = user.is_superuser or user.has_perm('salaries.view_salaryreport')
+        if report:
+            report_user = report.employee.user
+            if report_user:
+                result_condition = result_condition or report.employee.user.id == user.id
+        return result_condition
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        request = self.request
+        context['report_link'] = "%s://%s%s" % (
+            request.scheme,
+            request.META['HTTP_HOST'],
+            self.object.get_absolute_url()
+        )
+        return context
+
+
+class SalaryReportForm(ModelForm):
+    class Meta:
+        model = SalaryReport
+        fields = '__all__'
+        exclude = ['slug_id']
+
+
+class SalaryResultView(LoginRequiredMixin, UserPassesTestMixin, View):
+
+    def test_func(self):
+        user = self.request.user
+        result_condition = user.is_superuser or user.is_staff
+        if not result_condition:
+            employee = Employee.objects.get(pk=self.request.POST['employee_id'])
+            result_condition = user.employee == employee
+
+        return result_condition
 
     def post(self, request, *args, **kwargs):
 
-        employee = get_object_or_404(Employee, pk=kwargs['employee_id'])
+        employee = get_object_or_404(Employee, pk=request.POST['employee_id'])
 
         timezone = pytz.timezone("Europe/Moscow")
 
-        timestamp_from = timezone.localize(datetime
-                                           .fromisoformat(request.POST['date_from'])
-                                           .replace(hour=0, minute=0, second=0)
-                                           ).timestamp()
+        dt_from = timezone.localize(
+            datetime
+            .fromisoformat(request.POST['date_from'])
+            .replace(hour=0, minute=0, second=0)
+        )
 
-        timestamp_to = timezone.localize(datetime
-                                         .fromisoformat(request.POST['date_to'])
-                                         .replace(hour=23, minute=59, second=59)
-                                         ).timestamp()
+        dt_to = timezone.localize(
+            datetime
+            .fromisoformat(request.POST['date_to'])
+            .replace(hour=0, minute=0, second=0)
+        )
+
+        timestamp_from = dt_from.timestamp()
+        timestamp_to = dt_to.timestamp()
 
         onpbx_client = OnpbxClient(employee.onpbx_account.subdomain, employee.onpbx_account.api_key)
 
@@ -53,11 +148,13 @@ class SalaryResultView(LoginRequiredMixin, View):
 
         calculator = SalaryCounter(employee, onpbx_client, sipuni_client)
         report = asyncio.run(calculator.get_detailed_report(timestamp_from, timestamp_to))
+        report.employee = employee
+        report.date_from = dt_from
+        report.date_to = dt_to
+
         return render(request, "salaries/salary_result.html", {
             "report": report,
-            'employee': employee,
-            'from': request.POST['date_from'],
-            'to': request.POST['date_to']
+            'save_form': SalaryReportForm(instance=report)
         })
 
 

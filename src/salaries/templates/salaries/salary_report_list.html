@@ -1,0 +1,46 @@
+{% extends "./../base.html" %}
+{% load static %}
+{% block title %} Reports list {% endblock title %}
+
+{% block head_assets %}
+<link rel="stylesheet" href="{% static 'mazer_assets/css/pages/simple-datatables.css' %}">
+{% endblock head_assets %}
+
+{% block content %}
+
+<section class="section">
+    <div class="card">
+        <div class="card-header">
+            Salary reports
+        </div>
+        <div class="card-body">
+            <table class="table table-striped" id="table1">
+                <thead>
+                    <tr>
+                        <th>Created at</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in reports_list %}
+                    <tr>
+                        <td>
+                            <a href='{{ report.get_absolute_url }}'>{{ report.created_at|date:"d.m.Y, H:i" }}</a>
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ report.get_report_status_css_class }}">{{ report.get_status_display }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</section>
+
+{% endblock content %}
+
+{% block scripts_assets %}
+<script src="{% static 'mazer_assets/js/extensions/simple-datatables.js' %}"></script>
+{% endblock scripts_assets %}

@@ -44,8 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'salaries.apps.SalariesConfig',
-    'auth_pages.apps.AuthPagesConfig'
+    'salaries.apps.SalariesConfig'
 ]
 
 MIDDLEWARE = [

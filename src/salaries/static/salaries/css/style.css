@@ -6,3 +6,7 @@ body {
     font-size: 25px;
     font-weight: 500;
 }
+
+.hidden {
+    display: none !important;
+}
