@@ -47,7 +47,7 @@ class SalaryReportAdminConfig(admin.ModelAdmin):
         formatted_date = obj.created_at.strftime('%d.%m.%Y (%H:%M)')
         return f"{obj.id}. {obj.employee.name}, {formatted_date}"
 
-    @admin.display(empty_value=None)
+    @admin.display(empty_value=None, description='Итоговая сумма')
     def final_money(self, obj):
         metrica = obj.get_metrica_by('label', 'salary')
         if metrica:
