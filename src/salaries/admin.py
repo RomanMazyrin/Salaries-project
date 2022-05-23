@@ -47,8 +47,16 @@ class SalaryReportAdminConfig(admin.ModelAdmin):
         formatted_date = obj.created_at.strftime('%d.%m.%Y (%H:%M)')
         return f"{obj.id}. {obj.employee.name}, {formatted_date}"
 
+    @admin.display(empty_value=None)
+    def final_money(self, obj):
+        metrica = obj.get_metrica_by('label', 'salary')
+        if metrica:
+            return f"{metrica.value:,}"
+        return None
+
     readonly_fields = ('slug_id',)
-    list_display = ('instance_name', 'date_from', 'date_to', 'status')
+    list_display = ('instance_name', 'date_from', 'date_to', 'status', 'final_money')
+    list_editable = ('status',)
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(SalaryReportAdminConfig, self).get_form(request, obj, **kwargs)

@@ -1,10 +1,18 @@
 import pytest
-from salaries.models.SalaryReport import SalaryReport, Metrica
+from salaries.models.SalaryReport import SalaryReport, Metrica, MetricsCollection
 
 
 @pytest.fixture
 def report():
     return SalaryReport()
+
+
+@pytest.fixture
+def metrics_collection():
+    collection = MetricsCollection()
+    collection.add(Metrica('hello', 'world', label='money'))
+    collection.add(Metrica('test', 'just', label='not money'))
+    return collection
 
 
 def test_adding_metrica(report: SalaryReport):
@@ -25,3 +33,8 @@ def test_adding_metrica(report: SalaryReport):
 
     with pytest.raises(TypeError):
         report.add_metrica("hello")
+
+
+def test_getting_metrica(metrics_collection: MetricsCollection):
+    assert metrics_collection.get_by('label', 'money').value == 'world'
+    assert metrics_collection.get_by('label', 'not money').value == 'just'

@@ -88,6 +88,12 @@ class MetricsCollection:
     def len(self):
         return len(self._items)
 
+    def get_by(self, key, value):
+        for item in self._items:
+            if getattr(item, key) == value:
+                return item
+        return None
+
     @classmethod
     def from_list(cls, list):
         collection = cls()
@@ -181,6 +187,13 @@ class SalaryReport(models.Model):
 
     def count_metrics(self):
         return self.__get_metrics_as_collection().len()
+
+    def get_metrica_by(self, key, value):
+        metrics = self.__get_metrics_as_collection()
+        metrica = metrics.get_by(key, value)
+        if metrica:
+            return metrica
+        return None
 
     def get_absolute_url(self):
         return reverse("salaries:salary_report_view", kwargs={
