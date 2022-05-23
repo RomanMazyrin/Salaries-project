@@ -30,7 +30,6 @@ class IndexView(LoginRequiredMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        print(context)
         if self.request.user.is_superuser or self.request.user.is_staff:
             if context['object_list']:
                 context['show_employees_calculate_form'] = True
@@ -48,7 +47,7 @@ class MyReportsListView(LoginRequiredMixin, generic.ListView):
         return (
             SalaryReport.objects
             .filter(employee=self.request.user.employee)
-            .order_by('created_at')
+            .order_by('-created_at')
             .all()
         )
 
