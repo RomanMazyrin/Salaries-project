@@ -6,7 +6,8 @@ from .models import OnpbxAccount
 from .models import Setting
 from .models import SalaryReport
 from django.contrib.admin import BooleanFieldListFilter
-
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
 
 class IsActiveFilter(BooleanFieldListFilter):
     def queryset(self, request, queryset):
@@ -62,3 +63,14 @@ class SalaryReportAdminConfig(admin.ModelAdmin):
         form = super(SalaryReportAdminConfig, self).get_form(request, obj, **kwargs)
         form.base_fields['employee'].queryset = Employee.objects.filter(is_active=True)
         return form
+
+
+class EmployeeInline(admin.StackedInline):
+    model = Employee
+
+
+admin.site.unregister(User)
+
+@admin.register(User)
+class CustomUserAdmin(UserAdmin):
+    inlines = [EmployeeInline]
