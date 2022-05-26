@@ -4,9 +4,9 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-pytest = "*"
 flake8 = "*"
 autopep8 = "*"
+pytest = "*"
 
 [packages]
 django = "==3.2.11"
@@ -16,6 +16,7 @@ gunicorn = {extras = ["gevent"], version = "*"}
 psycopg2 = "*"
 whitenoise = "*"
 python-dotenv = "*"
+pytest-django = "*"
 
 [requires]
 python_version = "3.7"

@@ -1,11 +1,14 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.contrib.auth.models import User
 
 from salaries.models.SipuniAccount import SipuniAccount
 from .OnpbxAccount import OnpbxAccount
 
 
 class Employee(models.Model):
+
+    user = models.OneToOneField(User, on_delete=models.DO_NOTHING, null=True, blank=True)
 
     onpbx_id = models.IntegerField(blank=True, null=True, validators=[
                                    MaxValueValidator(999), MinValueValidator(100)])
@@ -102,6 +105,9 @@ class Employee(models.Model):
         null=False,
         default=True
     )
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         verbose_name = 'Сотрудник'

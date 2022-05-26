@@ -5,7 +5,17 @@ from . import views
 app_name = "salaries"
 
 urlpatterns = [
-    path('', views.IndexView.as_view(), name='index'),
-    path('salary-result/<int:employee_id>', views.SalaryResultView.as_view(), name='salary_result'),
-    path('sales-plan-progress', views.SalesPlanView.as_view(), name='sales_plan_progress')
+    path('', views.IndexView.as_view(template_name="salaries/main.html"), name='index'),
+    path('my-reports-list', views.MyReportsListView.as_view(), name='my_reports_list'),
+    path('salary-result', views.SalaryResultView.as_view(), name='salary_result'),
+    path('sales-plan-progress', views.SalesPlanView.as_view(), name='sales_plan_progress'),
+
+    path(
+        'salary-report/create',
+        views.SalaryReportCreateView.as_view(),
+        name='salary_report_create'
+    ),
+
+    path('salary-report/view/<slug:report_slug>',
+         views.SalaryReportView.as_view(), name='salary_report_view')
 ]

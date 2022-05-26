@@ -44,8 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'salaries.apps.SalariesConfig',
-    'auth_pages.apps.AuthPagesConfig'
+    'salaries.apps.SalariesConfig'
 ]
 
 MIDDLEWARE = [
@@ -64,7 +63,7 @@ ROOT_URLCONF = 'app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

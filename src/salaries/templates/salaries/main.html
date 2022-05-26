@@ -1,0 +1,131 @@
+{% extends "./../base.html" %}
+{% load static %}
+
+{% block content %}
+
+    <div class="row">
+        {% if show_employees_calculate_form %}
+            <div class="col-md-6 col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Employee salary calculator</h4>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-body">
+                            <form class="form form-horizontal show-loader" action="{% url 'salaries:salary_result' %}" method="POST">
+
+                                {% csrf_token %}
+
+                                <div class="form-body">
+                                    <div class="row">
+
+                                        <div class="col-md-4">
+                                            <label>Employee</label>
+                                        </div>
+                                        <div class="col-md-8 form-group">
+                                            <select class="choices form-select" name="employee_id" required>
+                                                <option value=""> --- Не выбран --- </option>
+
+                                                {% for employee in employee_list %}
+                                                <option value="{{ employee.id }}">{{ employee.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label>Date from</label>
+                                        </div>
+                                        <div class="col-md-8 form-group">
+                                            <input type="date" class="form-control" name="date_from" required>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label>Date to</label>
+                                        </div>
+                                        <div class="col-md-8 form-group">
+                                            <input type="date" class="form-control" name="date_to" required>
+                                        </div>
+
+                                        <div class="col-sm-12 d-flex justify-content-end">
+                                            <button type="submit" class="btn btn-primary me-1 mb-1">
+                                                <span class="spinner-border spinner-border-sm hidden" role="status" aria-hidden="true"></span>
+                                                Calculate
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if user.employee %}
+            <div class="col-md-6 col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Calculate self salary</h4>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-body">
+                            <form class="form form-horizontal show-loader" action="{% url 'salaries:salary_result' %}" method="POST">
+
+                                {% csrf_token %}
+
+                                <div class="form-body">
+                                    <div class="row">
+
+                                        <input type="hidden" name="employee_id" value="{{ user.employee.id }}">
+
+                                        <div class="col-md-4">
+                                            <label>Date from</label>
+                                        </div>
+                                        <div class="col-md-8 form-group">
+                                            <input type="date" class="form-control" name="date_from" required>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label>Date to</label>
+                                        </div>
+                                        <div class="col-md-8 form-group">
+                                            <input type="date" class="form-control" name="date_to" required>
+                                        </div>
+
+                                        <div class="col-sm-12 d-flex justify-content-end">
+                                            <button type="submit" class="btn btn-primary me-1 mb-1">
+                                                <span class="spinner-border spinner-border-sm hidden" role="status" aria-hidden="true"></span>
+                                                Calculate
+                                            </button>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <button type="buton" id="modal-activator" class="btn btn-primary me-1 mb-1 hidden" data-bs-toggle="modal" data-bs-target="#loader">Calculate</button>
+
+    <div class="modal text-center" id="loader" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img src="{% static 'mazer_assets/images/svg-loaders/circles.svg' %}" class="me-4" style="width: 5rem" alt="audio">
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+{% block scripts_assets %}
+<script src="{% static 'salaries/js/main_page.js' %}"></script>
+{% endblock scripts_assets %}

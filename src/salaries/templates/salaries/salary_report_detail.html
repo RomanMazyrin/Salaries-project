@@ -1,0 +1,32 @@
+{% extends './../base.html' %}
+
+{% block title %} 
+    {{ report.employee.name }} с {{ report.date_from|date:"d.m.Y" }} по {{ report.date_to|date:"d.m.Y" }}
+{% endblock title %}
+
+{% block content%}
+
+<section class="section">
+    <div class="row">
+        <div class="col-6 offset-3">
+            
+            <div class="card">
+                <div class="card-header">
+                    Report link
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-light-info color-info">
+                        <i class="bi-globe"></i>
+                        <a href="{{ report_link }}" style="margin-left: 10px;">{{ report_link }}</a>
+                    </div>
+                </div>
+            </div>
+
+            {% include "./salary_report_table.html" %}
+
+
+        </div>
+    </div>
+</section>
+
+{% endblock content %}
