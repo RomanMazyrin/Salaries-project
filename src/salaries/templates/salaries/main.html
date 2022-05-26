@@ -1,4 +1,5 @@
 {% extends "./../base.html" %}
+{% load static %}
 
 {% block content %}
 
@@ -11,7 +12,7 @@
                     </div>
                     <div class="card-content">
                         <div class="card-body">
-                            <form class="form form-horizontal" action="{% url 'salaries:salary_result' %}" method="POST">
+                            <form class="form form-horizontal show-loader" action="{% url 'salaries:salary_result' %}" method="POST">
 
                                 {% csrf_token %}
 
@@ -66,7 +67,7 @@
                     </div>
                     <div class="card-content">
                         <div class="card-body">
-                            <form class="form form-horizontal" action="{% url 'salaries:salary_result' %}" method="POST">
+                            <form class="form form-horizontal show-loader" action="{% url 'salaries:salary_result' %}" method="POST">
 
                                 {% csrf_token %}
 
@@ -93,6 +94,7 @@
                                             <button type="submit" class="btn btn-primary me-1 mb-1">Calculate</button>
                                         </div>
 
+
                                     </div>
                                 </div>
                             </form>
@@ -103,5 +105,21 @@
         {% endif %}
     </div>
 
+    <button type="buton" id="modal-activator" class="btn btn-primary me-1 mb-1 hidden" data-bs-toggle="modal" data-bs-target="#loader">Calculate</button>
+
+    <div class="modal text-center" id="loader" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img src="{% static 'mazer_assets/images/svg-loaders/circles.svg' %}" class="me-4" style="width: 5rem" alt="audio">
+                </div>
+                
+            </div>
+        </div>
+    </div>
 
 {% endblock content %}
+
+{% block scripts_assets %}
+<script src="{% static 'salaries/js/main_page.js' %}"></script>
+{% endblock scripts_assets %}
