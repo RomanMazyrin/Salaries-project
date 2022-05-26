@@ -200,6 +200,12 @@ class SalaryReport(models.Model):
             "report_slug": self.slug_id
         })
 
+    def get_total_money(self):
+        metrica = self.get_metrica_by('label', 'salary')
+        if metrica:
+            return f"{metrica.value:,}"
+        return None
+
     def __str__(self):
         formatted_date = self.created_at.strftime('%d.%m.%Y (%H:%M)')
         return f"{self.id}. {self.employee.name}, {formatted_date}"

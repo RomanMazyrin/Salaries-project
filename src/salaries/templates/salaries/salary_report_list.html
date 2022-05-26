@@ -19,6 +19,7 @@
                     <tr>
                         <th>Created at</th>
                         <th>Status</th>
+                        <th>Total money</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -29,6 +30,9 @@
                         </td>
                         <td>
                             <span class="badge bg-{{ report.get_report_status_css_class }}">{{ report.get_status_display }}</span>
+                        </td>
+                        <td>
+                            {{ report.get_total_money|default:0 }}
                         </td>
                     </tr>
                     {% endfor %}

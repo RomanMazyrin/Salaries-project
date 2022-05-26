@@ -44,12 +44,16 @@ class MyReportsListView(LoginRequiredMixin, generic.ListView):
     context_object_name = 'reports_list'
 
     def get_queryset(self):
-        return (
-            SalaryReport.objects
-            .filter(employee=self.request.user.employee)
-            .order_by('-created_at')
-            .all()
-        )
+        try:
+            u_employee = self.request.user.employee
+            return (
+                SalaryReport.objects
+                .filter(employee=u_employee)
+                .order_by('-created_at')
+                .all()
+            )
+        except Employee.DoesNotExist:
+            return None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

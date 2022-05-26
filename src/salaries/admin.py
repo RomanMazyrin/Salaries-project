@@ -49,14 +49,12 @@ class SalaryReportAdminConfig(admin.ModelAdmin):
         return f"{obj.id}. {obj.employee.name}, {formatted_date}"
 
     @admin.display(empty_value=None, description='Итоговая сумма')
-    def final_money(self, obj):
-        metrica = obj.get_metrica_by('label', 'salary')
-        if metrica:
-            return f"{metrica.value:,}"
-        return None
+    def total_money(self, obj):
+        return obj.get_total_money()
+        
 
     readonly_fields = ('slug_id',)
-    list_display = ('instance_name', 'date_from', 'date_to', 'status', 'final_money')
+    list_display = ('instance_name', 'date_from', 'date_to', 'status', 'total_money')
     list_editable = ('status',)
 
     def get_form(self, request, obj=None, **kwargs):
