@@ -1,7 +1,8 @@
 document.querySelectorAll('form.show-loader').forEach(function(form) {
     form.addEventListener('submit', function(e) {
-        console.log('submitted');
         document.getElementById('modal-activator').click();
-        form.querySelector('button[type="submit"]').setAttribute('disabled', true);
+        var button = form.querySelector('button[type="submit"]');
+        button.setAttribute('disabled', true);
+        button.querySelector('.spinner-border').classList.remove('hidden');
     });
 });
