@@ -436,7 +436,8 @@ class SalaryCounter:
         report.add_metrica(Metrica(
             "Денег всего",
             money_amount,
-            class_name=self.TOTAL_MONEY_CLASS_NAME
+            class_name=self.TOTAL_MONEY_CLASS_NAME,
+            label='total_money'
         ))
 
         return report

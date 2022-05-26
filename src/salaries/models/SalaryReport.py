@@ -201,7 +201,7 @@ class SalaryReport(models.Model):
         })
 
     def get_total_money(self):
-        metrica = self.get_metrica_by('label', 'salary')
+        metrica = self.get_metrica_by('label', 'total_money')
         if metrica:
             return f"{metrica.value:,}"
         return None
