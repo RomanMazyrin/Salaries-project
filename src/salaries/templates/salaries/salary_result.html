@@ -1,27 +1,15 @@
-{% extends './../base.html' %}
+{% extends './salary_report_base.html' %}
 
-{% block title %} 
-    {{ report.employee.name }} с {{ report.date_from|date:"d.m.Y" }} по {{ report.date_to|date:"d.m.Y" }}
-{% endblock title %}
+{% block report_content %}
 
-{% block content%}
+    {% include "./salary_report_table.html" %}
 
-<section class="section">
-    <div class="row">
-        <div class="col-6 offset-3">
-            
-            {% include "./salary_report_table.html" %}
-
-            <form method="POST" action="{% url 'salaries:salary_report_create' %}">
-                {% csrf_token %}
-                <div class="hidden">
-                    {{ save_form }}
-                </div>
-                <button class="btn btn-success" type="submit">Save report</button>
-            </form>
-
+    <form method="POST" action="{% url 'salaries:salary_report_create' %}">
+        {% csrf_token %}
+        <div class="hidden">
+            {{ save_form }}
         </div>
-    </div>
-</section>
+        <button class="btn btn-success" type="submit">Save report</button>
+    </form>
 
-{% endblock content %}
+{% endblock report_content %}
