@@ -407,6 +407,43 @@ class SalaryCounter:
 
         return metrics
 
+    def __get_metrics_for_license_activations(self, timestamp_from, timestamp_to):
+        metrics = []
+
+        if not self.__employee.license_activation_cost:
+            return metrics
+
+        leads = self.__fetch_all_entities(
+            url=self.LEADS_FETCH_URL,
+            params={
+                'auth_key': self.AUTH_KEY,
+                "filter": json.dumps({
+                    "closed_at": {
+                        "from": timestamp_from,
+                        "to": timestamp_to
+                    },
+                    "statuses": [
+                        {"status_id": 142, "pipeline_id": 1212574}
+                    ]
+                })
+            },
+            entity_type='leads',
+            fetch_limit=50
+        )
+
+        metrics.append(Metrica("Лицензий активировано", len(leads), 'license_activations'))
+
+        metrics.append(Metrica(
+            "Денег за активацию лицензий",
+            self.__employee.license_activation_cost * len(leads),
+            group='license_activations',
+            label='license_activations_money',
+            meta_params={self.META_PARAM_COUNT_IN_TOTAL_SUM: True},
+            class_name=self.METRICA_MONEY_CLASS_NAME
+        ))
+
+        return metrics
+
     def __get_amocrm_metrics(self, timestamp_from, timestamp_to):
         metrics = []
         metrics.extend(self.__get_metrics_for_sales(timestamp_from, timestamp_to))
@@ -420,7 +457,8 @@ class SalaryCounter:
             async_wrap(self.__get_metrics_for_calls),
             async_wrap(self.__get_metrics_for_salary),
             async_wrap(self.__get_amocrm_metrics),
-            async_wrap(self.__get_metrics_for_outcome_email_messages)
+            async_wrap(self.__get_metrics_for_outcome_email_messages),
+            async_wrap(self.__get_metrics_for_license_activations),
         ]
 
         results = await asyncio.gather(

@@ -8,6 +8,7 @@ from .models import SalaryReport
 from django.contrib.admin import BooleanFieldListFilter
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
+from django.utils.safestring import mark_safe
 
 class IsActiveFilter(BooleanFieldListFilter):
     def queryset(self, request, queryset):
@@ -51,10 +52,14 @@ class SalaryReportAdminConfig(admin.ModelAdmin):
     @admin.display(empty_value=None, description='Итоговая сумма')
     def total_money(self, obj):
         return obj.get_total_money()
-        
+
+    @admin.display(empty_value=None, description='Ссылка')
+    def view_on_site_link(self, obj):
+        url = obj.get_absolute_url()
+        return mark_safe(f'<a href="{url}" target="_blank">Смотреть</a>')
 
     readonly_fields = ('slug_id',)
-    list_display = ('instance_name', 'date_from', 'date_to', 'status', 'total_money')
+    list_display = ('instance_name', 'created_at', 'date_from', 'date_to', 'status', 'total_money', 'view_on_site_link')
     list_editable = ('status',)
 
     def get_form(self, request, obj=None, **kwargs):

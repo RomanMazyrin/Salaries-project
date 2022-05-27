@@ -61,6 +61,14 @@ class Employee(models.Model):
         validators=[MinValueValidator(0)]
     )
 
+    license_activation_cost = models.IntegerField(
+        'Стоимость за активацию лицензии',
+        blank=True,
+        null=True,
+        default=0,
+        validators=[MinValueValidator(0)]
+    )
+
     audit_cost = models.IntegerField(
         'Стоимость аудита',
         blank=True,

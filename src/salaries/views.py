@@ -136,7 +136,7 @@ class SalaryResultView(LoginRequiredMixin, UserPassesTestMixin, View):
         dt_to = timezone.localize(
             datetime
             .fromisoformat(request.POST['date_to'])
-            .replace(hour=0, minute=0, second=0)
+            .replace(hour=23, minute=59, second=59)
         )
 
         timestamp_from = dt_from.timestamp()

@@ -127,17 +127,20 @@ class SalaryReport(models.Model):
     NOT_CONFIRMED = 'NOT_CONFIRMED'
     CONFIRMED_FOR_PAYMENT = 'CONFIRMED_FOR_PAYMENT'
     PAID = 'PAID'
+    DECLINED = 'DECLINED'
 
     REPORT_STATUSES = [
         (NOT_CONFIRMED, 'Не подтвержден'),
         (CONFIRMED_FOR_PAYMENT, 'Подтвержден для оплаты'),
         (PAID, 'Оплачен'),
+        (DECLINED, 'Отклонен')
     ]
 
     REPORT_STATUSES_CSS_CLASSES = {
         NOT_CONFIRMED: "secondary",
         CONFIRMED_FOR_PAYMENT: 'warning',
-        PAID: 'success'
+        PAID: 'success',
+        DECLINED: 'danger'
     }
 
     employee = models.ForeignKey(Employee, on_delete=models.DO_NOTHING, null=False)
