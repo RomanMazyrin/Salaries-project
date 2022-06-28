@@ -17,6 +17,7 @@ psycopg2 = "*"
 whitenoise = "*"
 python-dotenv = "*"
 pytest-django = "*"
+django-prometheus = "*"
 
 [requires]
 python_version = "3.7"

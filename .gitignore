@@ -8,3 +8,4 @@ src/static/
 .env
 .ignore
 .vscode/
+src/prometheus_metrics/*
