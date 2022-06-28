@@ -1,4 +1,3 @@
-import asyncio
 from django.forms import ModelForm
 from django.http.response import HttpResponse
 from django.views import generic, View
@@ -150,7 +149,7 @@ class SalaryResultView(LoginRequiredMixin, UserPassesTestMixin, View):
             sipuni_client = sipuni_account.client
 
         calculator = SalaryCounter(employee, onpbx_client, sipuni_client)
-        report = asyncio.run(calculator.get_detailed_report(timestamp_from, timestamp_to))
+        report = calculator.get_detailed_report(timestamp_from, timestamp_to)
         report.employee = employee
         report.date_from = dt_from
         report.date_to = dt_to
