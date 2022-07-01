@@ -3,7 +3,8 @@
 .pytest_cache
 __pycache__
 db.sqlite3
-src/uploads/
+src/uploads/**
+!src/uploads/.gitkeep
 src/static/
 .env
 .ignore
