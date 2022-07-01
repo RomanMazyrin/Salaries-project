@@ -25,10 +25,20 @@ class SalaryCounter:
 
     COLD_CALLS_PIPELINE_ID = 3636822
 
-    def __init__(self, employee, onpbx_client, sipuni_client=None):
+    def __init__(self, employee):
         self.__employee = employee
-        self.__onpbx_client = onpbx_client
-        self.__sipuni_client = sipuni_client
+
+        onpbx_account = employee.onpbx_account
+        sipuni_account = employee.sipuni_account
+
+        self.__onpbx_client = None
+        self.__sipuni_client = None
+
+        if onpbx_account:
+            self.__onpbx_client = onpbx_account.client
+
+        if sipuni_account:
+            self.__sipuni_client = sipuni_account.client
 
     def __get_metrics_for_calls(self, timestamp_from, timestamp_to):
 

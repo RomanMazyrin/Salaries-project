@@ -1,5 +1,5 @@
 from django.db import models
-
+from packages.Onlinepbx.Client import Client
 
 class OnpbxAccount(models.Model):
 
@@ -12,3 +12,7 @@ class OnpbxAccount(models.Model):
     class Meta:
         verbose_name = 'Аккаунт OnlinePBX'
         verbose_name_plural = 'Аккаунты OnlinePBX'
+
+    @property
+    def client(self):
+        return Client(self.subdomain, self.secret_key)
