@@ -17,6 +17,7 @@ psycopg2 = "*"
 whitenoise = "*"
 python-dotenv = "*"
 pytest-django = "*"
+xlsxwriter = "*"
 
 [requires]
 python_version = "3.7"

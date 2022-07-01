@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.http import HttpResponse
 
 from salaries.models.SipuniAccount import SipuniAccount
 from .models import Employee
@@ -9,6 +10,11 @@ from django.contrib.admin import BooleanFieldListFilter
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.utils.safestring import mark_safe
+from salaries.services.sheet_generators import generate_tinkoff_payment_sheet_by_salary_reports
+from datetime import datetime
+from app.settings import MEDIA_ROOT
+import os
+
 
 class IsActiveFilter(BooleanFieldListFilter):
     def queryset(self, request, queryset):
@@ -41,6 +47,20 @@ class SettingAdminConfig(admin.ModelAdmin):
     list_display = ('name', 'description')
 
 
+@admin.action(description='Create Tinkoff payment sheet (.xslx)')
+def create_payment_sheet(modeladmin, request, queryset):
+    filename = "tinkoff_" + str(datetime.now().strftime("%d-%m-%Y %H:%M:%S")) + ".xlsx"
+    filepath = MEDIA_ROOT / filename
+    generate_tinkoff_payment_sheet_by_salary_reports(filepath, queryset)
+    response = HttpResponse(
+        open(filepath, 'rb'),
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = "attachment; filename=%s" % filename
+    os.remove(filepath)
+    return response
+
+
 @admin.register(SalaryReport)
 class SalaryReportAdminConfig(admin.ModelAdmin):
 
@@ -59,8 +79,12 @@ class SalaryReportAdminConfig(admin.ModelAdmin):
         return mark_safe(f'<a href="{url}" target="_blank">Смотреть</a>')
 
     readonly_fields = ('slug_id',)
-    list_display = ('instance_name', 'created_at', 'date_from', 'date_to', 'status', 'total_money', 'view_on_site_link')
+    list_display = ('instance_name', 'employee', 'created_at', 'date_from',
+                    'date_to', 'status', 'total_money', 'view_on_site_link')
     list_editable = ('status',)
+    list_filter = ('employee',)
+
+    actions = [create_payment_sheet]
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(SalaryReportAdminConfig, self).get_form(request, obj, **kwargs)
@@ -73,6 +97,7 @@ class EmployeeInline(admin.StackedInline):
 
 
 admin.site.unregister(User)
+
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
