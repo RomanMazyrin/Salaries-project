@@ -22,7 +22,11 @@ class Employee(models.Model):
     middlename = models.CharField('Отчество', max_length=255, blank=True, null=True)
 
     bank_account = models.CharField('Номер банковского счета', max_length=40, blank=True, null=True)
-    default_payment_details = models.TextField('Назначение платежа по-умолчанию', blank=True, null=True)
+    default_payment_details = models.TextField(
+        'Назначение платежа по-умолчанию',
+        blank=True,
+        null=True
+    )
 
     onpbx_account = models.ForeignKey(OnpbxAccount, on_delete=models.SET_NULL, null=True)
     sipuni_account = models.ForeignKey(SipuniAccount, on_delete=models.SET_NULL, null=True)

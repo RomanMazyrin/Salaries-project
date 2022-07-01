@@ -15,6 +15,7 @@ from datetime import datetime
 from app.settings import MEDIA_ROOT
 import os
 
+
 class IsActiveFilter(BooleanFieldListFilter):
     def queryset(self, request, queryset):
         if self.used_parameters.get(self.lookup_kwarg) is None:
@@ -51,10 +52,14 @@ def create_payment_sheet(modeladmin, request, queryset):
     filename = "tinkoff_" + str(datetime.now().strftime("%d-%m-%Y %H:%M:%S")) + ".xlsx"
     filepath = MEDIA_ROOT / filename
     generate_tinkoff_payment_sheet_by_salary_reports(filepath, queryset)
-    response  = HttpResponse(open(filepath, 'rb'), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response = HttpResponse(
+        open(filepath, 'rb'),
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
     response['Content-Disposition'] = "attachment; filename=%s" % filename
     os.remove(filepath)
     return response
+
 
 @admin.register(SalaryReport)
 class SalaryReportAdminConfig(admin.ModelAdmin):
@@ -74,7 +79,8 @@ class SalaryReportAdminConfig(admin.ModelAdmin):
         return mark_safe(f'<a href="{url}" target="_blank">Смотреть</a>')
 
     readonly_fields = ('slug_id',)
-    list_display = ('instance_name', 'employee', 'created_at', 'date_from', 'date_to', 'status', 'total_money', 'view_on_site_link')
+    list_display = ('instance_name', 'employee', 'created_at', 'date_from',
+                    'date_to', 'status', 'total_money', 'view_on_site_link')
     list_editable = ('status',)
     list_filter = ('employee',)
 
@@ -91,6 +97,7 @@ class EmployeeInline(admin.StackedInline):
 
 
 admin.site.unregister(User)
+
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):

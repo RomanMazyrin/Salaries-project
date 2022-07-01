@@ -143,7 +143,8 @@ class SalaryReport(models.Model):
         DECLINED: 'danger'
     }
 
-    employee = models.ForeignKey(Employee, on_delete=models.DO_NOTHING, null=False, verbose_name='Сотрудник')
+    employee = models.ForeignKey(Employee, on_delete=models.DO_NOTHING,
+                                 null=False, verbose_name='Сотрудник')
     created_at = models.DateTimeField('Время создания', null=False, auto_now_add=True)
     date_from = models.DateTimeField('Время начала', null=False)
     date_to = models.DateTimeField("Время окончания", null=False)

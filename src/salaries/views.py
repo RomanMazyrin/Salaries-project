@@ -172,7 +172,7 @@ class SalesPlanView(View):
         get_params = request.GET.dict()
 
         interval = create_interval(**get_params)
-        
+
         excluded_amo_users = request.GET.getlist('excluded_users')
 
         f = ApiIterator(
@@ -202,7 +202,8 @@ class SalesPlanView(View):
 
         leads_total_sales = {}
 
-        employees = get_all_active_employees().filter(show_in_sales_plan=True).exclude(amocrm_id__in=excluded_amo_users).all()
+        employees = get_all_active_employees().filter(
+            show_in_sales_plan=True).exclude(amocrm_id__in=excluded_amo_users).all()
 
         for lead in f.get_next():
             employee_id = lead['responsible_user_id']
