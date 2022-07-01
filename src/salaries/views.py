@@ -9,7 +9,6 @@ from amocrm_components.ApiIterator import ApiIterator
 from salaries.models.SalaryReport import SalaryReport
 from .models import Employee
 from datetime import datetime
-from packages.Onlinepbx.Client import Client as OnpbxClient
 from salaries.services.SalaryCounter import SalaryCounter
 import pytz
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -141,14 +140,7 @@ class SalaryResultView(LoginRequiredMixin, UserPassesTestMixin, View):
         timestamp_from = dt_from.timestamp()
         timestamp_to = dt_to.timestamp()
 
-        onpbx_client = OnpbxClient(employee.onpbx_account.subdomain, employee.onpbx_account.api_key)
-
-        sipuni_account = employee.sipuni_account
-        sipuni_client = None
-        if sipuni_account:
-            sipuni_client = sipuni_account.client
-
-        calculator = SalaryCounter(employee, onpbx_client, sipuni_client)
+        calculator = SalaryCounter(employee)
         report = calculator.get_detailed_report(timestamp_from, timestamp_to)
         report.employee = employee
         report.date_from = dt_from

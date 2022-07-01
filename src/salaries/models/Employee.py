@@ -28,8 +28,9 @@ class Employee(models.Model):
         null=True
     )
 
-    onpbx_account = models.ForeignKey(OnpbxAccount, on_delete=models.SET_NULL, null=True)
-    sipuni_account = models.ForeignKey(SipuniAccount, on_delete=models.SET_NULL, null=True)
+    onpbx_account = models.ForeignKey(OnpbxAccount, on_delete=models.SET_NULL, null=True, blank=True)
+    sipuni_account = models.ForeignKey(SipuniAccount, on_delete=models.SET_NULL, null=True, blank=True)
+
     daily_salary_amount = models.IntegerField("Дневной оклад", blank=True, null=True)
     one_hour_salary_amount = models.IntegerField("Стоимость часа работы", blank=True, null=True)
     one_call_cost = models.FloatField(
