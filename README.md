@@ -8,6 +8,7 @@
 - **`DB_PASSWORD`** - Database user password
 - **`DB_HOST`** - Database host
 - **`DB_PORT`** - Database port
+- **`PROMETHEUS_MULTIPROC_DIR`** - Path for prometheus databases, where prometheus metrics are stored. Needs for multiple workers. Details [here](https://github.com/prometheus/client_python/blob/master/README.md#multiprocess-mode-eg-gunicorn). Default value in docker image is /app/src/prometheus_metrics.
 
 For docker environment variables look [Docker section](#Docker-container-environment-variables)
 
