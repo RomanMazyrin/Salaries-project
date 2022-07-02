@@ -15,4 +15,4 @@ class OnpbxAccount(models.Model):
 
     @property
     def client(self):
-        return Client(self.subdomain, self.secret_key)
+        return Client(self.subdomain, self.api_key)
