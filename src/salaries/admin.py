@@ -25,7 +25,7 @@ class IsActiveFilter(BooleanFieldListFilter):
 
 @admin.register(Employee)
 class EmployeeAdminConfig(admin.ModelAdmin):
-    list_display = ('name', 'is_active')
+    list_display = ('name', 'surname', 'is_active')
     list_editable = ('is_active',)
     list_filter = (
         ('is_active', IsActiveFilter),
