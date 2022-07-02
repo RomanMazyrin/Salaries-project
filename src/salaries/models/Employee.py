@@ -127,7 +127,8 @@ class Employee(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        surname = self.surname if self.surname is not None else ''
+        return f"{surname} {self.name}"
 
     class Meta:
         verbose_name = 'Сотрудник'

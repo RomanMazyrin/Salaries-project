@@ -25,7 +25,7 @@ class IsActiveFilter(BooleanFieldListFilter):
 
 @admin.register(Employee)
 class EmployeeAdminConfig(admin.ModelAdmin):
-    list_display = ('name', 'is_active')
+    list_display = ('name', 'surname', 'is_active')
     list_editable = ('is_active',)
     list_filter = (
         ('is_active', IsActiveFilter),
@@ -67,7 +67,9 @@ class SalaryReportAdminConfig(admin.ModelAdmin):
     @admin.display(description='Отчет')
     def instance_name(self, obj):
         formatted_date = obj.created_at.strftime('%d.%m.%Y (%H:%M)')
-        return f"{obj.id}. {obj.employee.name}, {formatted_date}"
+        name = obj.employee.name
+        surname = obj.employee.surname if obj.employee.surname is not None else ''
+        return f"{obj.id}. {surname} {name}, {formatted_date}"
 
     @admin.display(empty_value=None, description='Итоговая сумма')
     def total_money(self, obj):
