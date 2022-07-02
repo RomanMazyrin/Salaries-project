@@ -27,7 +27,7 @@
                                                 <option value=""> --- Не выбран --- </option>
 
                                                 {% for employee in employee_list %}
-                                                <option value="{{ employee.id }}">{{ employee.name }}</option>
+                                                <option value="{{ employee.id }}">{{ employee.surname|default:'' }} {{ employee.name }}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
