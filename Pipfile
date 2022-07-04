@@ -18,6 +18,7 @@ whitenoise = "*"
 python-dotenv = "*"
 pytest-django = "*"
 xlsxwriter = "*"
+django-prometheus = "*"
 
 [requires]
 python_version = "3.7"

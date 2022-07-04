@@ -22,5 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('salaries/', include('salaries.urls')),
     path('auth/login/', auth_views.LoginView.as_view(redirect_authenticated_user=True)),
-    path('auth/', include('django.contrib.auth.urls'))
+    path('auth/', include('django.contrib.auth.urls')),
+    path('', include('django_prometheus.urls'))
 ]

@@ -9,3 +9,5 @@ src/static/
 .env
 .ignore
 .vscode/
+src/prometheus_metrics/*
+!src/prometheus_metrics/.gitkeep
