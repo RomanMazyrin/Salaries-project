@@ -1,8 +1,8 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.contrib.auth.models import User
-
-from salaries.models.SipuniAccount import SipuniAccount
+from .EmployeePosition import EmployeePosition
+from .SipuniAccount import SipuniAccount
 from .OnpbxAccount import OnpbxAccount
 
 
@@ -17,6 +17,9 @@ class Employee(models.Model):
 
     amocrm_id = models.IntegerField(blank=True, null=True)
 
+    position = models.ForeignKey(EmployeePosition, on_delete=models.SET_NULL,
+                                 null=True, blank=True, verbose_name='Позиция')
+
     name = models.CharField('Имя', max_length=255)
     surname = models.CharField('Фамилия', max_length=255, blank=True, null=True)
     middlename = models.CharField('Отчество', max_length=255, blank=True, null=True)
@@ -28,8 +31,10 @@ class Employee(models.Model):
         null=True
     )
 
-    onpbx_account = models.ForeignKey(OnpbxAccount, on_delete=models.SET_NULL, null=True, blank=True)
-    sipuni_account = models.ForeignKey(SipuniAccount, on_delete=models.SET_NULL, null=True, blank=True)
+    onpbx_account = models.ForeignKey(
+        OnpbxAccount, on_delete=models.SET_NULL, null=True, blank=True)
+    sipuni_account = models.ForeignKey(
+        SipuniAccount, on_delete=models.SET_NULL, null=True, blank=True)
 
     daily_salary_amount = models.IntegerField("Дневной оклад", blank=True, null=True)
     one_hour_salary_amount = models.IntegerField("Стоимость часа работы", blank=True, null=True)

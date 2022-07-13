@@ -6,6 +6,7 @@ from django.views.generic.edit import CreateView
 from django.shortcuts import render, get_object_or_404
 
 from amocrm_components.ApiIterator import ApiIterator
+from salaries.models.EmployeePosition import EmployeePosition
 from salaries.models.SalaryReport import SalaryReport
 from .models import Employee
 from datetime import datetime
@@ -16,6 +17,7 @@ import json
 import math
 from .services.DateIntervals.DashboardDateInterval import create_interval
 from django.views.decorators.clickjacking import xframe_options_exempt
+from salaries.services.SalaryCalculators import get_calculator_by_position_type
 
 
 def get_all_active_employees():
@@ -140,8 +142,12 @@ class SalaryResultView(LoginRequiredMixin, UserPassesTestMixin, View):
         timestamp_from = dt_from.timestamp()
         timestamp_to = dt_to.timestamp()
 
-        calculator = SalaryCounter(employee)
-        report = calculator.get_detailed_report(timestamp_from, timestamp_to)
+        employee_position = employee.position
+        if employee_position is None:
+            employee_position = EmployeePosition.DEPRECATED
+
+        calculator = get_calculator_by_position_type(employee_position)
+        report = calculator.process(employee, timestamp_from, timestamp_to)
         report.employee = employee
         report.date_from = dt_from
         report.date_to = dt_to

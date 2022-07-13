@@ -1,6 +1,7 @@
 from django.db import models
 from packages.Onlinepbx.Client import Client
 
+
 class OnpbxAccount(models.Model):
 
     subdomain = models.CharField("Субдомен", max_length=255)

@@ -17,7 +17,7 @@ import os
 import prometheus_client
 
 prometheus_client.values.ValueClass = prometheus_client.values.MultiProcessValue(
-    process_identifier = lambda: os.environ.get("APP_WORKER_ID", '1')
+    process_identifier=lambda: os.environ.get("APP_WORKER_ID", '1')
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

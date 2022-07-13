@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.http import HttpResponse
+from salaries.models.EmployeePosition import EmployeePosition
 
 from salaries.models.SipuniAccount import SipuniAccount
 from .models import Employee
@@ -104,3 +105,8 @@ admin.site.unregister(User)
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     inlines = [EmployeeInline]
+
+
+@admin.register(EmployeePosition)
+class EmployeePositionAdmin(admin.ModelAdmin):
+    pass

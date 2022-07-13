@@ -1,5 +1,6 @@
 from app.metrics import django_http_requests_total_by_path_status
 
+
 def simple_middleware(get_response):
 
     def middleware(request):

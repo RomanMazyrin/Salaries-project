@@ -5,4 +5,3 @@ django_http_requests_total_by_path_status = Counter(
     'Number of requests per path with response statuses',
     ['path', 'status']
 )
-

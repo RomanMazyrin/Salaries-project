@@ -13,12 +13,13 @@ django = "==3.2.11"
 pillow = "*"
 requests = "*"
 gunicorn = {extras = ["gevent"], version = "*"}
-psycopg2 = "*"
 whitenoise = "*"
 python-dotenv = "*"
 pytest-django = "*"
 xlsxwriter = "*"
 django-prometheus = "*"
+psycopg2 = "*"
+pytz = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.9"
