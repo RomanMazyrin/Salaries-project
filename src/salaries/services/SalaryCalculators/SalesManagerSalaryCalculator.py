@@ -3,45 +3,7 @@ from salaries.models.EmployeePosition import EmployeePosition
 from salaries.models.SalaryReport import Metrica, SalaryReport
 from salaries.services.SalaryCalculators.AbstractSalaryCalculator import AbstractSalaryCalculator
 from salaries.services.SalaryCalculators.constants import LEADS_STATUSES_FOR_SALES_CALCULATIONS, META_PARAM_COUNT_IN_TOTAL_SUM, METRICA_MONEY_CLASS_NAME
-from salaries.services.SalaryCalculators.helpers import fetch_all_leads_by_months_covered_by_timestamp_interval
-
-class AggregatedValuesCalculator:
-    
-    def __init__(
-            self,
-            value_getter,
-            values_sum_plan,
-            plan_bonus_value,
-            timestamp_from,
-            timestamp_to):
-
-        self.value_getter = value_getter
-        self.values_sum_plan = values_sum_plan
-        self.plan_bonus_value = plan_bonus_value
-        self.timestamp_from = timestamp_from
-        self.timestamp_to = timestamp_to
-
-    def get_items_in_timestamp_interval(self, items, key):
-        return filter(
-            lambda item: self.timestamp_from <= item[key] <= self.timestamp_to,
-            items
-        )
-
-    def sum(self, items):
-        items_in_interval = self.get_items_in_timestamp_interval(items, 'closed_at')
-        return sum([self.value_getter(item) for item in items_in_interval])
-
-    def bonus_for_plan(self, items):
-        items_in_interval = self.get_items_in_timestamp_interval(items, 'closed_at')
-        sum_in_full_list = sum([self.value_getter(item) for item in items])
-
-        value_for_period = sum([self.value_getter(item) for item in items_in_interval])
-        value_in_full_list_above_plan = sum_in_full_list - self.values_sum_plan
-
-        if 0 <= value_in_full_list_above_plan <= value_for_period:
-            return self.plan_bonus_value
-        return 0
-
+from salaries.services.SalaryCalculators.helpers import AggregatedValuesCalculator, base_aggregated_values_calculator_factory, calculate_sum_value_over_leads_per_months, fetch_all_leads_by_months_covered_by_timestamp_interval
 
 class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
     '''
@@ -120,12 +82,6 @@ class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
             class_name=METRICA_MONEY_CLASS_NAME
         )
 
-    def calculate_sum_value_over_leads_per_months(self, leads_by_months, calculator):
-        total = 0
-        for (month_key, month_leads) in leads_by_months.items():
-            total += calculator(month_leads)
-        return total
-
     def get_metrics_for_sales(
             self,
             leads_by_months,
@@ -137,24 +93,15 @@ class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
             leads_by_months, timestamp_to
         )
 
-        sales_money_values_calculator = AggregatedValuesCalculator(
-            lambda lead: lead['price'],
-            position.sales_plan_money,
-            position.sales_plan_money_bonus,
-            timestamp_from, timestamp_to
-        )
-
-        sales_count_values_calculator = AggregatedValuesCalculator(
-            lambda lead: 1,
-            position.sales_plan_count,
-            position.sales_plan_count_bonus,
-            timestamp_from, timestamp_to
-        )
+        (sales_money_values_calculator,
+        sales_count_values_calculator) = base_aggregated_values_calculator_factory(
+            position, timestamp_from, timestamp_to
+        ).values()
 
         return [
             Metrica(
                 "Сумма продаж",
-                self.calculate_sum_value_over_leads_per_months(
+                calculate_sum_value_over_leads_per_months(
                     leads_by_months, sales_money_values_calculator.sum),
                 group='sales',
                 label='sales_income'
@@ -164,7 +111,7 @@ class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
 
             Metrica(
                 'Бонусы за выполнение плана по продажам',
-                self.calculate_sum_value_over_leads_per_months(
+                calculate_sum_value_over_leads_per_months(
                     leads_by_months, sales_money_values_calculator.bonus_for_plan),
                 group='sales',
                 label='sales_plan_bonuses',
@@ -174,7 +121,7 @@ class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
 
             Metrica(
                 "Количество продаж",
-                self.calculate_sum_value_over_leads_per_months(
+                calculate_sum_value_over_leads_per_months(
                     leads_by_months, sales_count_values_calculator.sum),
                 group='sales',
                 label='sales_count'
@@ -182,7 +129,7 @@ class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
 
             Metrica(
                 'Бонусы за выполнение плана по количеству продаж',
-                self.calculate_sum_value_over_leads_per_months(
+                calculate_sum_value_over_leads_per_months(
                     leads_by_months, sales_count_values_calculator.bonus_for_plan),
                 group='sales',
                 label='sales_plan_count_bonuses',
@@ -213,4 +160,6 @@ class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
 
         report.add_metrics(self.get_metrics_for_sales(
             leads_by_months, timestamp_from, timestamp_to, employee.position))
+        
+        return report
 

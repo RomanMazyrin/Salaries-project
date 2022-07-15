@@ -54,10 +54,33 @@ def sm_position():
     )
     return position
 
+@pytest.fixture
+def sales_head_position():
+    position = EmployeePosition(
+        position_type=EmployeePosition.SALES_HEAD,
+        daily_salary_amount=3182,
+        sales_plan_money=25000,
+        sales_plan_count=3,
+        sales_fee_percent=5,
+        sales_plan_money_bonus=10000,
+        sales_plan_count_bonus=10000
+    )
+    return position
+
 
 @pytest.fixture
 def sales_manager_calculator(sm_position):
     return get_calculator_by_position_type(sm_position.position_type)
+
+@pytest.fixture
+def calculator_generator():
+    def generator(position):
+        return get_calculator_by_position_type(position.position_type)
+    return generator
+
+@pytest.fixture
+def sales_head_calculator(calculator_generator, sales_head_position):
+    return calculator_generator(sales_head_position)
 
 
 @pytest.fixture
@@ -113,7 +136,7 @@ def samples_map_for_sales_manager_calculator():
     ]
 
 
-def test_sales_manager_calculator_sales_metrics(
+def test_sales_manager_calculator_metrics(
     samples_map_for_sales_manager_calculator,
     sales_metrics_collection_for_time_interval_generator
 ):
@@ -125,3 +148,18 @@ def test_sales_manager_calculator_sales_metrics(
         )
         for expected in sample['expected_metrics_values'].items():
             assert metrics.get_by('label', expected[0]).value == expected[1]
+
+
+def test_sales_head_calculator_metrics(
+    sales_head_calculator,
+    sales_head_position
+):
+
+    metrics = MetricsCollection().add(
+        sales_head_calculator.get_salary_metrica(
+            sales_head_position,
+            datetime(2022, 6, 11, 0, 0, 0).timestamp(),
+            datetime(2022, 6, 15, 23, 59, 59).timestamp()
+        )
+    )
+    assert metrics.get_by('label', 'salary').value == 15910

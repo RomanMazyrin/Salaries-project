@@ -17,7 +17,7 @@ import json
 import math
 from .services.DateIntervals.DashboardDateInterval import create_interval
 from django.views.decorators.clickjacking import xframe_options_exempt
-from salaries.services.SalaryCalculators import get_calculator_by_position_type
+from salaries.services.SalaryCalculators.factories import get_calculator_by_position_type
 
 
 def get_all_active_employees():
