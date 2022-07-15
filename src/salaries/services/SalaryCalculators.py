@@ -163,24 +163,25 @@ class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
             label='sales_count'
         )
 
-    def get_month_leads_income_money_slices(
-            self,
-            month_leads,
-            timestamp_from,
-            timestamp_to,
-            position):
+    def get_leads_params_slices_in_interval(
+        self,
+        leads_list,
+        timestamp_from,
+        timestamp_to,
+        plan,
+        lead_value_getter
+        ):
 
         leads_in_interval = filter(
             lambda lead: timestamp_from <= lead['closed_at'] <= timestamp_to,
-            month_leads
+            leads_list
         )
 
-        income_for_sales_in_month = sum([lead['price'] for lead in month_leads])
-        plan = position.sales_plan_money
+        sum_in_full_list = sum([lead_value_getter(lead) for lead in leads_list])
 
         return {
-            'income_for_sales_in_period': sum([lead['price'] for lead in leads_in_interval]),
-            'income_for_sales_in_period_above_the_plan': income_for_sales_in_month - plan
+            'value_for_period': sum([lead_value_getter(lead) for lead in leads_in_interval]),
+            'value_for_period_above_plan': sum_in_full_list - plan
         }
 
     def get_metrica_sales_fee_sum(self, leads_by_months, timestamp_from, timestamp_to, position):
@@ -189,8 +190,8 @@ class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
         for (month_key, month_leads) in leads_by_months.items():
 
             (income_for_sales_in_period,
-             income_for_sales_in_period_above_the_plan) = self.get_month_leads_income_money_slices(
-                month_leads, timestamp_from, timestamp_to, position
+             income_for_sales_in_period_above_the_plan) = self.get_leads_params_slices_in_interval(
+                month_leads, timestamp_from, timestamp_to, position.sales_plan_money, lambda lead: lead['price']
             ).values()
 
             if income_for_sales_in_period_above_the_plan < 0:
@@ -221,8 +222,8 @@ class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
         for (month_key, month_leads) in leads_by_months.items():
 
             (income_for_sales_in_period,
-             income_for_sales_in_period_above_the_plan) = self.get_month_leads_income_money_slices(
-                month_leads, timestamp_from, timestamp_to, position
+             income_for_sales_in_period_above_the_plan) = self.get_leads_params_slices_in_interval(
+                month_leads, timestamp_from, timestamp_to, position.sales_plan_money, lambda lead: lead['price']
             ).values()
 
             if 0 <= income_for_sales_in_period_above_the_plan <= income_for_sales_in_period:
@@ -233,6 +234,28 @@ class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
             total_bonus_money_for_sales_plan,
             group='sales',
             label='sales_plan_bonuses',
+            meta_params={META_PARAM_COUNT_IN_TOTAL_SUM: True},
+            class_name=METRICA_MONEY_CLASS_NAME
+        )
+
+    def get_metrica_sales_count_bonus_sum(self, leads_by_months, timestamp_from, timestamp_to, position):
+        total_bonus_money_for_sales_count_plan = 0
+
+        for (month_key, month_leads) in leads_by_months.items():
+
+            (sales_count_in_period,
+             sales_count_in_period_above_the_plan) = self.get_leads_params_slices_in_interval(
+                month_leads, timestamp_from, timestamp_to, position.sales_plan_count, lambda lead: 1
+            ).values()
+
+            if 0 <= sales_count_in_period_above_the_plan <= sales_count_in_period:
+                total_bonus_money_for_sales_count_plan += position.sales_plan_count_bonus
+
+        return Metrica(
+            'Бонусы за выполнение плана по количеству продаж',
+            total_bonus_money_for_sales_count_plan,
+            group='sales',
+            label='sales_plan_count_bonuses',
             meta_params={META_PARAM_COUNT_IN_TOTAL_SUM: True},
             class_name=METRICA_MONEY_CLASS_NAME
         )
@@ -248,7 +271,8 @@ class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
             self.get_metrica_sales_bonus_sum(
                 leads_by_months, timestamp_from, timestamp_to, position
             ),
-            self.get_metrica_sales_count(leads_by_months, timestamp_from, timestamp_to)
+            self.get_metrica_sales_count(leads_by_months, timestamp_from, timestamp_to),
+            self.get_metrica_sales_count_bonus_sum(leads_by_months, timestamp_from, timestamp_to, position)
         ]
 
     def cut_months_leads_closed_after_timestamp(self, leads_by_months, timestamp):

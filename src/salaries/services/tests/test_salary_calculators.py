@@ -45,9 +45,11 @@ def sm_position():
     position = EmployeePosition(
         position_type=EmployeePosition.SALES_MANAGER,
         sales_plan_money=25000,
+        sales_plan_count=3,
         sales_fee_percent=10,
         sales_fee_percent_above_plan=15,
-        sales_plan_money_bonus=30000
+        sales_plan_money_bonus=30000,
+        sales_plan_count_bonus=15000
     )
     return position
 
@@ -90,7 +92,8 @@ def samples_map_for_sales_manager_calculator():
                 'sales_income': 50000,
                 'sales_fee_salary': 6000,
                 'sales_plan_bonuses': 60000,
-                'sales_count': 5
+                'sales_count': 5,
+                'sales_plan_count_bonuses': 30000
             },
         },
         {
@@ -102,7 +105,8 @@ def samples_map_for_sales_manager_calculator():
                 'sales_income': 20000,
                 'sales_fee_salary': 2000,
                 'sales_plan_bonuses': 0,
-                'sales_count': 2
+                'sales_count': 2,
+                'sales_plan_count_bonuses': 0
             },
         }
     ]
