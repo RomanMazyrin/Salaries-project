@@ -74,10 +74,12 @@ class MetricsCollection:
         if not isinstance(item, self.ITEM_MODEL):
             raise TypeError
         self._items.append(item)
+        return self
 
     def extend(self, items):
         for item in items:
             self.add(item)
+        return self
 
     def to_list(self):
         return [item.to_dict() for item in self._items]
