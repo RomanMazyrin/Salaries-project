@@ -89,7 +89,8 @@ def samples_map_for_sales_manager_calculator():
             'expected_metrics_values': {
                 'sales_income': 50000,
                 'sales_fee_salary': 6000,
-                'sales_plan_bonuses': 60000
+                'sales_plan_bonuses': 60000,
+                'sales_count': 5
             },
         },
         {
@@ -100,7 +101,8 @@ def samples_map_for_sales_manager_calculator():
             'expected_metrics_values': {
                 'sales_income': 20000,
                 'sales_fee_salary': 2000,
-                'sales_plan_bonuses': 0
+                'sales_plan_bonuses': 0,
+                'sales_count': 2
             },
         }
     ]
