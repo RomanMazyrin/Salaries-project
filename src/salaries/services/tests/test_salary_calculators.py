@@ -1,8 +1,9 @@
 from datetime import datetime
 from salaries.models.SalaryReport import MetricsCollection
-from salaries.services.SalaryCalculators import (
-    get_calculator_by_position_type, DeprecatedSalaryCalculator, split_closed_leads_by_months
-)
+from salaries.services.SalaryCalculators.DeprecatedSalaryCalculator import DeprecatedSalaryCalculator
+from salaries.services.SalaryCalculators.factories import get_calculator_by_position_type
+from salaries.services.SalaryCalculators.helpers import split_closed_leads_by_months
+
 from salaries.models.EmployeePosition import EmployeePosition
 import pytest
 
