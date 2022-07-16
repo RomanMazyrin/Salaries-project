@@ -6,7 +6,14 @@ from .SipuniAccount import SipuniAccount
 from .OnpbxAccount import OnpbxAccount
 
 
+class EmployeeManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
+
+
 class Employee(models.Model):
+
+    objects = EmployeeManager()
 
     user = models.OneToOneField(User, on_delete=models.DO_NOTHING, null=True, blank=True)
 

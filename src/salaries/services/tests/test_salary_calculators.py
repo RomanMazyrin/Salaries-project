@@ -1,6 +1,8 @@
 from datetime import datetime
 from salaries.models.SalaryReport import MetricsCollection
-from salaries.services.SalaryCalculators.DeprecatedSalaryCalculator import DeprecatedSalaryCalculator
+from salaries.services.SalaryCalculators.DeprecatedSalaryCalculator import (
+    DeprecatedSalaryCalculator
+)
 from salaries.services.SalaryCalculators.factories import get_calculator_by_position_type
 from salaries.services.SalaryCalculators.helpers import split_closed_leads_by_months
 
@@ -54,6 +56,7 @@ def sm_position():
     )
     return position
 
+
 @pytest.fixture
 def sales_head_position():
     position = EmployeePosition(
@@ -72,11 +75,13 @@ def sales_head_position():
 def sales_manager_calculator(sm_position):
     return get_calculator_by_position_type(sm_position.position_type)
 
+
 @pytest.fixture
 def calculator_generator():
     def generator(position):
         return get_calculator_by_position_type(position.position_type)
     return generator
+
 
 @pytest.fixture
 def sales_head_calculator(calculator_generator, sales_head_position):

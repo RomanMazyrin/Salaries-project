@@ -3,10 +3,13 @@ from django.http import HttpResponse
 from salaries.models.EmployeePosition import EmployeePosition
 
 from salaries.models.SipuniAccount import SipuniAccount
-from .models import Employee
-from .models import OnpbxAccount
-from .models import Setting
-from .models import SalaryReport
+from .models import (
+    Employee,
+    OnpbxAccount,
+    Setting,
+    SalaryReport,
+    EmployeeGroup
+)
 from django.contrib.admin import BooleanFieldListFilter
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
@@ -24,6 +27,20 @@ class IsActiveFilter(BooleanFieldListFilter):
         return super().queryset(request, queryset)
 
 
+class MembershipInline(admin.TabularInline):
+    model = EmployeeGroup.employee_list.through
+    verbose_name = 'Группа'
+    verbose_name_plural = "Группы"
+    extra = 1
+
+
+class MembershipAsHeadInline(admin.TabularInline):
+    model = EmployeeGroup.group_heads.through
+    verbose_name = 'Руководитель группы'
+    verbose_name_plural = "Руководитель групп"
+    extra = 1
+
+
 @admin.register(Employee)
 class EmployeeAdminConfig(admin.ModelAdmin):
     list_display = ('name', 'surname', 'is_active')
@@ -31,6 +48,7 @@ class EmployeeAdminConfig(admin.ModelAdmin):
     list_filter = (
         ('is_active', IsActiveFilter),
     )
+    inlines = [MembershipInline, MembershipAsHeadInline]
 
 
 @admin.register(OnpbxAccount)
@@ -109,4 +127,9 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(EmployeePosition)
 class EmployeePositionAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(EmployeeGroup)
+class EmployeeGroupAdmin(admin.ModelAdmin):
     pass

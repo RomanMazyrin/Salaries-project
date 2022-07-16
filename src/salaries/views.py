@@ -142,11 +142,11 @@ class SalaryResultView(LoginRequiredMixin, UserPassesTestMixin, View):
         timestamp_from = dt_from.timestamp()
         timestamp_to = dt_to.timestamp()
 
-        employee_position = employee.position
-        if employee_position is None:
-            employee_position = EmployeePosition.DEPRECATED
+        employee_position_type = employee.position.position_type
+        if employee_position_type is None:
+            employee_position_type = EmployeePosition.DEPRECATED
 
-        calculator = get_calculator_by_position_type(employee_position)
+        calculator = get_calculator_by_position_type(employee_position_type)
         report = calculator.process(employee, timestamp_from, timestamp_to)
         report.employee = employee
         report.date_from = dt_from

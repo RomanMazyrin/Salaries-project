@@ -4,6 +4,7 @@ from .SipuniAccount import SipuniAccount
 from .Employee import Employee
 from .OnpbxAccount import OnpbxAccount
 from .Setting import Setting
+from .EmployeesGroup import EmployeeGroup
 
 __all__ = [
     Employee,
@@ -11,5 +12,6 @@ __all__ = [
     Setting,
     SipuniAccount,
     SalaryReport,
-    EmployeePosition
+    EmployeePosition,
+    EmployeeGroup
 ]

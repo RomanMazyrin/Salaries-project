@@ -11,8 +11,8 @@ POSITION_CALCULATORS = {
 }
 
 
-def get_calculator_by_position_type(position):
-    CalculatorClass = POSITION_CALCULATORS.get(position)
+def get_calculator_by_position_type(position_type):
+    CalculatorClass = POSITION_CALCULATORS.get(position_type)
     if issubclass(CalculatorClass, AbstractSalaryCalculator):
         return CalculatorClass()
     return None

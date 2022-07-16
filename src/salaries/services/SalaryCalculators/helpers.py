@@ -17,8 +17,7 @@ def split_closed_leads_by_months(leads_list):
     return result_map
 
 
-    
-def fetch_all_amocrm_entities_by_filter(self, **kwargs):
+def fetch_all_amocrm_entities_by_filter(**kwargs):
     f = ApiIterator(**kwargs)
     entities = []
     for entity in f.get_next():
@@ -27,11 +26,10 @@ def fetch_all_amocrm_entities_by_filter(self, **kwargs):
 
 
 def fetch_all_leads_by_months_covered_by_timestamp_interval(
-    self,
-    timestamp_from,
-    timestamp_to,
-    user_id=None,
-    statuses=None):
+        timestamp_from,
+        timestamp_to,
+        user_id=None,
+        statuses=None):
 
     timezone = pytz.timezone("Europe/Moscow")
 
@@ -53,7 +51,7 @@ def fetch_all_leads_by_months_covered_by_timestamp_interval(
     if statuses is not None:
         filter_params['statuses'] = statuses
 
-    leads = self.fetch_all_amocrm_entities_by_filter(
+    leads = fetch_all_amocrm_entities_by_filter(
         url=LEADS_FETCH_URL,
         params={
             'auth_key': AUTH_KEY,
@@ -68,7 +66,7 @@ def fetch_all_leads_by_months_covered_by_timestamp_interval(
 
 
 class AggregatedValuesCalculator:
-    
+
     def __init__(
             self,
             value_getter,
@@ -125,8 +123,21 @@ def base_aggregated_values_calculator_factory(position, timestamp_from, timestam
         'count_values_aggregator': sales_count_values_calculator
     }
 
+
 def calculate_sum_value_over_leads_per_months(leads_by_months, calculator):
     total = 0
     for (month_key, month_leads) in leads_by_months.items():
         total += calculator(month_leads)
     return total
+
+def get_dates_from_timestamp_interval(timestamp_from, timestamp_to):
+    right_border = timestamp_from
+    res = []
+    while True:
+        res += [datetime.fromtimestamp(right_border).replace(hour=0, minute=0, second=0)]
+        right_border += 3600*24
+        if right_border > timestamp_to:
+            res += [datetime.fromtimestamp(timestamp_to).replace(hour=0, minute=0, second=0)]
+            break
+
+    return list(set(res))

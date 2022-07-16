@@ -2,8 +2,17 @@ from salaries.models.Employee import Employee
 from salaries.models.EmployeePosition import EmployeePosition
 from salaries.models.SalaryReport import Metrica, SalaryReport
 from salaries.services.SalaryCalculators.AbstractSalaryCalculator import AbstractSalaryCalculator
-from salaries.services.SalaryCalculators.constants import LEADS_STATUSES_FOR_SALES_CALCULATIONS, META_PARAM_COUNT_IN_TOTAL_SUM, METRICA_MONEY_CLASS_NAME
-from salaries.services.SalaryCalculators.helpers import AggregatedValuesCalculator, base_aggregated_values_calculator_factory, calculate_sum_value_over_leads_per_months, fetch_all_leads_by_months_covered_by_timestamp_interval
+from salaries.services.SalaryCalculators.constants import (
+    LEADS_STATUSES_FOR_SALES_CALCULATIONS,
+    META_PARAM_COUNT_IN_TOTAL_SUM,
+    METRICA_MONEY_CLASS_NAME
+)
+from salaries.services.SalaryCalculators.helpers import (
+    base_aggregated_values_calculator_factory,
+    calculate_sum_value_over_leads_per_months,
+    fetch_all_leads_by_months_covered_by_timestamp_interval
+)
+
 
 class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
     '''
@@ -94,7 +103,7 @@ class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
         )
 
         (sales_money_values_calculator,
-        sales_count_values_calculator) = base_aggregated_values_calculator_factory(
+         sales_count_values_calculator) = base_aggregated_values_calculator_factory(
             position, timestamp_from, timestamp_to
         ).values()
 
