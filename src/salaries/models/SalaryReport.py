@@ -145,8 +145,8 @@ class SalaryReport(models.Model):
         DECLINED: 'danger'
     }
 
-    employee = models.ForeignKey(Employee, on_delete=models.DO_NOTHING,
-                                 null=False, verbose_name='Сотрудник')
+    employee = models.ForeignKey(Employee, on_delete=models.SET_NULL,
+                                 null=True, verbose_name='Сотрудник')
     created_at = models.DateTimeField('Время создания', null=False, auto_now_add=True)
     date_from = models.DateTimeField('Время начала', null=False)
     date_to = models.DateTimeField("Время окончания", null=False)
@@ -220,7 +220,8 @@ class SalaryReport(models.Model):
 
     def __str__(self):
         formatted_date = self.created_at.strftime('%d.%m.%Y (%H:%M)')
-        return f"{self.id}. {self.employee.name}, {formatted_date}"
+        employee = self.employee if self.employee is not None else Employee()
+        return f"{self.id}. {employee.name}, {formatted_date}"
 
     class Meta:
         verbose_name = 'Зарплатный отчет'

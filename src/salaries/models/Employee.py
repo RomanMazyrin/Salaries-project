@@ -15,7 +15,7 @@ class Employee(models.Model):
 
     objects = EmployeeManager()
 
-    user = models.OneToOneField(User, on_delete=models.DO_NOTHING, null=True, blank=True)
+    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     onpbx_id = models.IntegerField(blank=True, null=True, validators=[
                                    MaxValueValidator(999), MinValueValidator(100)])

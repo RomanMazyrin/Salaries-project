@@ -86,8 +86,13 @@ class SalaryReportAdminConfig(admin.ModelAdmin):
     @admin.display(description='Отчет')
     def instance_name(self, obj):
         formatted_date = obj.created_at.strftime('%d.%m.%Y (%H:%M)')
-        name = obj.employee.name
-        surname = obj.employee.surname if obj.employee.surname is not None else ''
+
+        employee = obj.employee
+        if not employee:
+            employee = Employee()
+
+        name = employee.name
+        surname = employee.surname if employee.surname is not None else ''
         return f"{obj.id}. {surname} {name}, {formatted_date}"
 
     @admin.display(empty_value=None, description='Итоговая сумма')
@@ -106,11 +111,6 @@ class SalaryReportAdminConfig(admin.ModelAdmin):
     list_filter = ('employee',)
 
     actions = [create_payment_sheet]
-
-    def get_form(self, request, obj=None, **kwargs):
-        form = super(SalaryReportAdminConfig, self).get_form(request, obj, **kwargs)
-        form.base_fields['employee'].queryset = Employee.objects.filter(is_active=True)
-        return form
 
 
 class EmployeeInline(admin.StackedInline):
