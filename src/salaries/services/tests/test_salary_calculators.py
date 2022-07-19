@@ -13,33 +13,37 @@ import pytest
 
 @pytest.fixture
 def leads_factory():
-    def create_lead(closed_at_datetime=None, price=0, status=None, pipeline=None):
+    def create_lead(closed_at_datetime=None, price=0, status=None, pipeline=None, user_id=None):
         closed_at_timestamp = closed_at_datetime.timestamp()
         return {
             'price': price,
             'closed_at': closed_at_timestamp,
             'status_id': status,
-            'pipeline_id': pipeline
+            'pipeline_id': pipeline,
+            'responsible_user_id': user_id
         }
     return create_lead
 
+@pytest.fixture
+def leads_list(leads_factory):
+    return [
+        leads_factory(datetime(2022, 4, 6, 15, 0, 0), 10000),
+        leads_factory(datetime(2022, 4, 8, 15, 0, 0), 10000),
+        leads_factory(datetime(2022, 4, 10, 15, 0, 0), 10000),
+        leads_factory(datetime(2022, 4, 25, 15, 0, 0), 10000),
+        leads_factory(datetime(2022, 5, 1, 15, 0, 0), 10000),
+        leads_factory(datetime(2022, 5, 3, 15, 0, 0), 10000),
+        leads_factory(datetime(2022, 5, 5, 15, 0, 0), 10000),
+        leads_factory(datetime(2022, 5, 18, 15, 0, 0), 10000),
+        leads_factory(datetime(2022, 6, 2, 15, 0, 0), 10000),
+        leads_factory(datetime(2022, 6, 5, 15, 0, 0), 10000),
+        leads_factory(datetime(2022, 6, 14, 15, 0, 0), 10000),
+        leads_factory(datetime(2022, 6, 16, 15, 0, 0), 10000)
+    ]
 
 @pytest.fixture
-def leads_by_months(leads_factory):
-    return split_closed_leads_by_months(
-        [leads_factory(datetime(2022, 4, 6, 15, 0, 0), 10000),
-         leads_factory(datetime(2022, 4, 8, 15, 0, 0), 10000),
-         leads_factory(datetime(2022, 4, 10, 15, 0, 0), 10000),
-         leads_factory(datetime(2022, 4, 25, 15, 0, 0), 10000),
-         leads_factory(datetime(2022, 5, 1, 15, 0, 0), 10000),
-         leads_factory(datetime(2022, 5, 3, 15, 0, 0), 10000),
-         leads_factory(datetime(2022, 5, 5, 15, 0, 0), 10000),
-         leads_factory(datetime(2022, 5, 18, 15, 0, 0), 10000),
-         leads_factory(datetime(2022, 6, 2, 15, 0, 0), 10000),
-         leads_factory(datetime(2022, 6, 5, 15, 0, 0), 10000),
-         leads_factory(datetime(2022, 6, 14, 15, 0, 0), 10000),
-         leads_factory(datetime(2022, 6, 16, 15, 0, 0), 10000)]
-    )
+def leads_by_months(leads_list):
+    return split_closed_leads_by_months(leads_list)
 
 @pytest.fixture
 def leads_fetcher(leads_by_months):
@@ -89,29 +93,19 @@ def calculator_generator(leads_fetcher):
     return generator
 
 
-@pytest.fixture
-def sales_metrics_collection_for_time_interval_generator(
-        calculator_generator,
-        sm_employee):
-
-    def generator(timestamp_from, timestamp_to):
-        return calculator_generator(sm_employee.position).process(
-            sm_employee,
-            timestamp_from,
-            timestamp_to
-        )
-    return generator
-
-
 def test_default_position_calculator():
     calculator = get_calculator_by_position_type(EmployeePosition.DEPRECATED)
     assert isinstance(calculator, DeprecatedSalaryCalculator)
 
 
 @pytest.fixture
-def samples_map_for_sales_manager_calculator():
+def samples_map_for_sales_manager_calculator(
+    sm_employee,
+    sales_head_employee,
+):
     return [
         {
+            'employee': sm_employee,
             'interval': {
                 "from": datetime(2022, 5, 4, 0, 0, 0).timestamp(),
                 'to': datetime(2022, 6, 14, 23, 59, 59).timestamp()
@@ -125,6 +119,7 @@ def samples_map_for_sales_manager_calculator():
             },
         },
         {
+            'employee': sm_employee,
             'interval': {
                 "from": datetime(2022, 4, 6, 0, 0, 0).timestamp(),
                 'to': datetime(2022, 4, 8, 23, 59, 59).timestamp()
@@ -136,33 +131,32 @@ def samples_map_for_sales_manager_calculator():
                 'sales_count': 2,
                 'sales_plan_count_bonus': 0
             },
+        },
+        {
+            'employee': sales_head_employee,
+            'interval': {
+                "from": datetime(2022, 6, 13, 0, 0, 0).timestamp(),
+                'to':  datetime(2022, 6, 17, 23, 59, 59).timestamp()
+            },
+            'expected_metrics_values': {
+                'salary': 15910
+            },
         }
     ]
 
 
-def test_sales_manager_calculator_metrics(
+def test_calculator_metrics_results(
     samples_map_for_sales_manager_calculator,
-    sales_metrics_collection_for_time_interval_generator
+    calculator_generator
 ):
 
     for sample in samples_map_for_sales_manager_calculator:
-        metrics = sales_metrics_collection_for_time_interval_generator(
+        employee = sample['employee']
+        calculator = calculator_generator(employee.position)
+        metrics = calculator.process(
+            employee,
             sample['interval']['from'],
             sample['interval']['to']
         )
         for expected in sample['expected_metrics_values'].items():
             assert metrics.get_metrica_by('label', expected[0]).value == expected[1]
-
-
-def test_sales_head_calculator_metrics(
-    calculator_generator,
-    sales_head_employee
-):
-    sales_head_calculator = calculator_generator(sales_head_employee.position)
-
-    metrics = sales_head_calculator.process(
-        sales_head_employee,
-        datetime(2022, 6, 13, 0, 0, 0).timestamp(),
-        datetime(2022, 6, 17, 23, 59, 59).timestamp()
-    )
-    assert metrics.get_metrica_by('label', 'salary').value == 15910

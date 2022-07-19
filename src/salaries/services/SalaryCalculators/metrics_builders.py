@@ -1,41 +1,9 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 
 from salaries.models.SalaryReport import Metrica
 from salaries.services.SalaryCalculators.helpers import (
     calculate_sum_value_over_leads_per_months
 )
-
-class MetricaBuilder(ABC):
-
-    DEFAULT_NAME = ''
-    DEFAULT_LABEL = ''
-    DEFAULT_GROUP = ''
-    
-    def __init__(self, name=None, label=None, group=None, value_func=None, meta={}, class_name=''):
-        self.metrica_name = name if name is not None else self.DEFAULT_NAME
-        self.metrica_label = label if label is not None else self.DEFAULT_LABEL
-        self.metrica_group = group if group is not None else self.DEFAULT_GROUP
-        self.metrica_meta = meta
-        self.metrica_class_name = class_name
-        self.metrica_value_func = value_func if value_func is not None else lambda: None
-
-    def _calculate_value(self, employee, timestamp_from, timestamp_to, *args, **kwargs):
-        return self.metrica_value_func(self, employee, timestamp_from, timestamp_to, *args, **kwargs)
-
-    def create(self, employee, timestamp_from, timestamp_to, *args, **kwargs):
-        value = self._calculate_value(employee, timestamp_from, timestamp_to, *args, **kwargs)
-        return Metrica(
-            name=self.metrica_name,
-            value=value,
-            group=self.metrica_group,
-            label=self.metrica_label,
-            meta_params=self.metrica_meta,
-            class_name=self.metrica_class_name
-        )
-
-
-class SimpleMetricaBuilder(MetricaBuilder):
-    pass
 
 
 def get_items_in_timestamp_interval(items, key, timestamp_from, timestamp_to):
@@ -54,6 +22,44 @@ def cut_months_leads_closed_after_timestamp(leads_by_months, timestamp):
         res[month_key] = update_month_leads
     return res
 
+
+class MetricaBuilder(ABC):
+
+    DEFAULT_NAME = ''
+    DEFAULT_LABEL = ''
+    DEFAULT_GROUP = ''
+    
+    def __init__(self, name=None, label=None, group=None, meta={}, class_name=''):
+        self.metrica_name = name if name is not None else self.DEFAULT_NAME
+        self.metrica_label = label if label is not None else self.DEFAULT_LABEL
+        self.metrica_group = group if group is not None else self.DEFAULT_GROUP
+        self.metrica_meta = meta
+        self.metrica_class_name = class_name
+
+    @abstractmethod
+    def _calculate_value(self, employee, timestamp_from, timestamp_to, *args, **kwargs):
+        pass
+
+    def create(self, employee, timestamp_from, timestamp_to, *args, **kwargs):
+        value = self._calculate_value(employee, timestamp_from, timestamp_to, *args, **kwargs)
+        return Metrica(
+            name=self.metrica_name,
+            value=value,
+            group=self.metrica_group,
+            label=self.metrica_label,
+            meta_params=self.metrica_meta,
+            class_name=self.metrica_class_name
+        )
+
+
+class SimpleMetricaBuilder(MetricaBuilder):
+    def __init__(self, value_func=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.metrica_value_func = value_func if value_func is not None else lambda: None
+
+    def _calculate_value(self, employee, timestamp_from, timestamp_to, *args, **kwargs):
+        return self.metrica_value_func(self, employee, timestamp_from, timestamp_to, *args, **kwargs)
+        
 
 class LeadsAggregatedValueMetricBuilder(MetricaBuilder):
     def __init__(self, item_value_getter, **kwargs):
