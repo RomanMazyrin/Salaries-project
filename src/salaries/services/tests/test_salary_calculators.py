@@ -1,9 +1,10 @@
 from datetime import datetime
-from salaries.models.SalaryReport import MetricsCollection
+from salaries.models.Employee import Employee
+from salaries.services.SalaryCalculators.AbstractSalaryCalculator import AbstractSalaryCalculator
 from salaries.services.SalaryCalculators.DeprecatedSalaryCalculator import (
     DeprecatedSalaryCalculator
 )
-from salaries.services.SalaryCalculators.factories import get_calculator_by_position_type
+from salaries.services.SalaryCalculators.factories import POSITION_CALCULATORS, get_calculator_by_position_type
 from salaries.services.SalaryCalculators.helpers import split_closed_leads_by_months
 
 from salaries.models.EmployeePosition import EmployeePosition
@@ -13,8 +14,6 @@ import pytest
 @pytest.fixture
 def leads_factory():
     def create_lead(closed_at_datetime=None, price=0, status=None, pipeline=None):
-        if closed_at_datetime is None:
-            closed_at_datetime = datetime.now()
         closed_at_timestamp = closed_at_datetime.timestamp()
         return {
             'price': price,
@@ -42,9 +41,16 @@ def leads_by_months(leads_factory):
          leads_factory(datetime(2022, 6, 16, 15, 0, 0), 10000)]
     )
 
+@pytest.fixture
+def leads_fetcher(leads_by_months):
+    def f(*args, **kwargs):
+        return {
+            'leads': leads_by_months
+        }
+    return f
 
 @pytest.fixture
-def sm_position():
+def sm_employee():
     position = EmployeePosition(
         position_type=EmployeePosition.SALES_MANAGER,
         sales_plan_money=25000,
@@ -54,11 +60,12 @@ def sm_position():
         sales_plan_money_bonus=30000,
         sales_plan_count_bonus=15000
     )
-    return position
+    employee = Employee(position=position)
+    return employee
 
 
 @pytest.fixture
-def sales_head_position():
+def sales_head_employee():
     position = EmployeePosition(
         position_type=EmployeePosition.SALES_HEAD,
         daily_salary_amount=3182,
@@ -68,39 +75,31 @@ def sales_head_position():
         sales_plan_money_bonus=10000,
         sales_plan_count_bonus=10000
     )
-    return position
-
-
-@pytest.fixture
-def sales_manager_calculator(sm_position):
-    return get_calculator_by_position_type(sm_position.position_type)
-
+    employee = Employee(position=position, name='Test head employee')
+    return employee
+    
 
 @pytest.fixture
-def calculator_generator():
+def calculator_generator(leads_fetcher):
     def generator(position):
-        return get_calculator_by_position_type(position.position_type)
+        CalculatorClass = POSITION_CALCULATORS.get(position.position_type)
+        if issubclass(CalculatorClass, AbstractSalaryCalculator):
+            return CalculatorClass(leads_fetcher)
+        return None
     return generator
 
 
 @pytest.fixture
-def sales_head_calculator(calculator_generator, sales_head_position):
-    return calculator_generator(sales_head_position)
-
-
-@pytest.fixture
 def sales_metrics_collection_for_time_interval_generator(
-        sales_manager_calculator,
-        leads_by_months,
-        sm_position):
+        calculator_generator,
+        sm_employee):
 
     def generator(timestamp_from, timestamp_to):
-        return MetricsCollection().extend(sales_manager_calculator.get_metrics_for_sales(
-            leads_by_months,
+        return calculator_generator(sm_employee.position).process(
+            sm_employee,
             timestamp_from,
-            timestamp_to,
-            sm_position
-        ))
+            timestamp_to
+        )
     return generator
 
 
@@ -120,9 +119,9 @@ def samples_map_for_sales_manager_calculator():
             'expected_metrics_values': {
                 'sales_income': 50000,
                 'sales_fee_salary': 6000,
-                'sales_plan_bonuses': 60000,
+                'sales_plan_bonus': 60000,
                 'sales_count': 5,
-                'sales_plan_count_bonuses': 30000
+                'sales_plan_count_bonus': 30000
             },
         },
         {
@@ -133,9 +132,9 @@ def samples_map_for_sales_manager_calculator():
             'expected_metrics_values': {
                 'sales_income': 20000,
                 'sales_fee_salary': 2000,
-                'sales_plan_bonuses': 0,
+                'sales_plan_bonus': 0,
                 'sales_count': 2,
-                'sales_plan_count_bonuses': 0
+                'sales_plan_count_bonus': 0
             },
         }
     ]
@@ -152,19 +151,18 @@ def test_sales_manager_calculator_metrics(
             sample['interval']['to']
         )
         for expected in sample['expected_metrics_values'].items():
-            assert metrics.get_by('label', expected[0]).value == expected[1]
+            assert metrics.get_metrica_by('label', expected[0]).value == expected[1]
 
 
 def test_sales_head_calculator_metrics(
-    sales_head_calculator,
-    sales_head_position
+    calculator_generator,
+    sales_head_employee
 ):
+    sales_head_calculator = calculator_generator(sales_head_employee.position)
 
-    metrics = MetricsCollection().add(
-        sales_head_calculator.get_salary_metrica(
-            sales_head_position,
-            datetime(2022, 6, 11, 0, 0, 0).timestamp(),
-            datetime(2022, 6, 15, 23, 59, 59).timestamp()
-        )
+    metrics = sales_head_calculator.process(
+        sales_head_employee,
+        datetime(2022, 6, 13, 0, 0, 0).timestamp(),
+        datetime(2022, 6, 17, 23, 59, 59).timestamp()
     )
-    assert metrics.get_by('label', 'salary').value == 15910
+    assert metrics.get_metrica_by('label', 'salary').value == 15910

@@ -65,70 +65,12 @@ def fetch_all_leads_by_months_covered_by_timestamp_interval(
     return split_closed_leads_by_months(leads)
 
 
-class AggregatedValuesCalculator:
-
-    def __init__(
-            self,
-            value_getter,
-            values_sum_plan,
-            plan_bonus_value,
-            timestamp_from,
-            timestamp_to):
-
-        self.value_getter = value_getter
-        self.values_sum_plan = values_sum_plan
-        self.plan_bonus_value = plan_bonus_value
-        self.timestamp_from = timestamp_from
-        self.timestamp_to = timestamp_to
-
-    def get_items_in_timestamp_interval(self, items, key):
-        return filter(
-            lambda item: self.timestamp_from <= item[key] <= self.timestamp_to,
-            items
-        )
-
-    def sum(self, items):
-        items_in_interval = self.get_items_in_timestamp_interval(items, 'closed_at')
-        return sum([self.value_getter(item) for item in items_in_interval])
-
-    def bonus_for_plan(self, items):
-        items_in_interval = self.get_items_in_timestamp_interval(items, 'closed_at')
-        sum_in_full_list = sum([self.value_getter(item) for item in items])
-
-        value_for_period = sum([self.value_getter(item) for item in items_in_interval])
-        value_in_full_list_above_plan = sum_in_full_list - self.values_sum_plan
-
-        if 0 <= value_in_full_list_above_plan <= value_for_period:
-            return self.plan_bonus_value
-        return 0
-
-
-def base_aggregated_values_calculator_factory(position, timestamp_from, timestamp_to):
-    sales_money_values_calculator = AggregatedValuesCalculator(
-        lambda lead: lead['price'],
-        position.sales_plan_money,
-        position.sales_plan_money_bonus,
-        timestamp_from, timestamp_to
-    )
-
-    sales_count_values_calculator = AggregatedValuesCalculator(
-        lambda lead: 1,
-        position.sales_plan_count,
-        position.sales_plan_count_bonus,
-        timestamp_from, timestamp_to
-    )
-
-    return {
-        'money_values_aggregator': sales_money_values_calculator,
-        'count_values_aggregator': sales_count_values_calculator
-    }
-
-
 def calculate_sum_value_over_leads_per_months(leads_by_months, calculator):
     total = 0
     for (month_key, month_leads) in leads_by_months.items():
         total += calculator(month_leads)
     return total
+
 
 def get_dates_from_timestamp_interval(timestamp_from, timestamp_to):
     right_border = timestamp_from

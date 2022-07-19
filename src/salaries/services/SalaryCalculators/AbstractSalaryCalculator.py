@@ -1,8 +1,38 @@
-from abc import ABC, abstractmethod
-from salaries.models.SalaryReport import SalaryReport
+from abc import ABC
+from salaries.models.SalaryReport import Metrica, SalaryReport
+from salaries.services.SalaryCalculators.constants import META_PARAM_COUNT_IN_TOTAL_SUM, TOTAL_MONEY_CLASS_NAME
 
 
 class AbstractSalaryCalculator(ABC):
-    @abstractmethod
+
+    METRICS_BUILDERS = []
+
+    def __init__(self, metrics_data_fetcher=None):
+        if metrics_data_fetcher is None:
+            self.metrics_data_fetcher = lambda: {}
+        else:
+            self.metrics_data_fetcher = metrics_data_fetcher
+
     def process(self, employee, timestamp_from, timestamp_to) -> SalaryReport:
-        pass
+        report = SalaryReport()
+        report.add_metrics(self.__build_metrics(employee, timestamp_from, timestamp_to))
+
+        money_amount = sum([metrica.value for metrica in report.get_metrics_by_meta_param(
+            META_PARAM_COUNT_IN_TOTAL_SUM, True)])
+
+        report.add_metrica(Metrica(
+            "Денег всего",
+            money_amount,
+            class_name=TOTAL_MONEY_CLASS_NAME,
+            label='total_money'
+        ))
+
+        return report
+
+    def get_metrics_data(self, employee, timestamp_from, timestamp_to):
+        return self.metrics_data_fetcher(employee, timestamp_from, timestamp_to)
+
+    def __build_metrics(self, employee, timestamp_from, timestamp_to):
+        metrics_data = self.get_metrics_data(employee, timestamp_from, timestamp_to)
+        metrics = [metrica_builder.create(employee, timestamp_from, timestamp_to, **metrics_data) for metrica_builder in self.METRICS_BUILDERS]
+        return metrics
