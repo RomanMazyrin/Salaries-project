@@ -6,4 +6,4 @@ lint:
 	flake8 src
 
 test:
-	cd src && pytest -s
+	cd src && pytest -s --cov --cov-report html --cov-report term

@@ -64,7 +64,7 @@ def sm_employee():
         sales_plan_money_bonus=30000,
         sales_plan_count_bonus=15000
     )
-    employee = Employee(position=position)
+    employee = Employee(position=position, name='Test manager')
     return employee
 
 
@@ -163,6 +163,20 @@ def samples_map_for_sales_manager_calculator(
             },
         },
     ]
+
+
+def test_calculator_metrics_creating(sm_employee):
+    calc = DeprecatedSalaryCalculator()
+    md = calc.get_metrics_data(1, 1, 1)
+    assert md == {}
+
+    def fetch_data(employee, f, t):
+        return {"hello": employee.name}
+
+    calc = DeprecatedSalaryCalculator(fetch_data)
+    md = calc.get_metrics_data(sm_employee, 1, 1)
+    assert md['hello'] == 'Test manager'
+
 
 
 def test_calculator_metrics_results(
