@@ -9,7 +9,9 @@ class AbstractSalaryCalculator(ABC):
 
     def __init__(self, metrics_data_fetcher=None):
         if metrics_data_fetcher is None:
-            self.metrics_data_fetcher = lambda: {}
+            def empty_data(*args, **kwargs):
+                return {}
+            self.metrics_data_fetcher = empty_data
         else:
             self.metrics_data_fetcher = metrics_data_fetcher
 

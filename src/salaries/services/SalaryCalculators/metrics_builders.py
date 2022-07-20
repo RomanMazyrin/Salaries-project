@@ -1,8 +1,11 @@
 from abc import ABC, abstractmethod
+import math
 
 from salaries.models.SalaryReport import Metrica
+from salaries.services.SalaryCalculators.constants import META_PARAM_COUNT_IN_TOTAL_SUM, METRICA_MONEY_CLASS_NAME
 from salaries.services.SalaryCalculators.helpers import (
-    calculate_sum_value_over_leads_per_months
+    calculate_sum_value_over_leads_per_months,
+    get_dates_from_timestamp_interval
 )
 
 
@@ -28,13 +31,15 @@ class MetricaBuilder(ABC):
     DEFAULT_NAME = ''
     DEFAULT_LABEL = ''
     DEFAULT_GROUP = ''
+    DEFAULT_META = {}
+    DEFAULT_CLASS_NAME = ''
     
-    def __init__(self, name=None, label=None, group=None, meta={}, class_name=''):
+    def __init__(self, name=None, label=None, group=None, meta=None, class_name=None):
         self.metrica_name = name if name is not None else self.DEFAULT_NAME
         self.metrica_label = label if label is not None else self.DEFAULT_LABEL
         self.metrica_group = group if group is not None else self.DEFAULT_GROUP
-        self.metrica_meta = meta
-        self.metrica_class_name = class_name
+        self.metrica_meta = meta if meta is not None else self.DEFAULT_META
+        self.metrica_class_name = class_name if class_name is not None else self.DEFAULT_CLASS_NAME
 
     @abstractmethod
     def _calculate_value(self, employee, timestamp_from, timestamp_to, *args, **kwargs):
@@ -141,3 +146,17 @@ class LeadsSalesFeeValueMetricaBuilder(MetricaBuilder):
                 (position.sales_fee_percent_above_plan / 100)
 
         return total_salary_money_for_sales
+
+
+class SalaryPerDayMetricaBuilder(MetricaBuilder):
+
+    DEFAULT_NAME = 'Оклад'
+    DEFAULT_LABEL = 'salary'
+    DEFAULT_GROUP = 'salary'
+    DEFAULT_META = {META_PARAM_COUNT_IN_TOTAL_SUM: True}
+    DEAFULT_CLASS_NAME = METRICA_MONEY_CLASS_NAME
+    
+    def _calculate_value(self, employee, timestamp_from, timestamp_to, *args, **kwargs):
+        interval_days = get_dates_from_timestamp_interval(timestamp_from, timestamp_to)
+        work_days = len([d.isoweekday() for d in interval_days if d.isoweekday() <= 5])
+        return math.ceil(employee.position.daily_salary_amount * work_days)

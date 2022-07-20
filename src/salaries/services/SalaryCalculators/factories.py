@@ -3,15 +3,16 @@ from salaries.services.SalaryCalculators.AbstractSalaryCalculator import Abstrac
 from salaries.services.SalaryCalculators.DeprecatedSalaryCalculator import DeprecatedSalaryCalculator
 from salaries.services.SalaryCalculators.SalesHeadSalaryCalculator import SalesHeadSalaryCalculator
 from salaries.services.SalaryCalculators.SalesManagerSalaryCalculator import SalesManagerSalaryCalculator
+from salaries.services.SalaryCalculators.TechSupportSalaryCalculator import TechSupportSalaryCalculator
 from salaries.services.SalaryCalculators.constants import LEADS_STATUSES_FOR_SALES_CALCULATIONS
 from salaries.services.SalaryCalculators.helpers import fetch_all_leads_by_months_covered_by_timestamp_interval
 
 POSITION_CALCULATORS = {
     EmployeePosition.DEPRECATED: DeprecatedSalaryCalculator,
     EmployeePosition.SALES_MANAGER: SalesManagerSalaryCalculator,
-    EmployeePosition.SALES_HEAD: SalesHeadSalaryCalculator
+    EmployeePosition.SALES_HEAD: SalesHeadSalaryCalculator,
+    EmployeePosition.TECH_SUPPORT: TechSupportSalaryCalculator
 }
-
 
 
 def employee_leads_fetcher(employee, timestamp_from, timestamp_to):
@@ -59,5 +60,5 @@ POSITION_LEADS_FETCHERS = {
 def get_calculator_by_position_type(position_type):
     CalculatorClass = POSITION_CALCULATORS.get(position_type)
     if issubclass(CalculatorClass, AbstractSalaryCalculator):
-        return CalculatorClass(POSITION_LEADS_FETCHERS[position_type])
+        return CalculatorClass(POSITION_LEADS_FETCHERS.get(position_type))
     return None

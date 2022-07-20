@@ -81,6 +81,15 @@ def sales_head_employee():
     )
     employee = Employee(position=position, name='Test head employee')
     return employee
+
+
+@pytest.fixture
+def tech_support_employee():
+    position = EmployeePosition(
+        position_type=EmployeePosition.TECH_SUPPORT,
+        daily_salary_amount=2000
+    )
+    return Employee(position=position, name='Test tech support employee')
     
 
 @pytest.fixture
@@ -102,6 +111,7 @@ def test_default_position_calculator():
 def samples_map_for_sales_manager_calculator(
     sm_employee,
     sales_head_employee,
+    tech_support_employee
 ):
     return [
         {
@@ -141,7 +151,17 @@ def samples_map_for_sales_manager_calculator(
             'expected_metrics_values': {
                 'salary': 15910
             },
-        }
+        },
+        {
+            'employee': tech_support_employee,
+            'interval': {
+                "from": datetime(2022, 6, 13, 0, 0, 0).timestamp(),
+                'to':  datetime(2022, 6, 17, 23, 59, 59).timestamp()
+            },
+            'expected_metrics_values': {
+                'salary': 10000
+            },
+        },
     ]
 
 
