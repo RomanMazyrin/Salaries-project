@@ -10,6 +10,7 @@ from salaries.services.SalaryCalculators.metrics_builders import (
     LeadsSumAggregatedValueMetricaBuilder
 )
 
+
 class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
 
     METRICS_BUILDERS = [
@@ -53,7 +54,7 @@ class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
             class_name=METRICA_MONEY_CLASS_NAME
         )
     ]
-    
+
     '''
     Список метрик:
 
@@ -66,4 +67,3 @@ class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
     7. Бонус за выполнение плана по количеству встреч
     8. Деньги за встречи
     '''
-

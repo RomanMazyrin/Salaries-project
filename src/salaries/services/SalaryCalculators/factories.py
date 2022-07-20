@@ -1,11 +1,13 @@
 from salaries.models.EmployeePosition import EmployeePosition
-from salaries.services.SalaryCalculators.AbstractSalaryCalculator import AbstractSalaryCalculator
-from salaries.services.SalaryCalculators.DeprecatedSalaryCalculator import DeprecatedSalaryCalculator
-from salaries.services.SalaryCalculators.SalesHeadSalaryCalculator import SalesHeadSalaryCalculator
-from salaries.services.SalaryCalculators.SalesManagerSalaryCalculator import SalesManagerSalaryCalculator
-from salaries.services.SalaryCalculators.TechSupportSalaryCalculator import TechSupportSalaryCalculator
+from salaries.services.SalaryCalculators import (
+    AbstractSalaryCalculator,
+    DeprecatedSalaryCalculator,
+    SalesHeadSalaryCalculator,
+    SalesManagerSalaryCalculator,
+    TechSupportSalaryCalculator,
+    fetch_all_leads_by_months_covered_by_timestamp_interval
+)
 from salaries.services.SalaryCalculators.constants import LEADS_STATUSES_FOR_SALES_CALCULATIONS
-from salaries.services.SalaryCalculators.helpers import fetch_all_leads_by_months_covered_by_timestamp_interval
 
 POSITION_CALCULATORS = {
     EmployeePosition.DEPRECATED: DeprecatedSalaryCalculator,
@@ -47,7 +49,6 @@ def sales_head_leads_fetcher(employee, timestamp_from, timestamp_to):
     return {
         'leads': leads_by_months
     }
-
 
 
 POSITION_LEADS_FETCHERS = {

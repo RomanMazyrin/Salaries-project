@@ -77,7 +77,7 @@ def get_dates_from_timestamp_interval(timestamp_from, timestamp_to):
     res = []
     while True:
         res += [datetime.fromtimestamp(right_border).replace(hour=0, minute=0, second=0)]
-        right_border += 3600*24
+        right_border += 3600 * 24
         if right_border > timestamp_to:
             res += [datetime.fromtimestamp(timestamp_to).replace(hour=0, minute=0, second=0)]
             break

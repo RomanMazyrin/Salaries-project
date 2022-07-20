@@ -9,5 +9,5 @@ test:
 	cd src && pytest -s
 
 test-coverage:
-	cd src && pytest -s --cov --cov-report html --cov-report term --cov-fail-under=80
+	cd src && pytest -s --cov --cov-report html --cov-report term --cov-fail-under=70
     

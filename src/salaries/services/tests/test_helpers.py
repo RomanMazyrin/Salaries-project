@@ -9,6 +9,7 @@ def timestamp_from_create():
         return datetime(year, month, day, 0, 0, 0).timestamp()
     return creator
 
+
 @pytest.fixture
 def timestamp_to_create():
     def creator(year, month, day):

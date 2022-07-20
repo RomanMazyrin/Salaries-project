@@ -1,6 +1,9 @@
 from abc import ABC
 from salaries.models.SalaryReport import Metrica, SalaryReport
-from salaries.services.SalaryCalculators.constants import META_PARAM_COUNT_IN_TOTAL_SUM, TOTAL_MONEY_CLASS_NAME
+from salaries.services.SalaryCalculators.constants import (
+    META_PARAM_COUNT_IN_TOTAL_SUM,
+    TOTAL_MONEY_CLASS_NAME
+)
 
 
 class AbstractSalaryCalculator(ABC):
@@ -34,7 +37,9 @@ class AbstractSalaryCalculator(ABC):
     def get_metrics_data(self, employee, timestamp_from, timestamp_to):
         return self.metrics_data_fetcher(employee, timestamp_from, timestamp_to)
 
-    def __build_metrics(self, employee, timestamp_from, timestamp_to):
-        metrics_data = self.get_metrics_data(employee, timestamp_from, timestamp_to)
-        metrics = [metrica_builder.create(employee, timestamp_from, timestamp_to, **metrics_data) for metrica_builder in self.METRICS_BUILDERS]
+    def __build_metrics(self, *args, **kwargs):
+        metrics_data = self.get_metrics_data(*args, **kwargs)
+        metrics = [
+            mb.create(*args, **kwargs, **metrics_data) for mb in self.METRICS_BUILDERS
+        ]
         return metrics

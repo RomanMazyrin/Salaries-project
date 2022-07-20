@@ -1,6 +1,5 @@
-import pytest
-
 from salaries.services.SalaryCalculators.metrics_builders import MetricaBuilder
+
 
 class MockMetricaBuilder(MetricaBuilder):
     DEFAULT_NAME = 'Test name'
@@ -9,6 +8,7 @@ class MockMetricaBuilder(MetricaBuilder):
 
     def _calculate_value(self, employee, timestamp_from, timestamp_to, *args, **kwargs):
         return 40
+
 
 def test_mock_metrica_builder():
 

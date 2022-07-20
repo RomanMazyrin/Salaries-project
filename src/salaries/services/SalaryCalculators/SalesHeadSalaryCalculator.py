@@ -11,6 +11,7 @@ from salaries.services.SalaryCalculators.metrics_builders import (
     SimpleMetricaBuilder
 )
 
+
 def sales_fee_calc(builder, employee, timestamp_from, timestamp_to, *args, **kwargs):
     sum_builder = LeadsSumAggregatedValueMetricaBuilder(
         name='Сумма продаж',
@@ -19,7 +20,8 @@ def sales_fee_calc(builder, employee, timestamp_from, timestamp_to, *args, **kwa
         item_value_getter=lambda lead: lead['price']
     )
 
-    sales_total_sum = sum_builder.create(employee, timestamp_from, timestamp_to, *args, **kwargs).value
+    sales_total_sum = sum_builder.create(
+        employee, timestamp_from, timestamp_to, *args, **kwargs).value
 
     sales_fee_salary = math.ceil(sales_total_sum * (employee.position.sales_fee_percent / 100))
     return sales_fee_salary
@@ -60,7 +62,7 @@ class SalesHeadSalaryCalculator(AbstractSalaryCalculator):
             meta={META_PARAM_COUNT_IN_TOTAL_SUM: True},
             class_name=METRICA_MONEY_CLASS_NAME
         ),
-        
+
         SalaryPerDayMetricaBuilder(),
 
         SimpleMetricaBuilder(

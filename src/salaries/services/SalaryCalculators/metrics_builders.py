@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
 import math
-
 from salaries.models.SalaryReport import Metrica
-from salaries.services.SalaryCalculators.constants import META_PARAM_COUNT_IN_TOTAL_SUM, METRICA_MONEY_CLASS_NAME
+from salaries.services.SalaryCalculators.constants import (
+    META_PARAM_COUNT_IN_TOTAL_SUM,
+    METRICA_MONEY_CLASS_NAME
+)
 from salaries.services.SalaryCalculators.helpers import (
     calculate_sum_value_over_leads_per_months,
     get_dates_from_timestamp_interval
@@ -14,6 +16,7 @@ def get_items_in_timestamp_interval(items, key, timestamp_from, timestamp_to):
         lambda item: timestamp_from <= item[key] <= timestamp_to,
         items
     )
+
 
 def cut_months_leads_closed_after_timestamp(leads_by_months, timestamp):
     res = {}
@@ -33,7 +36,7 @@ class MetricaBuilder(ABC):
     DEFAULT_GROUP = ''
     DEFAULT_META = {}
     DEFAULT_CLASS_NAME = ''
-    
+
     def __init__(self, name=None, label=None, group=None, meta=None, class_name=None):
         self.metrica_name = name if name is not None else self.DEFAULT_NAME
         self.metrica_label = label if label is not None else self.DEFAULT_LABEL
@@ -63,27 +66,28 @@ class SimpleMetricaBuilder(MetricaBuilder):
         self.metrica_value_func = value_func if value_func is not None else lambda: None
 
     def _calculate_value(self, employee, timestamp_from, timestamp_to, *args, **kwargs):
-        return self.metrica_value_func(self, employee, timestamp_from, timestamp_to, *args, **kwargs)
-        
+        return self.metrica_value_func(
+            self, employee, timestamp_from, timestamp_to, *args, **kwargs
+        )
+
 
 class LeadsAggregatedValueMetricBuilder(MetricaBuilder):
     def __init__(self, item_value_getter, **kwargs):
         super().__init__(**kwargs)
         self._item_value_getter = item_value_getter
 
-    
-    
+
 class LeadsSumAggregatedValueMetricaBuilder(LeadsAggregatedValueMetricBuilder):
     def _calculate_value(self, employee, timestamp_from, timestamp_to, *args, **kwargs):
 
         def _sum(items):
-            items_in_interval = get_items_in_timestamp_interval(items, 'closed_at', timestamp_from, timestamp_to)
+            items_in_interval = get_items_in_timestamp_interval(
+                items, 'closed_at', timestamp_from, timestamp_to)
             return sum([self._item_value_getter(item) for item in items_in_interval])
 
         leads_by_months = kwargs['leads']
         sales_total_sum = calculate_sum_value_over_leads_per_months(leads_by_months, _sum)
         return sales_total_sum
-
 
 
 class LeadsBonusArchievementValueMetricaBuilder(LeadsAggregatedValueMetricBuilder):
@@ -92,13 +96,14 @@ class LeadsBonusArchievementValueMetricaBuilder(LeadsAggregatedValueMetricBuilde
         super().__init__(**kwargs)
         self._plan_getter = plan
         self._bonus_getter = bonus
-        
+
     def _calculate_value(self, employee, timestamp_from, timestamp_to, *args, **kwargs):
         leads_by_months = cut_months_leads_closed_after_timestamp(kwargs['leads'], timestamp_to)
 
         def process_bonus(items):
-            
-            items_in_interval = get_items_in_timestamp_interval(items, 'closed_at', timestamp_from, timestamp_to)
+
+            items_in_interval = get_items_in_timestamp_interval(
+                items, 'closed_at', timestamp_from, timestamp_to)
 
             sum_in_full_list = sum([self._item_value_getter(item) for item in items])
             value_for_period = sum([self._item_value_getter(item) for item in items_in_interval])
@@ -110,7 +115,6 @@ class LeadsBonusArchievementValueMetricaBuilder(LeadsAggregatedValueMetricBuilde
 
         sales_total_sum = calculate_sum_value_over_leads_per_months(leads_by_months, process_bonus)
         return sales_total_sum
-        
 
 
 class LeadsSalesFeeValueMetricaBuilder(MetricaBuilder):
@@ -128,7 +132,7 @@ class LeadsSalesFeeValueMetricaBuilder(MetricaBuilder):
                 month_leads
             )
             sum_in_full_list = sum([lead['price'] for lead in month_leads])
-            
+
             income_for_sales_in_period = sum([lead['price'] for lead in leads_in_interval])
             income_for_sales_in_period_above_the_plan = sum_in_full_list - position.sales_plan_money
 
@@ -155,7 +159,7 @@ class SalaryPerDayMetricaBuilder(MetricaBuilder):
     DEFAULT_GROUP = 'salary'
     DEFAULT_META = {META_PARAM_COUNT_IN_TOTAL_SUM: True}
     DEAFULT_CLASS_NAME = METRICA_MONEY_CLASS_NAME
-    
+
     def _calculate_value(self, employee, timestamp_from, timestamp_to, *args, **kwargs):
         interval_days = get_dates_from_timestamp_interval(timestamp_from, timestamp_to)
         work_days = len([d.isoweekday() for d in interval_days if d.isoweekday() <= 5])

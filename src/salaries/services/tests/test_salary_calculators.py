@@ -4,7 +4,11 @@ from salaries.services.SalaryCalculators.AbstractSalaryCalculator import Abstrac
 from salaries.services.SalaryCalculators.DeprecatedSalaryCalculator import (
     DeprecatedSalaryCalculator
 )
-from salaries.services.SalaryCalculators.factories import POSITION_CALCULATORS, get_calculator_by_position_type
+from salaries.services.SalaryCalculators.factories import (
+    POSITION_CALCULATORS,
+    get_calculator_by_position_type
+)
+
 from salaries.services.SalaryCalculators.helpers import split_closed_leads_by_months
 
 from salaries.models.EmployeePosition import EmployeePosition
@@ -24,6 +28,7 @@ def leads_factory():
         }
     return create_lead
 
+
 @pytest.fixture
 def leads_list(leads_factory):
     return [
@@ -41,9 +46,11 @@ def leads_list(leads_factory):
         leads_factory(datetime(2022, 6, 16, 15, 0, 0), 10000)
     ]
 
+
 @pytest.fixture
 def leads_by_months(leads_list):
     return split_closed_leads_by_months(leads_list)
+
 
 @pytest.fixture
 def leads_fetcher(leads_by_months):
@@ -52,6 +59,7 @@ def leads_fetcher(leads_by_months):
             'leads': leads_by_months
         }
     return f
+
 
 @pytest.fixture
 def sm_employee():
@@ -90,7 +98,7 @@ def tech_support_employee():
         daily_salary_amount=2000
     )
     return Employee(position=position, name='Test tech support employee')
-    
+
 
 @pytest.fixture
 def calculator_generator(leads_fetcher):
@@ -146,7 +154,7 @@ def samples_map_for_sales_manager_calculator(
             'employee': sales_head_employee,
             'interval': {
                 "from": datetime(2022, 6, 13, 0, 0, 0).timestamp(),
-                'to':  datetime(2022, 6, 17, 23, 59, 59).timestamp()
+                'to': datetime(2022, 6, 17, 23, 59, 59).timestamp()
             },
             'expected_metrics_values': {
                 'salary': 15910
@@ -156,7 +164,7 @@ def samples_map_for_sales_manager_calculator(
             'employee': tech_support_employee,
             'interval': {
                 "from": datetime(2022, 6, 13, 0, 0, 0).timestamp(),
-                'to':  datetime(2022, 6, 17, 23, 59, 59).timestamp()
+                'to': datetime(2022, 6, 17, 23, 59, 59).timestamp()
             },
             'expected_metrics_values': {
                 'salary': 10000
@@ -176,7 +184,6 @@ def test_calculator_metrics_creating(sm_employee):
     calc = DeprecatedSalaryCalculator(fetch_data)
     md = calc.get_metrics_data(sm_employee, 1, 1)
     assert md['hello'] == 'Test manager'
-
 
 
 def test_calculator_metrics_results(

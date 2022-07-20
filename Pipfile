@@ -8,6 +8,7 @@ flake8 = "*"
 autopep8 = "*"
 pytest = "*"
 pytest-cov = "*"
+pre-commit = "*"
 
 [packages]
 django = "==3.2.11"
