@@ -16,12 +16,17 @@ import sys
 import os
 import prometheus_client
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+os.environ["PROMETHEUS_MULTIPROC_DIR"] = os.environ.get(
+    "PROMETHEUS_MULTIPROC_DIR", str(BASE_DIR / "prometheus_metrics")
+)
+
 prometheus_client.values.ValueClass = prometheus_client.values.MultiProcessValue(
     process_identifier=lambda: os.environ.get("APP_WORKER_ID", "1")
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 ENV_FILE_PATH = BASE_DIR / ".env"
 
 if os.path.exists(ENV_FILE_PATH):

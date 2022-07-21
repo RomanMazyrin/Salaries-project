@@ -1,4 +1,4 @@
-FROM python:3.7-alpine
+FROM python:3.9-alpine
 
 LABEL org.opencontainers.image.source="https://github.com/RomanMazyrin/django_playground"
 
@@ -19,13 +19,12 @@ RUN pip install pipenv
 COPY Pipfile /app
 COPY Pipfile.lock /app
 
-RUN pipenv sync --system
+RUN pipenv sync --system --dev
 
 COPY ./docker/entrypoint.sh /app/entrypoint.sh
 RUN chmod 777 /app/entrypoint.sh
 
-RUN mkdir /app/src
-COPY src /app/src
+COPY . /app
 
 WORKDIR /app/src
 
