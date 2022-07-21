@@ -5,9 +5,7 @@ repos:
         name: lint
         id: lint
         language: python
-        verbose: true
       - entry: make test-coverage
         language: python
         name: test
         id: test
-        verbose: true
