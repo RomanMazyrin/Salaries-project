@@ -24,10 +24,13 @@ jobs:
           file: ./docker/Dockerfile
           tags: salaries_app
 
-      -
-        name: Lint
-        run: docker run --entrypoint='' salaries_app sh -c 'cd /app && flake8 src'
+      - name: check
+        run: docker images
 
-      -
-        name: Test
-        run: docker run --entrypoint='' salaries_app sh -c 'cd /app && pytest'
+      # -
+      #   name: Lint
+      #   run: docker run --entrypoint='' salaries_app sh -c 'cd /app && flake8 src'
+
+      # -
+      #   name: Test
+      #   run: docker run --entrypoint='' salaries_app sh -c 'cd /app && pytest'
