@@ -7,25 +7,40 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('salaries', '0007_auto_20201119_2306'),
+        ("salaries", "0007_auto_20201119_2306"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='OnpbxAccount',
+            name="OnpbxAccount",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('subdomain', models.CharField(max_length=255, verbose_name='Субдомен')),
-                ('api_key', models.CharField(max_length=255, verbose_name='Ключ API')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "subdomain",
+                    models.CharField(max_length=255, verbose_name="Субдомен"),
+                ),
+                ("api_key", models.CharField(max_length=255, verbose_name="Ключ API")),
             ],
             options={
-                'verbose_name': 'Аккаунт OnlinePBX',
-                'verbose_name_plural': 'Аккаунты OnlinePBX',
+                "verbose_name": "Аккаунт OnlinePBX",
+                "verbose_name_plural": "Аккаунты OnlinePBX",
             },
         ),
         migrations.AddField(
-            model_name='employee',
-            name='onpbx_account',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='salaries.onpbxaccount'),
+            model_name="employee",
+            name="onpbx_account",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="salaries.onpbxaccount",
+            ),
         ),
     ]

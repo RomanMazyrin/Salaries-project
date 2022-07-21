@@ -11,5 +11,5 @@ __all__ = [
     SalesHeadSalaryCalculator,
     SalesManagerSalaryCalculator,
     TechSupportSalaryCalculator,
-    fetch_all_leads_by_months_covered_by_timestamp_interval
+    fetch_all_leads_by_months_covered_by_timestamp_interval,
 ]

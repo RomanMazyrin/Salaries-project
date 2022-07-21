@@ -4,9 +4,16 @@ import time
 
 
 class ApiIterator:
-
-    def __init__(self, url, fetch_limit=50, start_page=1,
-                 params={}, entity_type='', total_limit=None, request_pause_timeout=1):
+    def __init__(
+        self,
+        url,
+        fetch_limit=50,
+        start_page=1,
+        params={},
+        entity_type="",
+        total_limit=None,
+        request_pause_timeout=1,
+    ):
 
         self.url = url
         self.limit = fetch_limit
@@ -44,20 +51,17 @@ class ApiIterator:
         return entities
 
     def __get_request_params_with_page_and_limit(self, page):
-        limit_params = {
-            "limit": self.limit,
-            "page": page
-        }
+        limit_params = {"limit": self.limit, "page": page}
 
         request_params = self.params.copy()
 
-        if 'filter' in request_params:
-            filter_params = request_params['filter']
+        if "filter" in request_params:
+            filter_params = request_params["filter"]
             if type(filter_params) == str:
                 filter_params = json.loads(filter_params)
         else:
             filter_params = {}
 
         filter_params.update(limit_params)
-        request_params['filter'] = json.dumps(filter_params)
+        request_params["filter"] = json.dumps(filter_params)
         return request_params

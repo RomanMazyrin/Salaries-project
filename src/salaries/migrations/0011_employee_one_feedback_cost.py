@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('salaries', '0010_employee_one_hour_salary_amount'),
+        ("salaries", "0010_employee_one_hour_salary_amount"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='employee',
-            name='one_feedback_cost',
-            field=models.IntegerField(blank=True, null=True, verbose_name='Стоимость одного отзыва'),
+            model_name="employee",
+            name="one_feedback_cost",
+            field=models.IntegerField(
+                blank=True, null=True, verbose_name="Стоимость одного отзыва"
+            ),
         ),
     ]

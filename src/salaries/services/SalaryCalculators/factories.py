@@ -5,15 +5,17 @@ from salaries.services.SalaryCalculators import (
     SalesHeadSalaryCalculator,
     SalesManagerSalaryCalculator,
     TechSupportSalaryCalculator,
-    fetch_all_leads_by_months_covered_by_timestamp_interval
+    fetch_all_leads_by_months_covered_by_timestamp_interval,
 )
-from salaries.services.SalaryCalculators.constants import LEADS_STATUSES_FOR_SALES_CALCULATIONS
+from salaries.services.SalaryCalculators.constants import (
+    LEADS_STATUSES_FOR_SALES_CALCULATIONS,
+)
 
 POSITION_CALCULATORS = {
     EmployeePosition.DEPRECATED: DeprecatedSalaryCalculator,
     EmployeePosition.SALES_MANAGER: SalesManagerSalaryCalculator,
     EmployeePosition.SALES_HEAD: SalesHeadSalaryCalculator,
-    EmployeePosition.TECH_SUPPORT: TechSupportSalaryCalculator
+    EmployeePosition.TECH_SUPPORT: TechSupportSalaryCalculator,
 }
 
 
@@ -22,11 +24,9 @@ def employee_leads_fetcher(employee, timestamp_from, timestamp_to):
         timestamp_from,
         timestamp_to,
         employee.amocrm_id,
-        LEADS_STATUSES_FOR_SALES_CALCULATIONS
+        LEADS_STATUSES_FOR_SALES_CALCULATIONS,
     )
-    return {
-        'leads': leads_by_months
-    }
+    return {"leads": leads_by_months}
 
 
 def sales_head_leads_fetcher(employee, timestamp_from, timestamp_to):
@@ -43,18 +43,16 @@ def sales_head_leads_fetcher(employee, timestamp_from, timestamp_to):
         timestamp_from,
         timestamp_to,
         amocrm_id_list,
-        LEADS_STATUSES_FOR_SALES_CALCULATIONS
+        LEADS_STATUSES_FOR_SALES_CALCULATIONS,
     )
 
-    return {
-        'leads': leads_by_months
-    }
+    return {"leads": leads_by_months}
 
 
 POSITION_LEADS_FETCHERS = {
     EmployeePosition.DEPRECATED: employee_leads_fetcher,
     EmployeePosition.SALES_MANAGER: employee_leads_fetcher,
-    EmployeePosition.SALES_HEAD: sales_head_leads_fetcher
+    EmployeePosition.SALES_HEAD: sales_head_leads_fetcher,
 }
 
 

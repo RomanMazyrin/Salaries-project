@@ -8,8 +8,8 @@ class SipuniAccount(models.Model):
     secret_key = models.CharField("Секретный ключ", max_length=255)
 
     class Meta:
-        verbose_name = 'Аккаунт Sipuni'
-        verbose_name_plural = 'Аккаунты Sipuni'
+        verbose_name = "Аккаунт Sipuni"
+        verbose_name_plural = "Аккаунты Sipuni"
 
     @property
     def client(self):

@@ -7,28 +7,52 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('salaries', '0017_employee_audit_cost'),
+        ("salaries", "0017_employee_audit_cost"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='employee',
-            name='email_imap_address',
-            field=models.CharField(blank=True, default='', max_length=255, null=True, verbose_name='IMAP address'),
+            model_name="employee",
+            name="email_imap_address",
+            field=models.CharField(
+                blank=True,
+                default="",
+                max_length=255,
+                null=True,
+                verbose_name="IMAP address",
+            ),
         ),
         migrations.AddField(
-            model_name='employee',
-            name='email_imap_login',
-            field=models.CharField(blank=True, default='', max_length=255, null=True, verbose_name='IMAP login'),
+            model_name="employee",
+            name="email_imap_login",
+            field=models.CharField(
+                blank=True,
+                default="",
+                max_length=255,
+                null=True,
+                verbose_name="IMAP login",
+            ),
         ),
         migrations.AddField(
-            model_name='employee',
-            name='email_imap_password',
-            field=models.CharField(blank=True, default='', max_length=255, null=True, verbose_name='IMAP password'),
+            model_name="employee",
+            name="email_imap_password",
+            field=models.CharField(
+                blank=True,
+                default="",
+                max_length=255,
+                null=True,
+                verbose_name="IMAP password",
+            ),
         ),
         migrations.AddField(
-            model_name='employee',
-            name='outcome_email_message_cost',
-            field=models.IntegerField(blank=True, default=0, null=True, validators=[django.core.validators.MinValueValidator(0)], verbose_name='Стоимость исходящего email сообщения'),
+            model_name="employee",
+            name="outcome_email_message_cost",
+            field=models.IntegerField(
+                blank=True,
+                default=0,
+                null=True,
+                validators=[django.core.validators.MinValueValidator(0)],
+                verbose_name="Стоимость исходящего email сообщения",
+            ),
         ),
     ]

@@ -3,11 +3,9 @@ from .OnpbxApiRequest import OnpbxApiRequest
 
 
 class Client:
-    """ Client for Onlinepbx API """
+    """Client for Onlinepbx API"""
 
-    services_map = {
-        'call_history': CallHistory
-    }
+    services_map = {"call_history": CallHistory}
 
     def __init__(self, subdomain, api_key):
         self.__subdomain = subdomain

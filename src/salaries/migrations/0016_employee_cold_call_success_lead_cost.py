@@ -7,13 +7,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('salaries', '0015_auto_20211229_1747'),
+        ("salaries", "0015_auto_20211229_1747"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='employee',
-            name='cold_call_success_lead_cost',
-            field=models.IntegerField(blank=True, default=0, null=True, validators=[django.core.validators.MinValueValidator(0)], verbose_name='Стоимость за успешную сделку по холодному обзвону'),
+            model_name="employee",
+            name="cold_call_success_lead_cost",
+            field=models.IntegerField(
+                blank=True,
+                default=0,
+                null=True,
+                validators=[django.core.validators.MinValueValidator(0)],
+                verbose_name="Стоимость за успешную сделку по холодному обзвону",
+            ),
         ),
     ]

@@ -11,8 +11,8 @@ class OnpbxAccount(models.Model):
         return self.subdomain
 
     class Meta:
-        verbose_name = 'Аккаунт OnlinePBX'
-        verbose_name_plural = 'Аккаунты OnlinePBX'
+        verbose_name = "Аккаунт OnlinePBX"
+        verbose_name_plural = "Аккаунты OnlinePBX"
 
     @property
     def client(self):

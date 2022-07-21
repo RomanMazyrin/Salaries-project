@@ -1,5 +1,4 @@
 class Call:
-
     def __init__(self):
         self.uuid = None
         self.caller_id_name = None

@@ -37,8 +37,16 @@ class BaseJsonSerializable:
 
 
 class Metrica(BaseJsonSerializable):
-    def __init__(self, name, value,
-                 group=None, description=None, label=None, meta_params={}, class_name=''):
+    def __init__(
+        self,
+        name,
+        value,
+        group=None,
+        description=None,
+        label=None,
+        meta_params={},
+        class_name="",
+    ):
         self.name = name
         self.value = value
         self.group = group
@@ -126,34 +134,36 @@ def get_random_slug():
 
 class SalaryReport(models.Model):
 
-    NOT_CONFIRMED = 'NOT_CONFIRMED'
-    CONFIRMED_FOR_PAYMENT = 'CONFIRMED_FOR_PAYMENT'
-    PAID = 'PAID'
-    DECLINED = 'DECLINED'
+    NOT_CONFIRMED = "NOT_CONFIRMED"
+    CONFIRMED_FOR_PAYMENT = "CONFIRMED_FOR_PAYMENT"
+    PAID = "PAID"
+    DECLINED = "DECLINED"
 
     REPORT_STATUSES = [
-        (NOT_CONFIRMED, 'Не подтвержден'),
-        (CONFIRMED_FOR_PAYMENT, 'Подтвержден для оплаты'),
-        (PAID, 'Оплачен'),
-        (DECLINED, 'Отклонен')
+        (NOT_CONFIRMED, "Не подтвержден"),
+        (CONFIRMED_FOR_PAYMENT, "Подтвержден для оплаты"),
+        (PAID, "Оплачен"),
+        (DECLINED, "Отклонен"),
     ]
 
     REPORT_STATUSES_CSS_CLASSES = {
         NOT_CONFIRMED: "secondary",
-        CONFIRMED_FOR_PAYMENT: 'warning',
-        PAID: 'success',
-        DECLINED: 'danger'
+        CONFIRMED_FOR_PAYMENT: "warning",
+        PAID: "success",
+        DECLINED: "danger",
     }
 
-    employee = models.ForeignKey(Employee, on_delete=models.SET_NULL,
-                                 null=True, verbose_name='Сотрудник')
-    created_at = models.DateTimeField('Время создания', null=False, auto_now_add=True)
-    date_from = models.DateTimeField('Время начала', null=False)
+    employee = models.ForeignKey(
+        Employee, on_delete=models.SET_NULL, null=True, verbose_name="Сотрудник"
+    )
+    created_at = models.DateTimeField("Время создания", null=False, auto_now_add=True)
+    date_from = models.DateTimeField("Время начала", null=False)
     date_to = models.DateTimeField("Время окончания", null=False)
     slug_id = models.SlugField(unique=True, blank=False, null=False, max_length=8)
-    status = models.CharField('Статус', choices=REPORT_STATUSES,
-                              default=NOT_CONFIRMED, max_length=50)
-    metrics = models.JSONField('Метрики', blank=True, null=False, default='')
+    status = models.CharField(
+        "Статус", choices=REPORT_STATUSES, default=NOT_CONFIRMED, max_length=50
+    )
+    metrics = models.JSONField("Метрики", blank=True, null=False, default="")
 
     def get_report_status_css_class(self):
         return self.REPORT_STATUSES_CSS_CLASSES[self.status]
@@ -202,30 +212,28 @@ class SalaryReport(models.Model):
         return None
 
     def get_absolute_url(self):
-        return reverse("salaries:salary_report_view", kwargs={
-            "report_slug": self.slug_id
-        })
+        return reverse("salaries:salary_report_view", kwargs={"report_slug": self.slug_id})
 
     def get_total_money(self):
-        metrica = self.get_metrica_by('label', 'total_money')
+        metrica = self.get_metrica_by("label", "total_money")
         if metrica:
             return f"{metrica.value:,}"
         return None
 
     def get_total_money_as_int(self):
-        metrica = self.get_metrica_by('label', 'total_money')
+        metrica = self.get_metrica_by("label", "total_money")
         if metrica:
             return int(metrica.value)
         return None
 
     def __str__(self):
-        formatted_date = self.created_at.strftime('%d.%m.%Y (%H:%M)')
+        formatted_date = self.created_at.strftime("%d.%m.%Y (%H:%M)")
         employee = self.employee if self.employee is not None else Employee()
         return f"{self.id}. {employee.name}, {formatted_date}"
 
     class Meta:
-        verbose_name = 'Зарплатный отчет'
-        verbose_name_plural = 'Зарплатные отчеты'
+        verbose_name = "Зарплатный отчет"
+        verbose_name_plural = "Зарплатные отчеты"
 
 
 @receiver(pre_save, sender=SalaryReport)

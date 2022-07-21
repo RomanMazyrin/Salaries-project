@@ -6,18 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('salaries', '0031_alter_salaryreport_employee'),
+        ("salaries", "0031_alter_salaryreport_employee"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='employeegroup',
-            name='employee_list',
-            field=models.ManyToManyField(blank=True, related_name='groups_as_employee', to='salaries.Employee', verbose_name='Список участников'),
+            model_name="employeegroup",
+            name="employee_list",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="groups_as_employee",
+                to="salaries.Employee",
+                verbose_name="Список участников",
+            ),
         ),
         migrations.AlterField(
-            model_name='employeegroup',
-            name='group_heads',
-            field=models.ManyToManyField(blank=True, related_name='groups_as_head', to='salaries.Employee', verbose_name='Список руководителей'),
+            model_name="employeegroup",
+            name="group_heads",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="groups_as_head",
+                to="salaries.Employee",
+                verbose_name="Список руководителей",
+            ),
         ),
     ]

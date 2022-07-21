@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('salaries', '0020_employee_is_active'),
+        ("salaries", "0020_employee_is_active"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='employee',
-            name='show_in_sales_plan',
-            field=models.BooleanField(default=True, verbose_name='Показывать в плане продаж'),
+            model_name="employee",
+            name="show_in_sales_plan",
+            field=models.BooleanField(default=True, verbose_name="Показывать в плане продаж"),
         ),
     ]

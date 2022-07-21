@@ -1,4 +1,6 @@
-from salaries.services.SalaryCalculators.AbstractSalaryCalculator import AbstractSalaryCalculator
+from salaries.services.SalaryCalculators.AbstractSalaryCalculator import (
+    AbstractSalaryCalculator,
+)
 from salaries.services.SalaryCounter import SalaryCounter
 
 

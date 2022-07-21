@@ -7,13 +7,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('salaries', '0016_employee_cold_call_success_lead_cost'),
+        ("salaries", "0016_employee_cold_call_success_lead_cost"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='employee',
-            name='audit_cost',
-            field=models.IntegerField(blank=True, default=0, null=True, validators=[django.core.validators.MinValueValidator(0)], verbose_name='Стоимость аудита'),
+            model_name="employee",
+            name="audit_cost",
+            field=models.IntegerField(
+                blank=True,
+                default=0,
+                null=True,
+                validators=[django.core.validators.MinValueValidator(0)],
+                verbose_name="Стоимость аудита",
+            ),
         ),
     ]

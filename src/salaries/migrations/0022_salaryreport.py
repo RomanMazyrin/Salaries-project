@@ -7,25 +7,54 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('salaries', '0021_employee_show_in_sales_plan'),
+        ("salaries", "0021_employee_show_in_sales_plan"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='SalaryReport',
+            name="SalaryReport",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Время создания')),
-                ('date_from', models.DateTimeField(verbose_name='Время начала')),
-                ('date_to', models.DateTimeField(verbose_name='Время окончания')),
-                ('slug_id', models.SlugField(max_length=8, unique=True)),
-                ('status', models.CharField(choices=[('NOT_CONFIRMED', 'Не подтвержден'), ('CONFIRMED_FOR_PAYMENT', 'Подтвержден для оплаты'), ('PAID', 'Оплачен')], default='NOT_CONFIRMED', max_length=50, verbose_name='Статус')),
-                ('metrics', models.JSONField(verbose_name='Метрики')),
-                ('employee', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='salaries.employee')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(auto_now_add=True, verbose_name="Время создания"),
+                ),
+                ("date_from", models.DateTimeField(verbose_name="Время начала")),
+                ("date_to", models.DateTimeField(verbose_name="Время окончания")),
+                ("slug_id", models.SlugField(max_length=8, unique=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("NOT_CONFIRMED", "Не подтвержден"),
+                            ("CONFIRMED_FOR_PAYMENT", "Подтвержден для оплаты"),
+                            ("PAID", "Оплачен"),
+                        ],
+                        default="NOT_CONFIRMED",
+                        max_length=50,
+                        verbose_name="Статус",
+                    ),
+                ),
+                ("metrics", models.JSONField(verbose_name="Метрики")),
+                (
+                    "employee",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        to="salaries.employee",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Зарплатный отчет',
-                'verbose_name_plural': 'Зарплатные отчеты',
+                "verbose_name": "Зарплатный отчет",
+                "verbose_name_plural": "Зарплатные отчеты",
             },
         ),
     ]

@@ -1,12 +1,14 @@
 from datetime import datetime
 from salaries.models.Employee import Employee
-from salaries.services.SalaryCalculators.AbstractSalaryCalculator import AbstractSalaryCalculator
+from salaries.services.SalaryCalculators.AbstractSalaryCalculator import (
+    AbstractSalaryCalculator,
+)
 from salaries.services.SalaryCalculators.DeprecatedSalaryCalculator import (
-    DeprecatedSalaryCalculator
+    DeprecatedSalaryCalculator,
 )
 from salaries.services.SalaryCalculators.factories import (
     POSITION_CALCULATORS,
-    get_calculator_by_position_type
+    get_calculator_by_position_type,
 )
 
 from salaries.services.SalaryCalculators.helpers import split_closed_leads_by_months
@@ -20,12 +22,13 @@ def leads_factory():
     def create_lead(closed_at_datetime=None, price=0, status=None, pipeline=None, user_id=None):
         closed_at_timestamp = closed_at_datetime.timestamp()
         return {
-            'price': price,
-            'closed_at': closed_at_timestamp,
-            'status_id': status,
-            'pipeline_id': pipeline,
-            'responsible_user_id': user_id
+            "price": price,
+            "closed_at": closed_at_timestamp,
+            "status_id": status,
+            "pipeline_id": pipeline,
+            "responsible_user_id": user_id,
         }
+
     return create_lead
 
 
@@ -43,7 +46,7 @@ def leads_list(leads_factory):
         leads_factory(datetime(2022, 6, 2, 15, 0, 0), 10000),
         leads_factory(datetime(2022, 6, 5, 15, 0, 0), 10000),
         leads_factory(datetime(2022, 6, 14, 15, 0, 0), 10000),
-        leads_factory(datetime(2022, 6, 16, 15, 0, 0), 10000)
+        leads_factory(datetime(2022, 6, 16, 15, 0, 0), 10000),
     ]
 
 
@@ -55,9 +58,8 @@ def leads_by_months(leads_list):
 @pytest.fixture
 def leads_fetcher(leads_by_months):
     def f(*args, **kwargs):
-        return {
-            'leads': leads_by_months
-        }
+        return {"leads": leads_by_months}
+
     return f
 
 
@@ -70,9 +72,9 @@ def sm_employee():
         sales_fee_percent=10,
         sales_fee_percent_above_plan=15,
         sales_plan_money_bonus=30000,
-        sales_plan_count_bonus=15000
+        sales_plan_count_bonus=15000,
     )
-    employee = Employee(position=position, name='Test manager')
+    employee = Employee(position=position, name="Test manager")
     return employee
 
 
@@ -85,19 +87,18 @@ def sales_head_employee():
         sales_plan_count=3,
         sales_fee_percent=5,
         sales_plan_money_bonus=10000,
-        sales_plan_count_bonus=10000
+        sales_plan_count_bonus=10000,
     )
-    employee = Employee(position=position, name='Test head employee')
+    employee = Employee(position=position, name="Test head employee")
     return employee
 
 
 @pytest.fixture
 def tech_support_employee():
     position = EmployeePosition(
-        position_type=EmployeePosition.TECH_SUPPORT,
-        daily_salary_amount=2000
+        position_type=EmployeePosition.TECH_SUPPORT, daily_salary_amount=2000
     )
-    return Employee(position=position, name='Test tech support employee')
+    return Employee(position=position, name="Test tech support employee")
 
 
 @pytest.fixture
@@ -107,6 +108,7 @@ def calculator_generator(leads_fetcher):
         if issubclass(CalculatorClass, AbstractSalaryCalculator):
             return CalculatorClass(leads_fetcher)
         return None
+
     return generator
 
 
@@ -117,58 +119,52 @@ def test_default_position_calculator():
 
 @pytest.fixture
 def samples_map_for_sales_manager_calculator(
-    sm_employee,
-    sales_head_employee,
-    tech_support_employee
+    sm_employee, sales_head_employee, tech_support_employee
 ):
     return [
         {
-            'employee': sm_employee,
-            'interval': {
+            "employee": sm_employee,
+            "interval": {
                 "from": datetime(2022, 5, 4, 0, 0, 0).timestamp(),
-                'to': datetime(2022, 6, 14, 23, 59, 59).timestamp()
+                "to": datetime(2022, 6, 14, 23, 59, 59).timestamp(),
             },
-            'expected_metrics_values': {
-                'sales_income': 50000,
-                'sales_fee_salary': 6000,
-                'sales_plan_bonus': 60000,
-                'sales_count': 5,
-                'sales_plan_count_bonus': 30000
+            "expected_metrics_values": {
+                "sales_income": 50000,
+                "sales_fee_salary": 6000,
+                "sales_plan_bonus": 60000,
+                "sales_count": 5,
+                "sales_plan_count_bonus": 30000,
             },
         },
         {
-            'employee': sm_employee,
-            'interval': {
+            "employee": sm_employee,
+            "interval": {
                 "from": datetime(2022, 4, 6, 0, 0, 0).timestamp(),
-                'to': datetime(2022, 4, 8, 23, 59, 59).timestamp()
+                "to": datetime(2022, 4, 8, 23, 59, 59).timestamp(),
             },
-            'expected_metrics_values': {
-                'sales_income': 20000,
-                'sales_fee_salary': 2000,
-                'sales_plan_bonus': 0,
-                'sales_count': 2,
-                'sales_plan_count_bonus': 0
-            },
-        },
-        {
-            'employee': sales_head_employee,
-            'interval': {
-                "from": datetime(2022, 6, 13, 0, 0, 0).timestamp(),
-                'to': datetime(2022, 6, 17, 23, 59, 59).timestamp()
-            },
-            'expected_metrics_values': {
-                'salary': 15910
+            "expected_metrics_values": {
+                "sales_income": 20000,
+                "sales_fee_salary": 2000,
+                "sales_plan_bonus": 0,
+                "sales_count": 2,
+                "sales_plan_count_bonus": 0,
             },
         },
         {
-            'employee': tech_support_employee,
-            'interval': {
+            "employee": sales_head_employee,
+            "interval": {
                 "from": datetime(2022, 6, 13, 0, 0, 0).timestamp(),
-                'to': datetime(2022, 6, 17, 23, 59, 59).timestamp()
+                "to": datetime(2022, 6, 17, 23, 59, 59).timestamp(),
             },
-            'expected_metrics_values': {
-                'salary': 10000
+            "expected_metrics_values": {"salary": 15910},
+        },
+        {
+            "employee": tech_support_employee,
+            "interval": {
+                "from": datetime(2022, 6, 13, 0, 0, 0).timestamp(),
+                "to": datetime(2022, 6, 17, 23, 59, 59).timestamp(),
             },
+            "expected_metrics_values": {"salary": 10000},
         },
     ]
 
@@ -183,21 +179,14 @@ def test_calculator_metrics_creating(sm_employee):
 
     calc = DeprecatedSalaryCalculator(fetch_data)
     md = calc.get_metrics_data(sm_employee, 1, 1)
-    assert md['hello'] == 'Test manager'
+    assert md["hello"] == "Test manager"
 
 
-def test_calculator_metrics_results(
-    samples_map_for_sales_manager_calculator,
-    calculator_generator
-):
+def test_calculator_metrics_results(samples_map_for_sales_manager_calculator, calculator_generator):
 
     for sample in samples_map_for_sales_manager_calculator:
-        employee = sample['employee']
+        employee = sample["employee"]
         calculator = calculator_generator(employee.position)
-        metrics = calculator.process(
-            employee,
-            sample['interval']['from'],
-            sample['interval']['to']
-        )
-        for expected in sample['expected_metrics_values'].items():
-            assert metrics.get_metrica_by('label', expected[0]).value == expected[1]
+        metrics = calculator.process(employee, sample["interval"]["from"], sample["interval"]["to"])
+        for expected in sample["expected_metrics_values"].items():
+            assert metrics.get_metrica_by("label", expected[0]).value == expected[1]

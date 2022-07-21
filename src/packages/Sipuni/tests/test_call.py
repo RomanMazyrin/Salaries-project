@@ -2,32 +2,34 @@ from packages.Sipuni.services.CallsStatistic.CallModel import CallModel
 
 
 def test_call_model_creation_from_dict():
-    call = CallModel.from_dict({
-        "type": "1",
-        "status": "2",
-        "call_time": "3",
-        "call_schema_id": "4",
-        "schema": "5",
-        "outbound_line": "6",
-        "call_from": "7",
-        "call_to": "8",
-        "answered_user_id": "9",
-        "call_duration": "10",
-        "talk_duration": "11",
-        "answer_time": "12",
-        "score": "13",
-        "record_id": "14",
-        "mark": "15",
-        "tags": "16",
-        "call_order_id": "17",
-        "is_record_exists": "18",
-        "is_new_client": "19",
-        "dtmf": "20",
-        "callback_state": "21",
-        "callback_time": "22",
-        "crm_info": "23",
-        "crm_responsible_user": "24"
-    })
+    call = CallModel.from_dict(
+        {
+            "type": "1",
+            "status": "2",
+            "call_time": "3",
+            "call_schema_id": "4",
+            "schema": "5",
+            "outbound_line": "6",
+            "call_from": "7",
+            "call_to": "8",
+            "answered_user_id": "9",
+            "call_duration": "10",
+            "talk_duration": "11",
+            "answer_time": "12",
+            "score": "13",
+            "record_id": "14",
+            "mark": "15",
+            "tags": "16",
+            "call_order_id": "17",
+            "is_record_exists": "18",
+            "is_new_client": "19",
+            "dtmf": "20",
+            "callback_state": "21",
+            "callback_time": "22",
+            "crm_info": "23",
+            "crm_responsible_user": "24",
+        }
+    )
 
     assert call.type == "1"
     assert call.status == "2"

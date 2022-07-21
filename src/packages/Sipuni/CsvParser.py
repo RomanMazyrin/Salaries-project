@@ -26,17 +26,18 @@ FIELDS_MAP = {
     "Состояние перезвона": "callback_state",
     "Время перезвона": "callback_time",
     "Информация из CRM": "crm_info",
-    "Ответственный из CRM": "crm_responsible_user"
+    "Ответственный из CRM": "crm_responsible_user",
 }
 
 
 def parse_calls(csv_str):
     csv_str_io = StringIO(csv_str)
-    reader = csv.DictReader(csv_str_io, delimiter=';')
+    reader = csv.DictReader(csv_str_io, delimiter=";")
     calls = []
     for raw in reader:
-        call_params_dict = dict((FIELDS_MAP[key], value)
-                                for (key, value) in raw.items() if FIELDS_MAP.get(key))
+        call_params_dict = dict(
+            (FIELDS_MAP[key], value) for (key, value) in raw.items() if FIELDS_MAP.get(key)
+        )
         call = CallModel.from_dict(call_params_dict)
         calls.append(call)
     return calls

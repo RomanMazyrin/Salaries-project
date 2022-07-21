@@ -13,5 +13,5 @@ __all__ = [
     SipuniAccount,
     SalaryReport,
     EmployeePosition,
-    EmployeeGroup
+    EmployeeGroup,
 ]

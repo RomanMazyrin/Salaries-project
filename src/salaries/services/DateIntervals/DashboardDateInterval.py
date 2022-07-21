@@ -27,7 +27,6 @@ class DashboardDateInterval(ABC):
 
 
 class CustomInterval(DashboardDateInterval):
-
     def get_timestamp_from(self):
         dt = self.create_datetime(self.date_from)
         dt = dt.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -40,7 +39,6 @@ class CustomInterval(DashboardDateInterval):
 
 
 class DayInterval(DashboardDateInterval):
-
     def get_timestamp_from(self):
         dt = datetime.now()
         dt = dt.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -53,7 +51,6 @@ class DayInterval(DashboardDateInterval):
 
 
 class MonthInterval(DashboardDateInterval):
-
     def get_timestamp_from(self):
         dt = datetime.now()
         dt = dt.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -65,7 +62,6 @@ class MonthInterval(DashboardDateInterval):
 
 
 class WeekInterval(DashboardDateInterval):
-
     def get_timestamp_from(self):
         dt = datetime.now()
         delta = timedelta(7)
@@ -78,7 +74,6 @@ class WeekInterval(DashboardDateInterval):
 
 
 class YesterdayInterval(DashboardDateInterval):
-
     def __get_yesterday(self):
         return datetime.now() - timedelta(1)
 
@@ -92,15 +87,15 @@ class YesterdayInterval(DashboardDateInterval):
 
 
 intervals = {
-    'month': MonthInterval,
-    'yesterday': YesterdayInterval,
-    'week': WeekInterval,
-    'day': DayInterval,
-    'custom': CustomInterval
+    "month": MonthInterval,
+    "yesterday": YesterdayInterval,
+    "week": WeekInterval,
+    "day": DayInterval,
+    "custom": CustomInterval,
 }
 
 
 def create_interval(**kwargs):
-    interval_name = kwargs.get('period', 'month')
+    interval_name = kwargs.get("period", "month")
     interval_class = intervals[interval_name]
     return interval_class(**kwargs)
