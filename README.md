@@ -18,12 +18,18 @@ For docker environment variables look [Docker section](#Docker-container-environ
 
 ```
 $ pipenv sync
-``` 
+```
 
 ## Activate virtual environment shell
 
 ```
 $ pipenv shell
+```
+
+## Activate pre-commit hooks
+
+```
+$ pre-commit install
 ```
 
 ## Set environment variables
@@ -51,6 +57,18 @@ $ make runserver
 
 ```
 $ make lint
+```
+
+# Testing
+
+```
+$ make test
+```
+
+# Testing with code coverage
+
+```
+$ make test-coverage
 ```
 
 <br>
