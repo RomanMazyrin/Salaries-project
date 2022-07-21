@@ -33,6 +33,7 @@ jobs:
           tags: |
             ghcr.io/romanmazyrin/salaries_project:latest
             salaries_project_temp
+            ghcr.io/romanmazyrin/salaries_project_temp:latest
 
       -
         name: Lint
@@ -49,4 +50,4 @@ jobs:
           file: ./docker/Dockerfile
           push: true
           tags: |
-            salaries_project_temp
+            ghcr.io/romanmazyrin/salaries_project_temp:latest
