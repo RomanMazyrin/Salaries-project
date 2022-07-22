@@ -7,18 +7,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('salaries', '0002_auto_20201119_2303'),
+        ("salaries", "0002_auto_20201119_2303"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='employee',
-            name='amocrm_id',
+            model_name="employee",
+            name="amocrm_id",
             field=models.IntegerField(blank=True, default=None),
         ),
         migrations.AlterField(
-            model_name='employee',
-            name='onpbx_id',
-            field=models.IntegerField(blank=True, default=None, validators=[django.core.validators.MaxValueValidator(999), django.core.validators.MinValueValidator(100)]),
+            model_name="employee",
+            name="onpbx_id",
+            field=models.IntegerField(
+                blank=True,
+                default=None,
+                validators=[
+                    django.core.validators.MaxValueValidator(999),
+                    django.core.validators.MinValueValidator(100),
+                ],
+            ),
         ),
     ]

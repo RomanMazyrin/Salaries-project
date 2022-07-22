@@ -3,9 +3,7 @@ from .services.CallsStatistic.CallStaticticService import CallStatisticService
 
 class Client:
 
-    services_map = {
-        'calls_stats': CallStatisticService
-    }
+    services_map = {"calls_stats": CallStatisticService}
 
     def __init__(self, user_id, secret_key):
         self.__user_id = user_id
@@ -16,4 +14,4 @@ class Client:
 
     @property
     def calls_stats(self):
-        return self.services_map['calls_stats'](self.__user_id, self.__secret_key)
+        return self.services_map["calls_stats"](self.__user_id, self.__secret_key)

@@ -1,5 +1,4 @@
 class ApiKey:
-
     def __init__(self, key_id, key):
         self.__key_id = key_id
         self.__key = key
@@ -8,7 +7,4 @@ class ApiKey:
         return format_str.format(**self.as_dict())
 
     def as_dict(self):
-        return {
-            "key_id": self.__key_id,
-            "key": self.__key
-        }
+        return {"key_id": self.__key_id, "key": self.__key}

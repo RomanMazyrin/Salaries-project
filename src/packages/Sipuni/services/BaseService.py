@@ -12,7 +12,7 @@ class BaseService:
 
     @staticmethod
     def _make_hash(*args):
-        stringForHash = '+'.join(args)
+        stringForHash = "+".join(args)
         return hashlib.md5(stringForHash.encode()).hexdigest()
 
     @classmethod

@@ -3,5 +3,5 @@ from packages.Sipuni.services import CallStatisticService
 
 
 def test_sipuni_client():
-    client = Client('test', 'test')
+    client = Client("test", "test")
     assert type(client.calls_stats) == CallStatisticService

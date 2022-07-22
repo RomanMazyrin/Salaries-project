@@ -7,13 +7,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('salaries', '0006_auto_20201119_2306'),
+        ("salaries", "0006_auto_20201119_2306"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='employee',
-            name='sale_fee_percent',
-            field=models.FloatField(blank=True, default=None, null=True, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(100)], verbose_name='Процент с продаж'),
+            model_name="employee",
+            name="sale_fee_percent",
+            field=models.FloatField(
+                blank=True,
+                default=None,
+                null=True,
+                validators=[
+                    django.core.validators.MinValueValidator(0),
+                    django.core.validators.MaxValueValidator(100),
+                ],
+                verbose_name="Процент с продаж",
+            ),
         ),
     ]

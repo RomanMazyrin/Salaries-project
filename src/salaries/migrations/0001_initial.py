@@ -8,17 +8,33 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Employee',
+            name="Employee",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('onpbx_id', models.IntegerField(blank=True, validators=[django.core.validators.MaxValueValidator(100), django.core.validators.MinValueValidator(999)])),
-                ('amocrm_id', models.IntegerField(blank=True)),
-                ('name', models.CharField(max_length=255)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "onpbx_id",
+                    models.IntegerField(
+                        blank=True,
+                        validators=[
+                            django.core.validators.MaxValueValidator(100),
+                            django.core.validators.MinValueValidator(999),
+                        ],
+                    ),
+                ),
+                ("amocrm_id", models.IntegerField(blank=True)),
+                ("name", models.CharField(max_length=255)),
             ],
         ),
     ]

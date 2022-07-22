@@ -1,5 +1,6 @@
 [flake8]
-ignore = E265, F811, PT001, DJ05, SIM113, SIM102
+ignore = E265, F811, PT001, DJ05, SIM113, SIM102, W503
+extend-ignore = E203
 max-line-length = 100
 exclude =
       static,

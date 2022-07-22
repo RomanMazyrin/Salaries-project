@@ -7,7 +7,6 @@ from .AuthClient import AuthClient
 
 
 class OnpbxApiRequest:
-
     def __init__(self, subdomain, api_key, key):
         self.__subdomain = subdomain
         self.__key = key
@@ -46,19 +45,19 @@ class OnpbxApiRequest:
     def get_api_key_header(self):
         if not self.__key:
             return None
-        header_name = 'x-pbx-authentication'
+        header_name = "x-pbx-authentication"
         header_value_tmpl = "{key_id}:{key}"
         return {header_name: self.__key.format(header_value_tmpl)}
 
     def parse_response(self, response):
         try:
             parsed_response = response.json()
-            if parsed_response.get('status') == "0":
+            if parsed_response.get("status") == "0":
                 self.check_response_status(parsed_response)
             return parsed_response
         except ValueError:
             raise OnpbxApiException("Response is not valid JSON")
 
     def check_response_status(self, response):
-        if response.get('isNotAuth'):
+        if response.get("isNotAuth"):
             raise OnpbxApiAuthException("Unauthorized")

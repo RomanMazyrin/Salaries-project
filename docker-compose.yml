@@ -8,7 +8,14 @@ services:
       dockerfile: docker/Dockerfile
     ports:
       - 80:${PORT:-8000}
-    env_file: ./src/.env
+    environment:
+      DEBUG: 0
+      DB_ENGINE: django.db.backends.postgresql
+      DB_DATABASE: postgres
+      DB_USER: postgres
+      DB_PASSWORD: 123456
+      DB_HOST: db
+      DB_PORT: 5432
     volumes:
       - ./src:/app/src/
     restart: unless-stopped
@@ -22,7 +29,14 @@ services:
       context: ./
       dockerfile: docker/Dockerfile
     entrypoint: python3 manage.py migrate --no-input
-    env_file: ./src/.env
+    environment:
+      DEBUG: 0
+      DB_ENGINE: django.db.backends.postgresql
+      DB_DATABASE: postgres
+      DB_USER: postgres
+      DB_PASSWORD: 123456
+      DB_HOST: db
+      DB_PORT: 5432
     volumes:
         - "./src:/app/src/"
     restart: on-failure
@@ -32,4 +46,4 @@ services:
   db:
     image: postgres:13-alpine
     environment:
-      POSTGRES_PASSWORD: '211200'
+      POSTGRES_PASSWORD: '123456'

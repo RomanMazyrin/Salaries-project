@@ -11,3 +11,5 @@ src/static/
 docker-compose.yml
 docker-compose.dev.yml
 .env
+.coverage
+htmlcov
