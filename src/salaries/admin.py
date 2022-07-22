@@ -18,8 +18,8 @@ import os
 
 class IsActiveFilter(BooleanFieldListFilter):
     def queryset(self, request, queryset):
-        if self.used_parameters.get(self.lookup_kwarg) is None:
-            return queryset.filter(is_active=True)
+        if self.used_parameters.get(self.lookup_kwarg) == 0:
+            return Employee.objects.get_default_queryset().filter(is_active=False)
         return super().queryset(request, queryset)
 
 
@@ -39,7 +39,7 @@ class MembershipAsHeadInline(admin.TabularInline):
 
 @admin.register(Employee)
 class EmployeeAdminConfig(admin.ModelAdmin):
-    list_display = ("name", "surname", "is_active")
+    list_display = ("name", "surname", "position", "is_active")
     list_editable = ("is_active",)
     list_filter = (("is_active", IsActiveFilter),)
     inlines = [MembershipInline, MembershipAsHeadInline]
