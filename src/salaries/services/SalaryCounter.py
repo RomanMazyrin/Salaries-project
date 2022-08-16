@@ -110,7 +110,7 @@ class SalaryCounter:
             sipuni_inbound_calls.extend(
                 self.__sipuni_client.calls_stats.get(
                     call_type=INBOUND_CALL_TYPE,
-                    from_number=self.__employee.sipuni_id,
+                    to_answer=self.__employee.sipuni_id,
                     state=ACCEPTED_CALL_STATE,
                     from_date=date_from.strftime(date_format),
                     to_date=date_to.strftime(date_format),
@@ -129,7 +129,9 @@ class SalaryCounter:
         sipuni_inbound_calls_count = len(
             list(
                 filter(
-                    lambda call: int(call.talk_duration) >= min_call_length,
+                    lambda call: (int(call.talk_duration) >= min_call_length)
+                    if call.talk_duration
+                    else False,
                     sipuni_inbound_calls,
                 )
             )
