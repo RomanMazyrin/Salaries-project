@@ -6,6 +6,7 @@ from salaries.services.SalaryCalculators.AbstractSalaryCalculator import (
 from salaries.services.SalaryCalculators.DeprecatedSalaryCalculator import (
     DeprecatedSalaryCalculator,
 )
+from salaries.services.SalaryCalculators.SalesManagerSalaryCalculator import get_audits_count, get_audits_money
 from salaries.services.SalaryCalculators.factories import (
     POSITION_CALCULATORS,
     get_calculator_by_position_type,
@@ -49,6 +50,14 @@ def leads_list(leads_factory):
         leads_factory(datetime(2022, 6, 16, 15, 0, 0), 10000),
     ]
 
+@pytest.fixture
+def audit_leads(leads_factory):
+    return [
+        leads_factory(datetime.now()),
+        leads_factory(datetime.now()),
+        leads_factory(datetime.now()),
+    ]
+
 
 @pytest.fixture
 def leads_by_months(leads_list):
@@ -56,9 +65,9 @@ def leads_by_months(leads_list):
 
 
 @pytest.fixture
-def leads_fetcher(leads_by_months):
+def leads_fetcher(leads_by_months, audit_leads):
     def f(*args, **kwargs):
-        return {"leads": leads_by_months}
+        return {"leads": leads_by_months, 'audit_leads': audit_leads}
 
     return f
 
@@ -73,6 +82,8 @@ def sm_employee():
         sales_fee_percent_above_plan=15,
         sales_plan_money_bonus=30000,
         sales_plan_count_bonus=15000,
+        daily_salary_amount=953,
+        one_audit_commit_cost=200
     )
     employee = Employee(position=position, name="Test manager")
     return employee
@@ -140,7 +151,7 @@ def samples_map_for_sales_manager_calculator(
             "employee": sm_employee,
             "interval": {
                 "from": datetime(2022, 4, 6, 0, 0, 0).timestamp(),
-                "to": datetime(2022, 4, 8, 23, 59, 59).timestamp(),
+                "to": datetime(2022, 4, 9, 23, 59, 59).timestamp(),
             },
             "expected_metrics_values": {
                 "sales_income": 20000,
@@ -148,6 +159,8 @@ def samples_map_for_sales_manager_calculator(
                 "sales_plan_bonus": 0,
                 "sales_count": 2,
                 "sales_plan_count_bonus": 0,
+                "salary": 2859,
+                "total_money": 5459
             },
         },
         {
@@ -190,3 +203,12 @@ def test_calculator_metrics_results(samples_map_for_sales_manager_calculator, ca
         metrics = calculator.process(employee, sample["interval"]["from"], sample["interval"]["to"])
         for expected in sample["expected_metrics_values"].items():
             assert metrics.get_metrica_by("label", expected[0]).value == expected[1]
+
+
+
+def test_audit_leads_values_calculators(sm_employee, leads_fetcher):
+    leads_info = leads_fetcher()
+    audits_count = get_audits_count(None, sm_employee, 1, 1, **leads_info)
+    assert audits_count == 3
+    audits_cost = get_audits_money(None, sm_employee, 1, 1, **leads_info)
+    assert audits_cost == 600

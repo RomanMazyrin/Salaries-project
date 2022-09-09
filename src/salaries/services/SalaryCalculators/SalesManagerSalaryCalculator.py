@@ -10,7 +10,20 @@ from salaries.services.SalaryCalculators.metrics_builders import (
     LeadsBonusArchievementValueMetricaBuilder,
     LeadsSalesFeeValueMetricaBuilder,
     LeadsSumAggregatedValueMetricaBuilder,
+    SalaryPerDayMetricaBuilder,
+    SimpleMetricaBuilder,
 )
+
+
+def get_audits_count(builder, employee, timestamp_from, timestamp_to, *args, **kwargs):
+    return len(kwargs["audit_leads"])
+
+
+def get_audits_money(builder, employee, timestamp_from, timestamp_to, *args, **kwargs):
+    audits_count = get_audits_count(
+        builder, employee, timestamp_from, timestamp_to, *args, **kwargs
+    )
+    return audits_count * employee.position.one_audit_commit_cost
 
 
 class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
@@ -54,6 +67,22 @@ class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
             group="sales",
             meta={META_PARAM_COUNT_IN_TOTAL_SUM: True},
             class_name=METRICA_MONEY_CLASS_NAME,
+        ),
+        SalaryPerDayMetricaBuilder(),
+        SimpleMetricaBuilder(
+            name="Количество назначенных аудитов",
+            group="audits",
+            label="audits_count",
+            meta={META_PARAM_COUNT_IN_TOTAL_SUM: False},
+            value_func=get_audits_count,
+        ),
+        SimpleMetricaBuilder(
+            name="Денег за назначенные аудиты",
+            group="audits",
+            label="audits_money",
+            meta={META_PARAM_COUNT_IN_TOTAL_SUM: True},
+            class_name=METRICA_MONEY_CLASS_NAME,
+            value_func=get_audits_money,
         ),
     ]
 

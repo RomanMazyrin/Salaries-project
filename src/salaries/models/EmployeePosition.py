@@ -101,6 +101,14 @@ class EmployeePosition(models.Model):
         validators=[MinValueValidator(0)],
     )
 
+    one_audit_commit_cost = models.IntegerField(
+        "Стоимость за назначение аудита",
+        blank=True,
+        null=True,
+        default=0,
+        validators=[MinValueValidator(0)],
+    )
+
     def __str__(self):
         return self.position_name
 
