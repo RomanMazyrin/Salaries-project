@@ -1,5 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
+import math
 import pytz
 from amocrm_components.ApiIterator import ApiIterator
 from salaries.services.SalaryCalculators.constants import AUTH_KEY, LEADS_FETCH_URL
@@ -15,6 +16,11 @@ def split_closed_leads_by_months(leads_list):
             result_map[lead_closed_month_key] = []
         result_map[lead_closed_month_key].append(lead)
     return result_map
+
+
+def last_day_of_month(any_day):
+    next_month = any_day.replace(day=28) + timedelta(days=4)
+    return next_month - timedelta(days=next_month.day)
 
 
 def fetch_all_amocrm_entities_by_filter(**kwargs):
@@ -79,3 +85,17 @@ def get_dates_from_timestamp_interval(timestamp_from, timestamp_to):
             break
 
     return list(set(res))
+
+
+def get_workdays_in_interval(timestamp_from, timestamp_to):
+    interval_days = get_dates_from_timestamp_interval(timestamp_from, timestamp_to)
+    work_days = len([d.isoweekday() for d in interval_days if d.isoweekday() <= 5])
+    return work_days
+
+
+def get_month_daily_salary(timestamp, month_salary):
+    date = datetime.fromtimestamp(timestamp)
+    first_day = date.replace(day=1)
+    last_day = last_day_of_month(date)
+    workdays = get_workdays_in_interval(first_day.timestamp(), last_day.timestamp())
+    return math.ceil(month_salary / workdays)

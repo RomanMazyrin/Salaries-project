@@ -147,7 +147,7 @@ class LeadsSalesFeeValueMetricaBuilder(MetricaBuilder):
                 position.sales_fee_percent_above_plan / 100
             )
 
-        return total_salary_money_for_sales
+        return math.ceil(total_salary_money_for_sales)
 
 
 class SalaryPerDayMetricaBuilder(MetricaBuilder):

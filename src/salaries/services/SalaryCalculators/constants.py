@@ -12,3 +12,4 @@ LEADS_FETCH_URL = "https://mazdata.ru/deltasales/get-leads-by-filter"
 TOTAL_MONEY_CLASS_NAME = "success"
 METRICA_MONEY_CLASS_NAME = "warning"
 METRICA_ERROR_CLASS_NAME = "danger"
+AMOCRM_LEAD_AUDIT_MANAGER_ID_FIELD_ID = 703378
