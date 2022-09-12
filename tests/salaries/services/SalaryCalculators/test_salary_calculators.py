@@ -17,6 +17,8 @@ from salaries.services.SalaryCalculators.helpers import split_closed_leads_by_mo
 from salaries.models.EmployeePosition import EmployeePosition
 import pytest
 
+from salaries.services.SalaryCalculators.metrics_builders import SalaryPerDayMetricaBuilder
+
 
 @pytest.fixture
 def leads_factory():
@@ -82,8 +84,8 @@ def sm_employee():
         sales_fee_percent_above_plan=15,
         sales_plan_money_bonus=30000,
         sales_plan_count_bonus=15000,
-        daily_salary_amount=953,
-        one_audit_commit_cost=200
+        one_audit_commit_cost=200,
+        month_salary=40000
     )
     employee = Employee(position=position, name="Test manager")
     return employee
@@ -93,7 +95,7 @@ def sm_employee():
 def sales_head_employee():
     position = EmployeePosition(
         position_type=EmployeePosition.SALES_HEAD,
-        daily_salary_amount=3182,
+        month_salary=70000,
         sales_plan_money=25000,
         sales_plan_count=3,
         sales_fee_percent=5,
@@ -107,7 +109,7 @@ def sales_head_employee():
 @pytest.fixture
 def tech_support_employee():
     position = EmployeePosition(
-        position_type=EmployeePosition.TECH_SUPPORT, daily_salary_amount=2000
+        position_type=EmployeePosition.TECH_SUPPORT, month_salary=40000
     )
     return Employee(position=position, name="Test tech support employee")
 
@@ -159,8 +161,8 @@ def samples_map_for_sales_manager_calculator(
                 "sales_plan_bonus": 0,
                 "sales_count": 2,
                 "sales_plan_count_bonus": 0,
-                "salary": 2859,
-                "total_money": 5459
+                "salary": 5715,
+                "total_money": 8315
             },
         },
         {
@@ -177,7 +179,7 @@ def samples_map_for_sales_manager_calculator(
                 "from": datetime(2022, 6, 13, 0, 0, 0).timestamp(),
                 "to": datetime(2022, 6, 17, 23, 59, 59).timestamp(),
             },
-            "expected_metrics_values": {"salary": 10000},
+            "expected_metrics_values": {"salary": 9095},
         },
     ]
 
@@ -212,3 +214,12 @@ def test_audit_leads_values_calculators(sm_employee, leads_fetcher):
     assert audits_count == 3
     audits_cost = get_audits_money(None, sm_employee, 1, 1, **leads_info)
     assert audits_cost == 600
+
+
+
+def test_dynamic_salary_per_day(sm_employee):
+    builder = SalaryPerDayMetricaBuilder()
+    timestamp_from = datetime(2022, 2, 4, 0, 0, 0).timestamp()
+    timestamp_to = datetime(2022, 5, 23, 23, 59, 59).timestamp()
+    result_metrica = builder.create(sm_employee, timestamp_from, timestamp_to)
+    assert result_metrica.value == 143129

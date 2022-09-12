@@ -89,7 +89,7 @@ def get_dates_from_timestamp_interval(timestamp_from, timestamp_to):
 
 def get_workdays_in_interval(timestamp_from, timestamp_to):
     interval_days = get_dates_from_timestamp_interval(timestamp_from, timestamp_to)
-    work_days = len([d.isoweekday() for d in interval_days if d.isoweekday() <= 5])
+    work_days = [d for d in interval_days if d.isoweekday() <= 5]
     return work_days
 
 
@@ -98,4 +98,9 @@ def get_month_daily_salary(timestamp, month_salary):
     first_day = date.replace(day=1)
     last_day = last_day_of_month(date)
     workdays = get_workdays_in_interval(first_day.timestamp(), last_day.timestamp())
-    return math.ceil(month_salary / workdays)
+    return math.ceil(month_salary / len(workdays))
+
+
+def get_months_in_interval(timestamp_from, timestamp_to):
+    dates = get_dates_from_timestamp_interval(timestamp_from, timestamp_to)
+    return set([(d.month, d.year) for d in dates])
