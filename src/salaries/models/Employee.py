@@ -39,10 +39,13 @@ class Employee(models.Model):
     )
 
     name = models.CharField("Имя", max_length=255)
+
     surname = models.CharField("Фамилия", max_length=255, blank=True, null=True)
+
     middlename = models.CharField("Отчество", max_length=255, blank=True, null=True)
 
     bank_account = models.CharField("Номер банковского счета", max_length=40, blank=True, null=True)
+
     default_payment_details = models.TextField(
         "Назначение платежа по-умолчанию", blank=True, null=True
     )
@@ -50,16 +53,21 @@ class Employee(models.Model):
     onpbx_account = models.ForeignKey(
         OnpbxAccount, on_delete=models.SET_NULL, null=True, blank=True
     )
+
     sipuni_account = models.ForeignKey(
         SipuniAccount, on_delete=models.SET_NULL, null=True, blank=True
     )
 
     daily_salary_amount = models.IntegerField("Дневной оклад", blank=True, null=True)
+
     one_hour_salary_amount = models.IntegerField("Стоимость часа работы", blank=True, null=True)
+
     one_call_cost = models.FloatField(
         "Стоимость одного звонка (рублей)", blank=True, null=True, default=None
     )
+
     one_feedback_cost = models.IntegerField("Стоимость одного отзыва", blank=True, null=True)
+
     min_call_length = models.IntegerField(
         "Минимальная длина звонка", blank=True, null=True, default=20
     )

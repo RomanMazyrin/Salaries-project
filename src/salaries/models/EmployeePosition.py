@@ -65,8 +65,12 @@ class EmployeePosition(models.Model):
         "Стоимость проведения одной  встречи", blank=True, null=True
     )
 
-    daily_salary_amount = models.IntegerField("Дневной оклад", blank=True, null=True)
+    month_salary = models.IntegerField(
+        "Месячный оклад", blank=True, null=False, default=0, validators=[MinValueValidator(0)]
+    )
+
     one_hour_salary_amount = models.IntegerField("Стоимость часа работы", blank=True, null=True)
+
     one_feedback_cost = models.IntegerField("Стоимость одного отзыва", blank=True, null=True)
 
     sales_fee_percent = models.FloatField(

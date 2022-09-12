@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 import math
 from salaries.models.SalaryReport import Metrica
 from salaries.services.SalaryCalculators.constants import (
@@ -7,7 +8,9 @@ from salaries.services.SalaryCalculators.constants import (
 )
 from salaries.services.SalaryCalculators.helpers import (
     calculate_sum_value_over_leads_per_months,
-    get_dates_from_timestamp_interval,
+    get_month_daily_salary,
+    get_months_in_interval,
+    get_workdays_in_interval,
 )
 
 
@@ -159,6 +162,16 @@ class SalaryPerDayMetricaBuilder(MetricaBuilder):
     DEAFULT_CLASS_NAME = METRICA_MONEY_CLASS_NAME
 
     def _calculate_value(self, employee, timestamp_from, timestamp_to, *args, **kwargs):
-        interval_days = get_dates_from_timestamp_interval(timestamp_from, timestamp_to)
-        work_days = len([d.isoweekday() for d in interval_days if d.isoweekday() <= 5])
-        return math.ceil(employee.position.daily_salary_amount * work_days)
+        months_in_interval = get_months_in_interval(timestamp_from, timestamp_to)
+        months_prices = {}
+        for month in months_in_interval:
+            months_prices[month] = get_month_daily_salary(
+                datetime(month[1], month[0], 1).timestamp(), employee.position.month_salary
+            )
+        work_days = get_workdays_in_interval(timestamp_from, timestamp_to)
+        day_prices = {}
+        for workday in work_days:
+            day_prices[(workday.day, workday.month, workday.year)] = months_prices[
+                (workday.month, workday.year)
+            ]
+        return math.ceil(sum(list(day_prices.values())))
