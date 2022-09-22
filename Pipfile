@@ -23,6 +23,8 @@ xlsxwriter = "*"
 django-prometheus = "*"
 psycopg2 = "*"
 pytz = "*"
+djangorestframework = "*"
+django-cors-headers = "*"
 
 [requires]
 python_version = "3.9"

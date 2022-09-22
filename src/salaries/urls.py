@@ -1,5 +1,4 @@
 from django.urls import path
-
 from . import views
 
 app_name = "salaries"
@@ -19,4 +18,5 @@ urlpatterns = [
         views.SalaryReportView.as_view(),
         name="salary_report_view",
     ),
+    path("api/salary-report/<slug_id>", views.SalaryReportApiView.as_view()),
 ]

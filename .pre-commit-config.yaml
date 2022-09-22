@@ -5,7 +5,10 @@ repos:
         name: lint
         id: lint
         language: python
-      - entry: make test-coverage
-        language: python
-        name: test
-        id: test
+        exclude: '^$'
+#       - entry: make test-coverage
+#         language: python
+#         name: test
+#         id: test
+#         exclude: frontend_components/.*
+#         types: [python]
