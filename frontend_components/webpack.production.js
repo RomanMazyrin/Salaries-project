@@ -23,7 +23,6 @@ module.exports = merge(common, {
         concatenateModules: false,
         minimizer: [
             new TerserPlugin({
-                cache: false,
                 terserOptions: {
                     compress: {
                         defaults: false,

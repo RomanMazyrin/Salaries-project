@@ -1,4 +1,5 @@
 from rest_framework.permissions import BasePermission
+from rest_framework.authentication import SessionAuthentication
 
 
 class HasEditPermission(BasePermission):
@@ -16,3 +17,8 @@ class ModelOwnerOrAdminOrHasPermPermission(BasePermission):
         if report_user:
             result_condition = result_condition or obj.employee.user.id == user.id
         return result_condition
+
+
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+    def enforce_csrf(self, request):
+        return

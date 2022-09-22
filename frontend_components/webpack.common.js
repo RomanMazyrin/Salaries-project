@@ -1,5 +1,4 @@
 const path = require('path');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
 
@@ -7,8 +6,11 @@ module.exports = {
 
     output: {
         filename: 'Components.js',
-        path: path.resolve(__dirname, 'dist'),
-        libraryTarget: 'umd',
+        path: path.resolve(__dirname, '../src/salaries/static/salaries/js'),
+        library: {
+            name: 'MyLibrary',
+            type: 'var',
+        },
         umdNamedDefine: true
     },
 
@@ -48,6 +50,5 @@ module.exports = {
 	},
 
     plugins: [
-        new CleanWebpackPlugin()
     ]
 };

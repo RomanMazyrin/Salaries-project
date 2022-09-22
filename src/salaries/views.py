@@ -21,9 +21,14 @@ from salaries.services.SalaryCalculators.factories import (
     get_calculator_by_position_type,
 )
 from salaries.serializers import SalaryReportSerializer
-from salaries.permissions import ModelOwnerOrAdminOrHasPermPermission, HasEditPermission
+from salaries.permissions import (
+    ModelOwnerOrAdminOrHasPermPermission,
+    HasEditPermission,
+    CsrfExemptSessionAuthentication,
+)
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from rest_framework.authentication import BasicAuthentication
 
 
 def get_all_active_employees():
@@ -268,3 +273,4 @@ class SalaryReportApiView(generics.RetrieveUpdateAPIView):
     serializer_class = SalaryReportSerializer
     lookup_field = "slug_id"
     permission_classes = [ModelOwnerOrAdminOrHasPermPermission]
+    authentication_classes = [CsrfExemptSessionAuthentication, BasicAuthentication]
