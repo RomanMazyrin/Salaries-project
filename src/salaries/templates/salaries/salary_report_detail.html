@@ -19,7 +19,7 @@
 
     <script src="{% static 'salaries/js/Components.js' %}"></script>
     <script>
-        MyLibrary.renderSalaryReportForm('{{ report.slug_id }}', 'report-form');
+        MyLibrary.renderSalaryReportForm('{{ report.slug_id }}', 'report-form', {{ can_edit | lower }});
     </script>
 
 {% endblock report_content %}

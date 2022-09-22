@@ -15530,11 +15530,11 @@ var MyLibrary;
         var de = __webpack_require__.n(fe);
         var Re = __webpack_require__(3935);
         var Te = __webpack_require__(5893);
-        const renderSalaryReportForm = async (ce, fe) => {
-            const Qe = await de().get(`/api/salary-report/${ce}`);
-            const Ye = new _.w(Qe.data, true);
+        const renderSalaryReportForm = async (ce, fe, Qe = false) => {
+            const Ye = await de().get(`/api/salary-report/${ce}`);
+            const Xe = new _.w(Ye.data, Qe);
             (0, Re.render)((0, Te.jsx)(U.d, {
-                model: Ye
+                model: Xe
             }), document.getElementById(fe));
         };
     })();
