@@ -16,8 +16,6 @@ services:
       DB_PASSWORD: 123456
       DB_HOST: db
       DB_PORT: 5432
-    volumes:
-      - ./src:/app/src/
     restart: unless-stopped
     depends_on:
       - migration
@@ -37,8 +35,6 @@ services:
       DB_PASSWORD: 123456
       DB_HOST: db
       DB_PORT: 5432
-    volumes:
-        - "./src:/app/src/"
     restart: on-failure
     depends_on:
       - db
