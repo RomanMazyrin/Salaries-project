@@ -1,10 +1,10 @@
 import axios from "axios";
 import { combine, createEffect, createEvent, createStore, sample } from "effector";
 import _ from "lodash";
+import moment from "moment";
 
 export const dateFormat = (d_string) => {
-    const d = new Date(d_string);
-    return `${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`;
+    return moment(d_string).format("DD.MM.YYYY");
 };
 
 const calculateResultReportSum = (metrics) => {
@@ -33,7 +33,7 @@ const calculateResultReport = (metrics) => {
 };
 
 export class ReportModel {
-    constructor({ employee = {}, date_from = '', date_to = '', status = '', metrics = [], slug_id } = {}, is_editable = false) {
+    constructor({ employee = {}, date_from = '', date_to = '', status = '', metrics = [], slug_id } = {}, is_editable = false, API_ENTITY_URL = '') {
         this.$employee = createStore(employee);
         this.$date_from = createStore(date_from);
         this.$date_to = createStore(date_to);
@@ -76,7 +76,7 @@ export class ReportModel {
             });
 
         this.saveReportFx = createEffect(async (data) => {
-            const response = await axios.patch(`http://localhost/api/salary-report/${data['slug_id']}`, JSON.stringify(data), {
+            const response = await axios.patch(API_ENTITY_URL, JSON.stringify(data), {
                 "headers": {
                     "content-type": "application/json"
                 }

@@ -41,9 +41,9 @@ const ReportView = ({ model }) => {
     return (
         <div className="card">
             <div className="card-header">
-                <h4 className="card-title">
-                    { employee.name }, { date_from } - { date_to }
-                    <span className={classNames("badge", "text-sm", `bg-${css_class}`)}>{ REPORT_STATUSES_LABELS[status] }</span>
+                <h4 className="card-title align-items-center">
+                    <span className="align-middle">{ employee.name }, { date_from } - { date_to }</span>
+                    <span className={classNames("badge", `bg-${css_class}`, 'align-middle', 'ms-3')}>{ REPORT_STATUSES_LABELS[status] }</span>
                 </h4>
             </div>
             <div className="card-content">
@@ -66,7 +66,7 @@ const ReportView = ({ model }) => {
                                     <td></td>
                                     <td className="text-center align-middle"></td>
                                     <td className="text-center align-middle"></td>
-                                    <td>
+                                    <td className="text-center align-middle">
                                         <button className='btn btn-primary' onClick={() => model.addMetrica(createMetrica())}>+ Add</button>
                                     </td>
                                 </tr>
@@ -74,7 +74,7 @@ const ReportView = ({ model }) => {
                                     <td></td>
                                     <td className="text-center align-middle"></td>
                                     <td className="text-center align-middle"></td>
-                                    <td>
+                                    <td className="text-center align-middle">
                                         <button className='btn btn-success' onClick={(e) => model.saveReport()}>Save</button>
                                     </td>
                                 </tr>

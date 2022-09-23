@@ -29,7 +29,7 @@ export const EditableMetricaView = ({metricaModel, reportModel, i}) => {
                     onChange={(e) => reportModel.updateMetrica({i, key: 'value', value: e.currentTarget.value})} />
             </td>
 
-            <td>
+            <td className="text-center align-middle">
                 <button className='btn btn-danger' onClick={() => reportModel.removeMetrica(i)}>Remove</button>
             </td>
 

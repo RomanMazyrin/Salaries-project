@@ -19,3 +19,7 @@ body {
     word-break: break-all;
     width: 100px;
 }
+
+#report-form .btn {
+    width: 100%;
+}
