@@ -5,7 +5,7 @@ from rest_framework.authentication import SessionAuthentication
 class HasEditPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
         user = request.user
-        result_condition = user.is_superuser or user.has_perm("salaries.edit_salaryreport")
+        result_condition = user.is_superuser or user.has_perm("salaries.change_salaryreport")
         return result_condition
 
 
