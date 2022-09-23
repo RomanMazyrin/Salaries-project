@@ -4,7 +4,7 @@ from django.views import generic, View
 from django.views.generic import DetailView
 from django.views.generic.edit import CreateView
 from django.shortcuts import render, get_object_or_404
-
+from rest_framework import generics
 from amocrm_components.ApiIterator import ApiIterator
 from salaries.models.EmployeePosition import EmployeePosition
 from salaries.models.SalaryReport import SalaryReport
@@ -20,6 +20,15 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from salaries.services.SalaryCalculators.factories import (
     get_calculator_by_position_type,
 )
+from salaries.serializers import SalaryReportSerializer
+from salaries.permissions import (
+    ModelOwnerOrAdminOrHasPermPermission,
+    HasEditPermission,
+    CsrfExemptSessionAuthentication,
+)
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from rest_framework.authentication import BasicAuthentication
 
 
 def get_all_active_employees():
@@ -98,6 +107,10 @@ class SalaryReportView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
             request.META["HTTP_HOST"],
             self.object.get_absolute_url(),
         )
+        edit_permission = HasEditPermission()
+        edit_permission = edit_permission.has_object_permission(request, self, self.object)
+        context["can_edit"] = edit_permission
+
         return context
 
 
@@ -252,3 +265,12 @@ class SalesPlanView(View):
             stats.append(stat)
 
         return render(request, "amo_dashboards/sales_plan_progress.html", {"stats": stats})
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class SalaryReportApiView(generics.RetrieveUpdateAPIView):
+    queryset = SalaryReport.objects.all()
+    serializer_class = SalaryReportSerializer
+    lookup_field = "slug_id"
+    permission_classes = [ModelOwnerOrAdminOrHasPermPermission]
+    authentication_classes = [CsrfExemptSessionAuthentication, BasicAuthentication]

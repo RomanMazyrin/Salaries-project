@@ -10,3 +10,16 @@ body {
 .hidden {
     display: none !important;
 }
+
+#report-form input[type='text'] {
+    width: 100%;
+}
+
+#report-form thead tr th:first-child {
+    word-break: break-all;
+    width: 100px;
+}
+
+#report-form .btn {
+    width: 100%;
+}
