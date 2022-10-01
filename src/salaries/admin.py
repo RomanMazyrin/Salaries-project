@@ -19,8 +19,8 @@ import os
 class IsActiveFilter(BooleanFieldListFilter):
     def queryset(self, request, queryset):
         if self.used_parameters.get(self.lookup_kwarg) == 0:
-            return Employee.objects.get_default_queryset().filter(is_active=False)
-        return super().queryset(request, queryset)
+            return queryset.filter(is_active=False)
+        return queryset.filter(is_active=True)
 
 
 class MembershipInline(admin.TabularInline):
@@ -43,6 +43,7 @@ class EmployeeAdminConfig(admin.ModelAdmin):
     list_editable = ("is_active",)
     list_filter = (("is_active", IsActiveFilter),)
     inlines = [MembershipInline, MembershipAsHeadInline]
+    save_on_top = True
 
 
 @admin.register(OnpbxAccount)
@@ -97,6 +98,11 @@ class SalaryReportAdminConfig(admin.ModelAdmin):
         url = obj.get_absolute_url()
         return mark_safe(f'<a href="{url}" target="_blank">Смотреть</a>')
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "employee":
+            kwargs["queryset"] = Employee.objects.filter(is_active=True)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
     readonly_fields = ("slug_id",)
     list_display = (
         "instance_name",
@@ -133,4 +139,7 @@ class EmployeePositionAdmin(admin.ModelAdmin):
 
 @admin.register(EmployeeGroup)
 class EmployeeGroupAdmin(admin.ModelAdmin):
-    pass
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name in ("employee_list", "group_heads"):
+            kwargs["queryset"] = Employee.objects.filter(is_active=True)
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
