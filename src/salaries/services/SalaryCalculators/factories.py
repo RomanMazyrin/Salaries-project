@@ -20,7 +20,7 @@ POSITION_CALCULATORS = {
     EmployeePosition.DEPRECATED: DeprecatedSalaryCalculator,
     EmployeePosition.SALES_MANAGER: SalesManagerSalaryCalculator,
     EmployeePosition.SALES_HEAD: SalesHeadSalaryCalculator,
-    EmployeePosition.TECH_SUPPORT: TechSupportSalaryCalculator,
+    EmployeePosition.FIXED_SALARY: TechSupportSalaryCalculator,
 }
 
 
