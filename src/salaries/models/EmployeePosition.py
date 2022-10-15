@@ -7,13 +7,13 @@ class EmployeePosition(models.Model):
     DEPRECATED = "DEPRECATED"
     SALES_MANAGER = "SALES_MANAGER"
     SALES_HEAD = "SALES_HEAD"
-    TECH_SUPPORT = "TECH_SUPPORT"
+    FIXED_SALARY = "FIXED_SALARY"
 
     POSITION_TYPES = [
         (DEPRECATED, "Default (deprecated)"),
         (SALES_MANAGER, "Менеджер по продажам"),
         (SALES_HEAD, "РОП"),
-        (TECH_SUPPORT, "Сотрудник технической поддержки"),
+        (FIXED_SALARY, "Сотрудник с фиксированным окладом"),
     ]
 
     position_name = models.CharField("Название позиции", max_length=255)
@@ -24,6 +24,13 @@ class EmployeePosition(models.Model):
 
     sales_plan_money = models.IntegerField(
         "План продаж (деньги)", blank=True, null=True, validators=[MinValueValidator(0)]
+    )
+
+    sales_plan_money_for_increased_percent = models.IntegerField(
+        "План продаж для повышенного процента",
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(0)],
     )
 
     sales_plan_count = models.IntegerField(

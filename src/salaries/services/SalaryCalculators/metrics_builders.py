@@ -133,7 +133,13 @@ class LeadsSalesFeeValueMetricaBuilder(MetricaBuilder):
             sum_in_full_list = sum([lead["price"] for lead in month_leads])
 
             income_for_sales_in_period = sum([lead["price"] for lead in leads_in_interval])
-            income_for_sales_in_period_above_the_plan = sum_in_full_list - position.sales_plan_money
+
+            if position.sales_plan_money_for_increased_percent:
+                income_for_sales_in_period_above_the_plan = (
+                    sum_in_full_list - position.sales_plan_money_for_increased_percent
+                )
+            else:
+                income_for_sales_in_period_above_the_plan = 0
 
             if income_for_sales_in_period_above_the_plan < 0:
                 income_for_sales_in_period_above_the_plan = 0

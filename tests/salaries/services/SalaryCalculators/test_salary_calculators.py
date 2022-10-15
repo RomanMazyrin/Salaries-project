@@ -85,7 +85,8 @@ def sm_employee():
         sales_plan_money_bonus=30000,
         sales_plan_count_bonus=15000,
         one_audit_commit_cost=200,
-        month_salary=40000
+        month_salary=40000,
+        sales_plan_money_for_increased_percent=20000
     )
     employee = Employee(position=position, name="Test manager")
     return employee
@@ -109,7 +110,7 @@ def sales_head_employee():
 @pytest.fixture
 def tech_support_employee():
     position = EmployeePosition(
-        position_type=EmployeePosition.TECH_SUPPORT, month_salary=40000
+        position_type=EmployeePosition.FIXED_SALARY, month_salary=40000
     )
     return Employee(position=position, name="Test tech support employee")
 
@@ -143,7 +144,7 @@ def samples_map_for_sales_manager_calculator(
             },
             "expected_metrics_values": {
                 "sales_income": 50000,
-                "sales_fee_salary": 6000,
+                "sales_fee_salary": 6500,
                 "sales_plan_bonus": 60000,
                 "sales_count": 5,
                 "sales_plan_count_bonus": 30000,

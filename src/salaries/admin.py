@@ -75,6 +75,26 @@ def create_payment_sheet(modeladmin, request, queryset):
     return response
 
 
+class AdminSalaryReportStatusUpdateAction:
+    def __init__(self, value, name):
+        self.value = value
+        self.__name__ = name
+
+    def __call__(self, modeladmin, request, queryset):
+        queryset.update(status=self.value)
+
+
+def change_report_status_action_generator(status_list):
+    for status in status_list:
+        handler = admin.action(
+            function=AdminSalaryReportStatusUpdateAction(
+                status[0], f"AdminStatusUpdateAction.{status[0]}"
+            ),
+            description=f"Пометить отчет как {status[1]}",
+        )
+        yield handler
+
+
 @admin.register(SalaryReport)
 class SalaryReportAdminConfig(admin.ModelAdmin):
     @admin.display(description="Отчет")
@@ -117,7 +137,10 @@ class SalaryReportAdminConfig(admin.ModelAdmin):
     list_editable = ("status",)
     list_filter = ("employee",)
 
-    actions = [create_payment_sheet]
+    actions = [
+        create_payment_sheet,
+        *change_report_status_action_generator(SalaryReport.REPORT_STATUSES),
+    ]
 
 
 class EmployeeInline(admin.StackedInline):
@@ -134,7 +157,8 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(EmployeePosition)
 class EmployeePositionAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("position_name",)
+    ordering = ("position_name",)
 
 
 @admin.register(EmployeeGroup)
