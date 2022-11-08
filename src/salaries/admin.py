@@ -75,6 +75,14 @@ def create_payment_sheet(modeladmin, request, queryset):
     return response
 
 
+@admin.action(description="Create copy")
+def create_employee_position_copy(modeladmin, request, queryset):
+    for model in queryset:
+        model.pk = None
+        model.position_name = model.position_name + " (Copy)"
+        model.save()
+
+
 class AdminSalaryReportStatusUpdateAction:
     def __init__(self, value, name):
         self.value = value
@@ -159,6 +167,7 @@ class CustomUserAdmin(UserAdmin):
 class EmployeePositionAdmin(admin.ModelAdmin):
     list_display = ("position_name",)
     ordering = ("position_name",)
+    actions = [create_employee_position_copy]
 
 
 @admin.register(EmployeeGroup)
