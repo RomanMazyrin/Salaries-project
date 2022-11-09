@@ -241,7 +241,12 @@ class SalesPlanView(View):
         }
 
         for employee in employees:
-            plan = employee.sales_plan if employee.sales_plan is not None else 0
+            position = employee.position
+            if position:
+                plan = position.sales_plan_money if position.sales_plan_money is not None else 0
+            else:
+                plan = 0
+
             percent = (
                 0
                 if plan == 0
