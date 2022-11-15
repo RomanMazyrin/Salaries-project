@@ -14,7 +14,10 @@ from salaries.services.SalaryCalculators.constants import (
     LEADS_FETCH_URL,
     LEADS_STATUSES_FOR_SALES_CALCULATIONS,
 )
-from salaries.services.SalaryCalculators.helpers import fetch_all_amocrm_entities_by_filter
+from salaries.services.SalaryCalculators.helpers import (
+    fetch_all_amocrm_entities_by_filter,
+    get_sales_head_amocrm_id_list_for_all_groups,
+)
 
 POSITION_CALCULATORS = {
     EmployeePosition.DEPRECATED: DeprecatedSalaryCalculator,
@@ -50,14 +53,7 @@ def employee_leads_fetcher(employee, timestamp_from, timestamp_to):
 
 
 def sales_head_leads_fetcher(employee, timestamp_from, timestamp_to):
-    amocrm_id_list = []
-
-    groups_as_head = employee.groups_as_head.all()
-    for group in groups_as_head:
-        members = group.employee_list.all()
-        amocrm_id_list += [member.amocrm_id for member in members]
-
-    amocrm_id_list = list(set(amocrm_id_list))
+    amocrm_id_list = get_sales_head_amocrm_id_list_for_all_groups(employee)
 
     leads_by_months = fetch_all_leads_by_months_covered_by_timestamp_interval(
         timestamp_from,

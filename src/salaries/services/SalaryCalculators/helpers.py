@@ -104,3 +104,13 @@ def get_month_daily_salary(timestamp, month_salary):
 def get_months_in_interval(timestamp_from, timestamp_to):
     dates = get_dates_from_timestamp_interval(timestamp_from, timestamp_to)
     return set([(d.month, d.year) for d in dates])
+
+
+def get_sales_head_amocrm_id_list_for_all_groups(employee):
+    amocrm_id_list = []
+    groups_as_head = employee.groups_as_head.all()
+    for group in groups_as_head:
+        members = group.employee_list.all()
+        amocrm_id_list += [member.amocrm_id for member in members]
+
+    return list(set(amocrm_id_list))

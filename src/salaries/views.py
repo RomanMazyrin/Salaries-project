@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from django.http.response import HttpResponse
+from django.http.response import HttpResponseForbidden
 from django.views import generic, View
 from django.views.generic import DetailView
 from django.views.generic.edit import CreateView
@@ -29,6 +29,7 @@ from salaries.permissions import (
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from rest_framework.authentication import BasicAuthentication
+from salaries.services.SalesPlanProgressCalculators import calculate_sales_plan_progress
 
 
 def get_all_active_employees():
@@ -173,7 +174,7 @@ class SalesPlanView(View):
 
         auth_key = request.GET.get("auth_key")
         if auth_key != "eo485yngw8oer9jvwiertu6bei7ty":
-            return HttpResponse("Access denied!")
+            return HttpResponseForbidden("Access denied!")
 
         get_params = request.GET.dict()
 
@@ -208,7 +209,7 @@ class SalesPlanView(View):
             fetch_limit=50,
         )
 
-        leads_total_sales = {}
+        leads = [lead for lead in f.get_next()]
 
         employees = (
             get_all_active_employees()
@@ -216,14 +217,6 @@ class SalesPlanView(View):
             .exclude(amocrm_id__in=excluded_amo_users)
             .all()
         )
-
-        for lead in f.get_next():
-            employee_id = lead["responsible_user_id"]
-            if not leads_total_sales.get(employee_id):
-                leads_total_sales[employee_id] = 0
-            leads_total_sales[employee_id] += lead["price"]
-
-        stats = []
 
         display_mods = {
             "percent": lambda actual, plan, percent: {
@@ -240,28 +233,13 @@ class SalesPlanView(View):
             },
         }
 
-        for employee in employees:
-            position = employee.position
-            if position:
-                plan = position.sales_plan_money if position.sales_plan_money is not None else 0
-            else:
-                plan = 0
+        stats = []
 
-            percent = (
-                0
-                if plan == 0
-                else round((leads_total_sales.get(employee.amocrm_id, 0) / plan) * 100, 2)
-            )
-            actual = leads_total_sales.get(employee.amocrm_id, 0)
-            stat = {
-                "employee": employee,
-                "actual": actual,
-                "plan": plan,
-                "percent": percent,
-            }
+        for employee in employees:
+            stat = calculate_sales_plan_progress(employee, leads)
 
             display_stat_options = display_mods[request.GET.get("display_mode", "all")](
-                actual, plan, percent
+                stat["actual"], stat["plan"], stat["percent"]
             )
             if display_stat_options["bar_width"] < 20:
                 display_stat_options["bar_width"] = 20
