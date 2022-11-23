@@ -4,6 +4,7 @@ from salaries.services.SalaryCalculators.AbstractSalaryCalculator import (
 from salaries.services.SalaryCalculators.constants import (
     META_PARAM_COUNT_IN_TOTAL_SUM,
     METRICA_MONEY_CLASS_NAME,
+    AMOCRM_AUDIT_DATE_FIELD_ID,
 )
 
 from salaries.services.SalaryCalculators.metrics_builders import (
@@ -13,6 +14,8 @@ from salaries.services.SalaryCalculators.metrics_builders import (
     SalaryPerDayMetricaBuilder,
     SimpleMetricaBuilder,
 )
+
+from salaries.services.SalaryCalculators.helpers import get_lead_date_custom_field_value
 
 
 def get_audits_count(builder, employee, timestamp_from, timestamp_to, *args, **kwargs):
@@ -41,6 +44,16 @@ class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
             group="sales",
             item_value_getter=lambda lead: 1,
         ),
+        LeadsSumAggregatedValueMetricaBuilder(
+            name="Количество проведенных встреч",
+            label="demonstrations_count",
+            group="demonstrations",
+            item_value_getter=lambda lead: 1,
+            leads_items_key="demonstration_leads",
+            value_getter_to_time_intervals_split=lambda lead: get_lead_date_custom_field_value(
+                lead, AMOCRM_AUDIT_DATE_FIELD_ID
+            ).timestamp(),
+        ),
         LeadsBonusArchievementValueMetricaBuilder(
             name="Бонус за выполнение плана по продажам в деньгах",
             label="sales_plan_bonus",
@@ -58,6 +71,20 @@ class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
             item_value_getter=lambda lead: 1,
             plan=lambda employee: employee.position.sales_plan_count,
             bonus=lambda employee: employee.position.sales_plan_count_bonus,
+            meta={META_PARAM_COUNT_IN_TOTAL_SUM: True},
+            class_name=METRICA_MONEY_CLASS_NAME,
+        ),
+        LeadsBonusArchievementValueMetricaBuilder(
+            name="Бонус за выполнение плана по встречам",
+            label="demonstrations_plan_bonus",
+            group="demonstrations",
+            item_value_getter=lambda lead: 1,
+            plan=lambda employee: employee.position.presentation_meetings_plan_count,
+            bonus=lambda employee: employee.position.presentation_meetings_plan_count_bonus,
+            leads_items_key="demonstration_leads",
+            value_getter_to_time_intervals_split=lambda lead: get_lead_date_custom_field_value(
+                lead, AMOCRM_AUDIT_DATE_FIELD_ID
+            ).timestamp(),
             meta={META_PARAM_COUNT_IN_TOTAL_SUM: True},
             class_name=METRICA_MONEY_CLASS_NAME,
         ),
@@ -85,16 +112,3 @@ class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
             value_func=get_audits_money,
         ),
     ]
-
-    """
-    Список метрик:
-
-    1. Сумма продаж в деньгах [x]
-    2. Деньги за продажи [x]
-    3. Бонус за выполнение плана по продажам в деньгах [x]
-    4. Количество продаж [x]
-    5. Бонус за выполнение плана по продажам в количестве [x]
-    6. Количество встреч
-    7. Бонус за выполнение плана по количеству встреч
-    8. Деньги за встречи
-    """

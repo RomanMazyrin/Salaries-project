@@ -69,7 +69,7 @@ def leads_by_months(leads_list):
 @pytest.fixture
 def leads_fetcher(leads_by_months, audit_leads):
     def f(*args, **kwargs):
-        return {"leads": leads_by_months, 'audit_leads': audit_leads}
+        return {"leads": leads_by_months, 'audit_leads': audit_leads, 'demonstration_leads': {}}
 
     return f
 
