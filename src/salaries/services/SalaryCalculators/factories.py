@@ -2,7 +2,6 @@ import json
 from salaries.models.EmployeePosition import EmployeePosition
 from salaries.services.SalaryCalculators import (
     AbstractSalaryCalculator,
-    DeprecatedSalaryCalculator,
     SalesHeadSalaryCalculator,
     SalesManagerSalaryCalculator,
     TechSupportSalaryCalculator,
@@ -26,7 +25,6 @@ from salaries.services.SalaryCalculators.helpers import (
 )
 
 POSITION_CALCULATORS = {
-    EmployeePosition.DEPRECATED: DeprecatedSalaryCalculator,
     EmployeePosition.SALES_MANAGER: SalesManagerSalaryCalculator,
     EmployeePosition.SALES_HEAD: SalesHeadSalaryCalculator,
     EmployeePosition.FIXED_SALARY: TechSupportSalaryCalculator,

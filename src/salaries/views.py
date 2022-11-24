@@ -10,7 +10,6 @@ from salaries.models.EmployeePosition import EmployeePosition
 from salaries.models.SalaryReport import SalaryReport
 from .models import Employee
 from datetime import datetime
-from salaries.services.SalaryCounter import SalaryCounter
 import pytz
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 import json
@@ -30,6 +29,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from rest_framework.authentication import BasicAuthentication
 from salaries.services.SalesPlanProgressCalculators import calculate_sales_plan_progress
+from salaries.services.SalaryCalculators.constants import LEADS_FETCH_URL, AUTH_KEY
 
 
 def get_all_active_employees():
@@ -155,6 +155,17 @@ class SalaryResultView(LoginRequiredMixin, UserPassesTestMixin, View):
         else:
             employee_position_type = employee_position.position_type
 
+        if employee_position_type == EmployeePosition.DEPRECATED:
+            return render(
+                request,
+                "salaries/salary_result_error.html",
+                {
+                    "error_message": "{error}. Причина: {description}".format(
+                        error="Не удалось сформировать отчет",
+                        description="У сотрудника не корректная позиция",
+                    )
+                },
+            )
         calculator = get_calculator_by_position_type(employee_position_type)
         report = calculator.process(employee, timestamp_from, timestamp_to)
         report.employee = employee
@@ -183,9 +194,9 @@ class SalesPlanView(View):
         excluded_amo_users = request.GET.getlist("excluded_users")
 
         f = ApiIterator(
-            url=SalaryCounter.LEADS_FETCH_URL,
+            url=LEADS_FETCH_URL,
             params={
-                "auth_key": SalaryCounter.AUTH_KEY,
+                "auth_key": AUTH_KEY,
                 "filter": json.dumps(
                     {
                         "closed_at": {

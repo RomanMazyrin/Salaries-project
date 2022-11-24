@@ -165,7 +165,7 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(EmployeePosition)
 class EmployeePositionAdmin(admin.ModelAdmin):
-    list_display = ("position_name",)
+    list_display = ("position_name", "position_type")
     ordering = ("position_name",)
     actions = [create_employee_position_copy]
 
