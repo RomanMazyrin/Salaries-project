@@ -43,3 +43,5 @@ services:
     image: postgres:13-alpine
     environment:
       POSTGRES_PASSWORD: '123456'
+    volumes:
+      - ./data/:/var/lib/postgresql/data/

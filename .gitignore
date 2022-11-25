@@ -13,3 +13,4 @@ src/prometheus_metrics/*
 !src/prometheus_metrics/.gitkeep
 .coverage
 node_modules/
+data/

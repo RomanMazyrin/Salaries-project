@@ -14,16 +14,16 @@ from salaries.services.SalaryCalculators.helpers import (
 )
 
 
-def get_items_in_timestamp_interval(items, key, timestamp_from, timestamp_to):
-    return filter(lambda item: timestamp_from <= item[key] <= timestamp_to, items)
+def get_items_in_timestamp_interval(items, getter, timestamp_from, timestamp_to):
+    return filter(lambda item: timestamp_from <= getter(item) <= timestamp_to, items)
 
 
-def cut_months_leads_closed_after_timestamp(leads_by_months, timestamp):
+def cut_months_leads_after_timestamp(leads_by_months, timestamp_value_getter, timestamp):
     res = {}
     for (month_key, month_leads) in leads_by_months.items():
         update_month_leads = []
         for lead in month_leads:
-            if lead["closed_at"] <= timestamp:
+            if timestamp_value_getter(lead) <= timestamp:
                 update_month_leads.append(lead)
         res[month_key] = update_month_leads
     return res
@@ -72,20 +72,28 @@ class SimpleMetricaBuilder(MetricaBuilder):
 
 
 class LeadsAggregatedValueMetricBuilder(MetricaBuilder):
-    def __init__(self, item_value_getter, **kwargs):
+    def __init__(
+        self,
+        item_value_getter,
+        leads_items_key="leads",
+        value_getter_to_time_intervals_split=lambda lead: lead["closed_at"],
+        **kwargs
+    ):
         super().__init__(**kwargs)
         self._item_value_getter = item_value_getter
+        self._leads_items_key = leads_items_key
+        self._value_getter_to_time_intervals_split = value_getter_to_time_intervals_split
 
 
 class LeadsSumAggregatedValueMetricaBuilder(LeadsAggregatedValueMetricBuilder):
     def _calculate_value(self, employee, timestamp_from, timestamp_to, *args, **kwargs):
         def _sum(items):
             items_in_interval = get_items_in_timestamp_interval(
-                items, "closed_at", timestamp_from, timestamp_to
+                items, self._value_getter_to_time_intervals_split, timestamp_from, timestamp_to
             )
             return sum([self._item_value_getter(item) for item in items_in_interval])
 
-        leads_by_months = kwargs["leads"]
+        leads_by_months = kwargs[self._leads_items_key]
         sales_total_sum = calculate_sum_value_over_leads_per_months(leads_by_months, _sum)
         return sales_total_sum
 
@@ -97,12 +105,14 @@ class LeadsBonusArchievementValueMetricaBuilder(LeadsAggregatedValueMetricBuilde
         self._bonus_getter = bonus
 
     def _calculate_value(self, employee, timestamp_from, timestamp_to, *args, **kwargs):
-        leads_by_months = cut_months_leads_closed_after_timestamp(kwargs["leads"], timestamp_to)
+        leads_by_months = cut_months_leads_after_timestamp(
+            kwargs[self._leads_items_key], self._value_getter_to_time_intervals_split, timestamp_to
+        )
 
         def process_bonus(items):
 
             items_in_interval = get_items_in_timestamp_interval(
-                items, "closed_at", timestamp_from, timestamp_to
+                items, self._value_getter_to_time_intervals_split, timestamp_from, timestamp_to
             )
 
             sum_in_full_list = sum([self._item_value_getter(item) for item in items])
@@ -120,7 +130,9 @@ class LeadsBonusArchievementValueMetricaBuilder(LeadsAggregatedValueMetricBuilde
 class LeadsSalesFeeValueMetricaBuilder(MetricaBuilder):
     def _calculate_value(self, employee, timestamp_from, timestamp_to, *args, **kwargs):
 
-        leads_by_months = cut_months_leads_closed_after_timestamp(kwargs["leads"], timestamp_to)
+        leads_by_months = cut_months_leads_after_timestamp(
+            kwargs["leads"], lambda lead: lead["closed_at"], timestamp_to
+        )
         position = employee.position
 
         total_salary_money_for_sales = 0

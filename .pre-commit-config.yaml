@@ -6,9 +6,3 @@ repos:
         id: lint
         language: python
         exclude: '^$'
-      - entry: make test-coverage
-        language: python
-        name: test
-        id: test
-        exclude: frontend_components/.*
-        types: [python]

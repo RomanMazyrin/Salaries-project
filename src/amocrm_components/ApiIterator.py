@@ -1,9 +1,14 @@
 import json
 import requests
 import time
+from abc import ABC, abstractmethod
 
 
-class ApiIterator:
+class BaseApiIterator(ABC):
+    @abstractmethod
+    def _request():
+        pass
+
     def __init__(
         self,
         url,
@@ -28,7 +33,7 @@ class ApiIterator:
         count = 0
 
         while True:
-            batch = self.__fetch_batch(page)
+            batch = self._fetch_batch(page)
 
             for entity in batch:
                 count += 1
@@ -44,13 +49,11 @@ class ApiIterator:
             if (len(batch) < self.limit) or len(batch) == 0:
                 return
 
-    def __fetch_batch(self, page):
-        request_params = self.__get_request_params_with_page_and_limit(page)
-        res = requests.get(self.url, params=request_params)
-        entities = res.json()[self.entity_type]
-        return entities
+    def _fetch_batch(self, page):
+        request_params = self._get_request_params_with_page_and_limit(page)
+        return self._request(request_params)
 
-    def __get_request_params_with_page_and_limit(self, page):
+    def _get_request_params_with_page_and_limit(self, page):
         limit_params = {"limit": self.limit, "page": page}
 
         request_params = self.params.copy()
@@ -65,3 +68,8 @@ class ApiIterator:
         filter_params.update(limit_params)
         request_params["filter"] = json.dumps(filter_params)
         return request_params
+
+
+class ApiIterator(BaseApiIterator):
+    def _request(self, request_params):
+        return requests.get(self.url, params=request_params).json()[self.entity_type]
