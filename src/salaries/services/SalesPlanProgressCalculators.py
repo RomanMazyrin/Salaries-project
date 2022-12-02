@@ -1,5 +1,7 @@
-from salaries.services.SalaryCalculators.helpers import get_sales_head_amocrm_id_list_for_all_groups
 from salaries.models.EmployeePosition import EmployeePosition
+from salaries.services.SalaryCalculators.helpers import (
+    get_sales_head_amocrm_id_list_for_all_groups,
+)
 
 
 def calculate_total_sales_for_manager(employee, leads_list):

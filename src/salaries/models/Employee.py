@@ -1,9 +1,10 @@
+from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.contrib.auth.models import User
+
 from .EmployeePosition import EmployeePosition
-from .SipuniAccount import SipuniAccount
 from .OnpbxAccount import OnpbxAccount
+from .SipuniAccount import SipuniAccount
 
 
 class Employee(models.Model):

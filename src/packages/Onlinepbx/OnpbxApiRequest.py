@@ -1,9 +1,9 @@
 import requests
 
+from .AuthClient import AuthClient
+from .Constants import BASE_URL
 from .Exceptions.OnpbxApiAuthException import OnpbxApiAuthException
 from .Exceptions.OnpbxApiException import OnpbxApiException
-from .Constants import BASE_URL
-from .AuthClient import AuthClient
 
 
 class OnpbxApiRequest:

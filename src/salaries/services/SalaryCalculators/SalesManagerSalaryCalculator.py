@@ -2,11 +2,11 @@ from salaries.services.SalaryCalculators.AbstractSalaryCalculator import (
     AbstractSalaryCalculator,
 )
 from salaries.services.SalaryCalculators.constants import (
+    AMOCRM_AUDIT_DATE_FIELD_ID,
     META_PARAM_COUNT_IN_TOTAL_SUM,
     METRICA_MONEY_CLASS_NAME,
-    AMOCRM_AUDIT_DATE_FIELD_ID,
 )
-
+from salaries.services.SalaryCalculators.helpers import get_lead_date_custom_field_value
 from salaries.services.SalaryCalculators.metrics_builders import (
     LeadsBonusArchievementValueMetricaBuilder,
     LeadsSalesFeeValueMetricaBuilder,
@@ -14,8 +14,6 @@ from salaries.services.SalaryCalculators.metrics_builders import (
     SalaryPerDayMetricaBuilder,
     SimpleMetricaBuilder,
 )
-
-from salaries.services.SalaryCalculators.helpers import get_lead_date_custom_field_value
 
 
 def get_audits_count(builder, employee, timestamp_from, timestamp_to, *args, **kwargs):

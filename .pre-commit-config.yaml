@@ -1,8 +1,24 @@
 repos:
   - repo: local
     hooks:
-      - entry: make lint
-        name: lint
-        id: lint
+
+      - id: black
+        name: black
+        entry: black
         language: python
-        exclude: '^$'
+        types: [python]
+        require_serial: true
+
+      - id: flake8
+        name: flake8
+        entry: flake8
+        language: python
+        types: [python]
+        require_serial: true
+
+      - id: isort
+        name: isort
+        entry: isort
+        language: python
+        types: [python]
+        require_serial: true

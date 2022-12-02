@@ -1,5 +1,6 @@
-from io import StringIO
 import csv
+from io import StringIO
+
 from .services.CallsStatistic.CallModel import CallModel
 
 FIELDS_MAP = {

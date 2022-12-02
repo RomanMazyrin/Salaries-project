@@ -1,4 +1,5 @@
 import math
+
 from salaries.services.SalaryCalculators.AbstractSalaryCalculator import (
     AbstractSalaryCalculator,
 )
