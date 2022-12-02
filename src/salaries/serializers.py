@@ -1,6 +1,8 @@
 import json
-from salaries.models import SalaryReport, Employee
+
 from rest_framework import serializers
+
+from salaries.models import Employee, SalaryReport
 
 
 class JsonCustomField(serializers.JSONField):

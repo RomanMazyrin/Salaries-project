@@ -1,7 +1,8 @@
 import json
-import requests
 import time
 from abc import ABC, abstractmethod
+
+import requests
 
 
 class BaseApiIterator(ABC):

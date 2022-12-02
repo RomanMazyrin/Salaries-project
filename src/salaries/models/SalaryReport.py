@@ -1,12 +1,13 @@
 import json
+from json import JSONEncoder
+
 from django.db import models
+from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.urls import reverse
-from .Employee import Employee
-import json
-from json import JSONEncoder
 from django.utils.crypto import get_random_string
-from django.db.models.signals import pre_save
+
+from .Employee import Employee
 
 
 class DefaultClassEncoder(JSONEncoder):

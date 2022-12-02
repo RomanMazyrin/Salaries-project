@@ -1,4 +1,5 @@
 from abc import ABC
+
 from salaries.models.SalaryReport import Metrica, SalaryReport
 from salaries.services.SalaryCalculators.constants import (
     META_PARAM_COUNT_IN_TOTAL_SUM,

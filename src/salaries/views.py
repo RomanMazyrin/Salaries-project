@@ -1,35 +1,38 @@
+import json
+import math
+from datetime import datetime
+
+import pytz
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.forms import ModelForm
 from django.http.response import HttpResponseForbidden
-from django.views import generic, View
+from django.shortcuts import get_object_or_404, render
+from django.utils.decorators import method_decorator
+from django.views import View, generic
+from django.views.decorators.clickjacking import xframe_options_exempt
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView
 from django.views.generic.edit import CreateView
-from django.shortcuts import render, get_object_or_404
 from rest_framework import generics
+from rest_framework.authentication import BasicAuthentication
+
 from amocrm_components.ApiIterator import ApiIterator
 from salaries.models.EmployeePosition import EmployeePosition
 from salaries.models.SalaryReport import SalaryReport
-from .models import Employee
-from datetime import datetime
-import pytz
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-import json
-import math
-from .services.DateIntervals.DashboardDateInterval import create_interval
-from django.views.decorators.clickjacking import xframe_options_exempt
+from salaries.permissions import (
+    CsrfExemptSessionAuthentication,
+    HasEditPermission,
+    ModelOwnerOrAdminOrHasPermPermission,
+)
+from salaries.serializers import SalaryReportSerializer
+from salaries.services.SalaryCalculators.constants import AUTH_KEY, LEADS_FETCH_URL
 from salaries.services.SalaryCalculators.factories import (
     get_calculator_by_position_type,
 )
-from salaries.serializers import SalaryReportSerializer
-from salaries.permissions import (
-    ModelOwnerOrAdminOrHasPermPermission,
-    HasEditPermission,
-    CsrfExemptSessionAuthentication,
-)
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
-from rest_framework.authentication import BasicAuthentication
 from salaries.services.SalesPlanProgressCalculators import calculate_sales_plan_progress
-from salaries.services.SalaryCalculators.constants import LEADS_FETCH_URL, AUTH_KEY
+
+from .models import Employee
+from .services.DateIntervals.DashboardDateInterval import create_interval
 
 
 def get_all_active_employees():

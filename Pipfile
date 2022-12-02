@@ -10,6 +10,8 @@ pytest = "*"
 pytest-cov = "*"
 pre-commit = "*"
 black = "*"
+isort = "*"
+mypy = "*"
 
 [packages]
 django = "==3.2.11"

@@ -1,4 +1,5 @@
 import json
+
 from salaries.models.EmployeePosition import EmployeePosition
 from salaries.services.SalaryCalculators import (
     AbstractSalaryCalculator,
@@ -8,20 +9,20 @@ from salaries.services.SalaryCalculators import (
     fetch_all_leads_by_months_covered_by_timestamp_interval,
 )
 from salaries.services.SalaryCalculators.constants import (
+    AMOCRM_AUDIT_DATE_FIELD_ID,
+    AMOCRM_AUDIT_RECORD_LINK_FIELD_ID,
+    AMOCRM_IS_AUDIT_CORRECT_FIELD_ID,
     AMOCRM_LEAD_AUDIT_MANAGER_ID_FIELD_ID,
     AUTH_KEY,
     LEADS_FETCH_URL,
     LEADS_STATUSES_FOR_SALES_CALCULATIONS,
-    AMOCRM_AUDIT_DATE_FIELD_ID,
-    AMOCRM_IS_AUDIT_CORRECT_FIELD_ID,
-    AMOCRM_AUDIT_RECORD_LINK_FIELD_ID,
 )
 from salaries.services.SalaryCalculators.helpers import (
     fetch_all_amocrm_entities_by_filter,
-    get_sales_head_amocrm_id_list_for_all_groups,
-    split_leads_by_months_by_custom_date_field,
     get_borders_by_timestamp_interval,
     get_lead_custom_field_value,
+    get_sales_head_amocrm_id_list_for_all_groups,
+    split_leads_by_months_by_custom_date_field,
 )
 
 POSITION_CALCULATORS = {

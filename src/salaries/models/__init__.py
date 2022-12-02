@@ -1,10 +1,10 @@
-from .EmployeePosition import EmployeePosition
-from .SalaryReport import SalaryReport
-from .SipuniAccount import SipuniAccount
 from .Employee import Employee
-from .OnpbxAccount import OnpbxAccount
-from .Setting import Setting
+from .EmployeePosition import EmployeePosition
 from .EmployeesGroup import EmployeeGroup
+from .OnpbxAccount import OnpbxAccount
+from .SalaryReport import SalaryReport
+from .Setting import Setting
+from .SipuniAccount import SipuniAccount
 
 __all__ = [
     Employee,

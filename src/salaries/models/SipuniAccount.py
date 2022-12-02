@@ -1,4 +1,5 @@
 from django.db import models
+
 from packages.Sipuni.Client import Client
 
 

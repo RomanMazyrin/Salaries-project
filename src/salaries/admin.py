@@ -1,19 +1,21 @@
-from django.contrib import admin
-from django.http import HttpResponse
-from salaries.models.EmployeePosition import EmployeePosition
+import os
+from datetime import datetime
 
-from salaries.models.SipuniAccount import SipuniAccount
-from .models import Employee, OnpbxAccount, Setting, SalaryReport, EmployeeGroup
+from django.contrib import admin
 from django.contrib.admin import BooleanFieldListFilter
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 from django.utils.safestring import mark_safe
+
+from app.settings import MEDIA_ROOT
+from salaries.models.EmployeePosition import EmployeePosition
+from salaries.models.SipuniAccount import SipuniAccount
 from salaries.services.sheet_generators import (
     generate_tinkoff_payment_sheet_by_salary_reports,
 )
-from datetime import datetime
-from app.settings import MEDIA_ROOT
-import os
+
+from .models import Employee, EmployeeGroup, OnpbxAccount, SalaryReport, Setting
 
 
 class IsActiveFilter(BooleanFieldListFilter):

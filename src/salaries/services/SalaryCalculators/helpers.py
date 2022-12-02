@@ -1,7 +1,9 @@
-from datetime import datetime, timedelta
 import json
 import math
+from datetime import datetime, timedelta
+
 import pytz
+
 from amocrm_components.ApiIterator import ApiIterator
 from salaries.services.SalaryCalculators.constants import AUTH_KEY, LEADS_FETCH_URL
 

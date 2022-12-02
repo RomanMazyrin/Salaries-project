@@ -1,6 +1,7 @@
+import math
 from abc import ABC, abstractmethod
 from datetime import datetime
-import math
+
 from salaries.models.SalaryReport import Metrica
 from salaries.services.SalaryCalculators.constants import (
     META_PARAM_COUNT_IN_TOTAL_SUM,

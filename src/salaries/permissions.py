@@ -1,5 +1,5 @@
-from rest_framework.permissions import BasePermission
 from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import BasePermission
 
 
 class HasEditPermission(BasePermission):
