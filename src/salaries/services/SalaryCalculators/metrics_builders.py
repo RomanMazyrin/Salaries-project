@@ -112,6 +112,11 @@ class LeadsBonusArchievementValueMetricaBuilder(LeadsAggregatedValueMetricBuilde
 
         def process_bonus(items):
 
+            plan_value = self._plan_getter(employee)
+            bonus_value = self._bonus_getter(employee)
+            if plan_value is None or bonus_value is None:
+                return 0
+
             items_in_interval = get_items_in_timestamp_interval(
                 items, self._value_getter_to_time_intervals_split, timestamp_from, timestamp_to
             )
@@ -121,7 +126,7 @@ class LeadsBonusArchievementValueMetricaBuilder(LeadsAggregatedValueMetricBuilde
             value_in_full_list_above_plan = sum_in_full_list - self._plan_getter(employee)
 
             if 0 <= value_in_full_list_above_plan <= value_for_period:
-                return self._bonus_getter(employee)
+                return bonus_value
             return 0
 
         sales_total_sum = calculate_sum_value_over_leads_per_months(leads_by_months, process_bonus)

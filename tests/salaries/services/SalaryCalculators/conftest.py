@@ -1,14 +1,21 @@
-import pytest
+import json
 from datetime import datetime
 from pathlib import Path
-import json
-from salaries.services.SalaryCalculators.factories import POSITION_CALCULATORS
-from salaries.services.SalaryCalculators.helpers import split_closed_leads_by_months
-from salaries.models.EmployeePosition import EmployeePosition
+
+import pytest
+
 from salaries.models.Employee import Employee
+from salaries.models.EmployeePosition import EmployeePosition
 from salaries.services.SalaryCalculators.AbstractSalaryCalculator import (
     AbstractSalaryCalculator,
 )
+from salaries.services.SalaryCalculators.constants import (
+    AMOCRM_LICENSES_PIPELINE_ID,
+    AMOCRM_PROJECTS_PIPELINE_ID,
+    AMOCRM_REALIZATION_PIPELINE_ID,
+)
+from salaries.services.SalaryCalculators.factories import POSITION_CALCULATORS
+from salaries.services.SalaryCalculators.helpers import split_closed_leads_by_months
 
 
 @pytest.fixture(scope="session")
@@ -35,18 +42,22 @@ def leads_factory():
 @pytest.fixture
 def leads_list(leads_factory):
     return [
-        leads_factory(datetime(2022, 4, 6, 15, 0, 0), 10000),
-        leads_factory(datetime(2022, 4, 8, 15, 0, 0), 10000),
-        leads_factory(datetime(2022, 4, 10, 15, 0, 0), 10000),
-        leads_factory(datetime(2022, 4, 25, 15, 0, 0), 10000),
-        leads_factory(datetime(2022, 5, 1, 15, 0, 0), 10000),
-        leads_factory(datetime(2022, 5, 3, 15, 0, 0), 10000),
-        leads_factory(datetime(2022, 5, 5, 15, 0, 0), 10000),
-        leads_factory(datetime(2022, 5, 18, 15, 0, 0), 10000),
-        leads_factory(datetime(2022, 6, 2, 15, 0, 0), 10000),
-        leads_factory(datetime(2022, 6, 5, 15, 0, 0), 10000),
-        leads_factory(datetime(2022, 6, 14, 15, 0, 0), 10000),
-        leads_factory(datetime(2022, 6, 16, 15, 0, 0), 10000),
+        leads_factory(datetime(2022, 4, 6, 15, 0, 0), 10000, pipeline=AMOCRM_LICENSES_PIPELINE_ID),
+        leads_factory(datetime(2022, 4, 8, 15, 0, 0), 10000, pipeline=AMOCRM_LICENSES_PIPELINE_ID),
+        leads_factory(datetime(2022, 4, 10, 15, 0, 0), 10000, pipeline=AMOCRM_LICENSES_PIPELINE_ID),
+        leads_factory(datetime(2022, 4, 25, 15, 0, 0), 10000, pipeline=AMOCRM_LICENSES_PIPELINE_ID),
+        leads_factory(datetime(2022, 5, 1, 15, 0, 0), 10000, pipeline=AMOCRM_LICENSES_PIPELINE_ID),
+        leads_factory(datetime(2022, 5, 3, 15, 0, 0), 10000, pipeline=AMOCRM_LICENSES_PIPELINE_ID),
+        leads_factory(datetime(2022, 5, 5, 15, 0, 0), 10000, pipeline=AMOCRM_LICENSES_PIPELINE_ID),
+        leads_factory(datetime(2022, 5, 18, 15, 0, 0), 10000, pipeline=AMOCRM_LICENSES_PIPELINE_ID),
+        leads_factory(datetime(2022, 6, 2, 15, 0, 0), 10000, pipeline=AMOCRM_LICENSES_PIPELINE_ID),
+        leads_factory(datetime(2022, 6, 5, 15, 0, 0), 10000, pipeline=AMOCRM_LICENSES_PIPELINE_ID),
+        leads_factory(datetime(2022, 6, 14, 15, 0, 0), 10000, pipeline=AMOCRM_LICENSES_PIPELINE_ID),
+        leads_factory(datetime(2022, 6, 14, 15, 0, 0), 0, pipeline=AMOCRM_REALIZATION_PIPELINE_ID),
+        leads_factory(datetime(2022, 6, 16, 15, 0, 0), 10000, pipeline=AMOCRM_LICENSES_PIPELINE_ID),
+        leads_factory(datetime(2022, 6, 16, 15, 0, 0), 10000, pipeline=AMOCRM_PROJECTS_PIPELINE_ID),
+        leads_factory(datetime(2022, 6, 16, 15, 0, 0), 10000, pipeline=AMOCRM_PROJECTS_PIPELINE_ID),
+        leads_factory(datetime(2022, 6, 16, 15, 0, 0), 10000, pipeline=AMOCRM_PROJECTS_PIPELINE_ID),
     ]
 
 
@@ -78,10 +89,12 @@ def sm_employee():
         position_type=EmployeePosition.SALES_MANAGER,
         sales_plan_money=25000,
         sales_plan_count=3,
+        sales_plan_count_bonus=15000,
+        sales_plan_projects_count=3,
+        sales_plan_projects_count_bonus=10000,
         sales_fee_percent=10,
         sales_fee_percent_above_plan=15,
         sales_plan_money_bonus=30000,
-        sales_plan_count_bonus=15000,
         one_audit_commit_cost=200,
         month_salary=40000,
         sales_plan_money_for_increased_percent=20000,
@@ -131,14 +144,16 @@ def samples_map_for_sales_manager_calculator(
             "employee": sm_employee,
             "interval": {
                 "from": datetime(2022, 5, 4, 0, 0, 0).timestamp(),
-                "to": datetime(2022, 6, 14, 23, 59, 59).timestamp(),
+                "to": datetime(2022, 6, 16, 23, 59, 59).timestamp(),
             },
             "expected_metrics_values": {
-                "sales_income": 50000,
-                "sales_fee_salary": 6500,
+                "sales_income": 90000,
+                "sales_fee_salary": 12500,
                 "sales_plan_bonus": 60000,
-                "sales_count": 5,
+                "sales_count": 6,
                 "sales_plan_count_bonus": 30000,
+                "sales_count_projects": 3,
+                "sales_plan_count_projects_bonus": 10000,
             },
         },
         {
@@ -163,7 +178,11 @@ def samples_map_for_sales_manager_calculator(
                 "from": datetime(2022, 6, 13, 0, 0, 0).timestamp(),
                 "to": datetime(2022, 6, 17, 23, 59, 59).timestamp(),
             },
-            "expected_metrics_values": {"salary": 15910},
+            "expected_metrics_values": {
+                "salary": 15910,
+                "sales_count": 5,
+                "sales_count_bouns": 10000,
+            },
         },
         {
             "employee": tech_support_employee,

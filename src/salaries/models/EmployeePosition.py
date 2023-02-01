@@ -34,7 +34,14 @@ class EmployeePosition(models.Model):
     )
 
     sales_plan_count = models.IntegerField(
-        "План продаж (количество)",
+        "План продаж (лицензии + виджеты) (количество)",
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(0)],
+    )
+
+    sales_plan_projects_count = models.IntegerField(
+        "План продаж (проекты) (количество)",
         blank=True,
         null=True,
         validators=[MinValueValidator(0)],
@@ -55,7 +62,14 @@ class EmployeePosition(models.Model):
     )
 
     sales_plan_count_bonus = models.IntegerField(
-        "Бонус за выполнение плана продаж (шт.)",
+        "Бонус за выполнение плана продаж (лицензии + виджеты) (шт.)",
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(0)],
+    )
+
+    sales_plan_projects_count_bonus = models.IntegerField(
+        "Бонус за выполнение плана продаж (проекты) (шт.)",
         blank=True,
         null=True,
         validators=[MinValueValidator(0)],

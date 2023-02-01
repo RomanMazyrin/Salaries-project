@@ -3,7 +3,8 @@ from salaries.services.SalaryCalculators.AbstractSalaryCalculator import (
 )
 from salaries.services.SalaryCalculators.constants import (
     AMOCRM_AUDIT_DATE_FIELD_ID,
-    AMOCRM_REALIZATION_PIPELINE_ID,
+    AMOCRM_PROJECTS_PIPELINE_ID,
+    LEAD_NOT_PROJECT_PIPELINES,
     META_PARAM_COUNT_IN_TOTAL_SUM,
     METRICA_MONEY_CLASS_NAME,
 )
@@ -38,11 +39,19 @@ class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
             item_value_getter=lambda lead: lead["price"],
         ),
         LeadsSumAggregatedValueMetricaBuilder(
-            name="Количество продаж",
+            name="Количество продаж (лицензии + виджеты)",
             label="sales_count",
             group="sales",
             item_value_getter=lambda lead: 1
-            if lead["pipeline_id"] != AMOCRM_REALIZATION_PIPELINE_ID
+            if lead["pipeline_id"] in LEAD_NOT_PROJECT_PIPELINES
+            else 0,
+        ),
+        LeadsSumAggregatedValueMetricaBuilder(
+            name="Количество продаж (проекты)",
+            label="sales_count_projects",
+            group="sales",
+            item_value_getter=lambda lead: 1
+            if lead["pipeline_id"] == AMOCRM_PROJECTS_PIPELINE_ID
             else 0,
         ),
         LeadsSumAggregatedValueMetricaBuilder(
@@ -66,14 +75,26 @@ class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
             class_name=METRICA_MONEY_CLASS_NAME,
         ),
         LeadsBonusArchievementValueMetricaBuilder(
-            name="Бонус за выполнение плана по количеству продаж",
+            name="Бонус за выполнение плана по количеству продаж (лицензии + виджеты)",
             label="sales_plan_count_bonus",
             group="sales",
             item_value_getter=lambda lead: 1
-            if lead["pipeline_id"] != AMOCRM_REALIZATION_PIPELINE_ID
+            if lead["pipeline_id"] in LEAD_NOT_PROJECT_PIPELINES
             else 0,
             plan=lambda employee: employee.position.sales_plan_count,
             bonus=lambda employee: employee.position.sales_plan_count_bonus,
+            meta={META_PARAM_COUNT_IN_TOTAL_SUM: True},
+            class_name=METRICA_MONEY_CLASS_NAME,
+        ),
+        LeadsBonusArchievementValueMetricaBuilder(
+            name="Бонус за выполнение плана по количеству продаж (проекты)",
+            label="sales_plan_count_projects_bonus",
+            group="sales",
+            item_value_getter=lambda lead: 1
+            if lead["pipeline_id"] == AMOCRM_PROJECTS_PIPELINE_ID
+            else 0,
+            plan=lambda employee: employee.position.sales_plan_projects_count,
+            bonus=lambda employee: employee.position.sales_plan_projects_count_bonus,
             meta={META_PARAM_COUNT_IN_TOTAL_SUM: True},
             class_name=METRICA_MONEY_CLASS_NAME,
         ),
