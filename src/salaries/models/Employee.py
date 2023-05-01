@@ -9,6 +9,16 @@ from .SipuniAccount import SipuniAccount
 
 class Employee(models.Model):
 
+    BANK_ACCOUNT_PAYMENT = "BANK_ACCOUNT_PAYMENT"
+    CARD_PAYMENT = "CARD_PAYMENT"
+
+    PAYMENT_METHODS = {
+        BANK_ACCOUNT_PAYMENT: ("На расчетный счет", "success"),
+        CARD_PAYMENT: ("На карту", "yellow"),
+    }
+
+    PAYMENT_METHODS_FIELD_CHOICES = [(pm[0], pm[1][0]) for pm in PAYMENT_METHODS.items()]
+
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     onpbx_id = models.IntegerField(
@@ -39,6 +49,15 @@ class Employee(models.Model):
 
     default_payment_details = models.TextField(
         "Назначение платежа по-умолчанию", blank=True, null=True
+    )
+
+    payment_method = models.CharField(
+        "Способ выплаты",
+        choices=PAYMENT_METHODS_FIELD_CHOICES,
+        default=BANK_ACCOUNT_PAYMENT,
+        max_length=50,
+        blank=True,
+        null=True,
     )
 
     onpbx_account = models.ForeignKey(
@@ -138,6 +157,15 @@ class Employee(models.Model):
     show_in_sales_plan = models.BooleanField(
         "Показывать в плане продаж", blank=False, null=False, default=True
     )
+
+    def get_payment_method_badge_link(self):
+        link_tmpl = "https://img.shields.io/badge/-{}-{}"
+        if self.payment_method is None:
+            return link_tmpl.format("Нет", "lightgrey")
+        return link_tmpl.format(
+            self.PAYMENT_METHODS[self.payment_method][0],
+            self.PAYMENT_METHODS[self.payment_method][1],
+        )
 
     def __str__(self):
         surname = self.surname if self.surname is not None else ""

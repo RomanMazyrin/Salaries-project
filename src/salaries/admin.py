@@ -133,16 +133,22 @@ class SalaryReportAdminConfig(admin.ModelAdmin):
             kwargs["queryset"] = Employee.objects.filter(is_active=True)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
+    @admin.display(empty_value=None, description="Способ выплаты")
+    def payment_method(self, obj):
+        paymenth_method_badge_link = obj.employee.get_payment_method_badge_link()
+        return mark_safe('<img src="{}" />'.format(paymenth_method_badge_link))
+
     readonly_fields = ("slug_id",)
     list_display = (
         "instance_name",
         "employee",
+        "status",
+        "payment_method",
+        "total_money",
+        "view_on_site_link",
         "created_at",
         "date_from",
         "date_to",
-        "status",
-        "total_money",
-        "view_on_site_link",
     )
     list_editable = ("status",)
     list_filter = ("employee",)
