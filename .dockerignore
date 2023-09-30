@@ -20,3 +20,5 @@ data/
 .vscode/
 lib/
 include/
+.git/
+.github/
