@@ -3,7 +3,6 @@ from django.db import models
 
 
 class EmployeePosition(models.Model):
-
     DEPRECATED = "DEPRECATED"
     SALES_MANAGER = "SALES_MANAGER"
     SALES_HEAD = "SALES_HEAD"

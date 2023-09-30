@@ -14,3 +14,7 @@ src/prometheus_metrics/*
 .coverage
 node_modules/
 data/
+pyvenv.cfg
+lib/
+bin/
+include/

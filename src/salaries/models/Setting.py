@@ -2,7 +2,6 @@ from django.db import models
 
 
 class Setting(models.Model):
-
     name = models.SlugField(
         "Строковой идентификатор параметра", unique=True, blank=False, null=False
     )

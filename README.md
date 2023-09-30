@@ -19,13 +19,13 @@ For docker environment variables look [Docker section](#Docker-container-environ
 ## Install dependencies
 
 ```
-$ pipenv sync
+$ pip install -r requirements.txt
 ```
 
 ## Activate virtual environment shell
 
 ```
-$ pipenv shell
+$ source bin/activate
 ```
 
 ## Activate pre-commit hooks
@@ -44,9 +44,9 @@ Create .env file in src/ folder and set necessary values for env variables
 
 ```
 $ cd src
-$ python3 manage.py collectstatic --no-input
-$ python3 manage.py migrate --no-input
-$ python3 manage.py createsuperuser
+$ python manage.py collectstatic --no-input
+$ python manage.py migrate --no-input
+$ python manage.py createsuperuser
 ``` 
 
 # Starting server

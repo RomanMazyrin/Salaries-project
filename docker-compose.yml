@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   web:
-    image: salaries_project:latest
+    image: dj:latest
     build:
       context: ./
       dockerfile: docker/Dockerfile
@@ -24,7 +24,7 @@ services:
       - db
 
   migration:
-    image: salaries_project:latest
+    image: dj:latest
     build:
       context: ./
       dockerfile: docker/Dockerfile

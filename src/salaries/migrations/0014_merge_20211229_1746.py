@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("salaries", "0013_employee_outcome_message_cost"),
         ("salaries", "0013_setting"),

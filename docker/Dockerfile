@@ -1,4 +1,4 @@
-FROM python:3.9-alpine
+FROM python:3.11-alpine
 
 LABEL org.opencontainers.image.source="https://github.com/RomanMazyrin/django_playground"
 
@@ -14,12 +14,9 @@ RUN apk add --no-cache --virtual .build-deps build-base linux-headers
 RUN apk add postgresql-dev gcc python3-dev musl-dev
 
 RUN pip install --upgrade pip
-RUN pip install pipenv
 
-COPY Pipfile /app
-COPY Pipfile.lock /app
-
-RUN pipenv sync --system --dev
+COPY requirements.txt /app
+RUN pip install -r requirements.txt
 
 COPY ./docker/entrypoint.sh /app/entrypoint.sh
 RUN chmod 777 /app/entrypoint.sh
@@ -28,6 +25,6 @@ COPY . /app
 
 WORKDIR /app/src
 
-RUN python3 manage.py collectstatic --no-input
+RUN python manage.py collectstatic --no-input
 
 ENTRYPOINT [ "/app/entrypoint.sh" ]

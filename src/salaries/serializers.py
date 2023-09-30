@@ -20,7 +20,6 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
 
 class SalaryReportSerializer(serializers.ModelSerializer):
-
     metrics = JsonCustomField()
     slug_id = serializers.SlugField(read_only=True)
     employee = EmployeeSerializer(read_only=True)

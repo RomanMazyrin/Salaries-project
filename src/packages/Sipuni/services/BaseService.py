@@ -4,7 +4,6 @@ from ..Constants import BASE_API_URL
 
 
 class BaseService:
-
     SERVICE_URL_NAME = None
 
     def __init__(self, user_id, secret):

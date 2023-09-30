@@ -2,7 +2,6 @@ from .services.CallsStatistic.CallStaticticService import CallStatisticService
 
 
 class Client:
-
     services_map = {"calls_stats": CallStatisticService}
 
     def __init__(self, user_id, secret_key):

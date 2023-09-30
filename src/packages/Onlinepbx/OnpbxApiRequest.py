@@ -20,7 +20,6 @@ class OnpbxApiRequest:
         return BASE_URL + "/" + method.format(domain=self.__subdomain + ".onpbx.ru").strip("/")
 
     def post(self, method, body=None, headers=None, need_to_refresh=False):
-
         if headers is None:
             headers = {}
         if body is None:

@@ -54,7 +54,6 @@ class IndexView(LoginRequiredMixin, generic.ListView):
 
 
 class MyReportsListView(LoginRequiredMixin, generic.ListView):
-
     template_name = "salaries/salary_report_list.html"
     table_fields = ("__str__", "created_at", "status")
     context_object_name = "reports_list"
@@ -85,7 +84,6 @@ class SalaryReportCreateView(LoginRequiredMixin, CreateView):
 
 
 class SalaryReportView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
-
     model = SalaryReport
     template_name = "salaries/salary_report_detail.html"
     slug_field = "slug_id"
@@ -137,7 +135,6 @@ class SalaryResultView(LoginRequiredMixin, UserPassesTestMixin, View):
         return result_condition
 
     def post(self, request, *args, **kwargs):
-
         employee = get_object_or_404(Employee, pk=request.POST["employee_id"])
 
         timezone = pytz.timezone("Europe/Moscow")
@@ -186,7 +183,6 @@ class SalaryResultView(LoginRequiredMixin, UserPassesTestMixin, View):
 class SalesPlanView(View):
     @xframe_options_exempt
     def get(self, request, *args, **kwargs):
-
         auth_key = request.GET.get("auth_key")
         if auth_key != settings.SALARIES_DASHBOARD_AUTH_KEY:
             return HttpResponseForbidden("Access denied!")

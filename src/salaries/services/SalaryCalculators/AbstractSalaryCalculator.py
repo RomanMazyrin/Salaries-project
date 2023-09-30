@@ -8,7 +8,6 @@ from salaries.services.SalaryCalculators.constants import (
 
 
 class AbstractSalaryCalculator(ABC):
-
     METRICS_BUILDERS = []
 
     def __init__(self, metrics_data_fetcher=None):

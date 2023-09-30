@@ -4,7 +4,6 @@ from packages.Sipuni.Client import Client
 
 
 class SipuniAccount(models.Model):
-
     user_id = models.CharField("ID пользователя (user_id)", max_length=255)
     secret_key = models.CharField("Секретный ключ", max_length=255)
 

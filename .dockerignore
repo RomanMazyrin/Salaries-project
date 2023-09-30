@@ -12,5 +12,11 @@ docker-compose.yml
 docker-compose.dev.yml
 .env
 .coverage
-htmlcov
+htmlcov/
 frontend_components/
+pyvenv.cfg
+bin/
+data/
+.vscode/
+lib/
+include/

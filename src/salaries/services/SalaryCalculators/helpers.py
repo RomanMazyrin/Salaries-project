@@ -107,7 +107,7 @@ def fetch_all_leads_by_months_covered_by_timestamp_interval(
 
 def calculate_sum_value_over_leads_per_months(leads_by_months, calculator):
     total = 0
-    for (month_key, month_leads) in leads_by_months.items():
+    for month_key, month_leads in leads_by_months.items():
         total += calculator(month_leads)
     return total
 

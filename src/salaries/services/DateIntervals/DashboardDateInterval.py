@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 
 
 class DashboardDateInterval(ABC):
-
     BASIC_DATE_FORMAT = "%d.%m.%Y"
 
     def __init__(self, date_from=None, date_to=None, *args, **kwargs):

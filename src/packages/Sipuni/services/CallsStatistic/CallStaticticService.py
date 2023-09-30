@@ -5,7 +5,6 @@ from packages.Sipuni.services.BaseService import BaseService
 
 
 class CallStatisticService(BaseService):
-
     SERVICE_URL_NAME = "statistic"
 
     def get(
@@ -25,7 +24,6 @@ class CallStatisticService(BaseService):
         tree="",
         call_type="",
     ):
-
         hashString = self._make_hash(
             anonymous,
             dtmf_user_answer,

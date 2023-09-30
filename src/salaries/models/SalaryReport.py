@@ -16,7 +16,6 @@ class DefaultClassEncoder(JSONEncoder):
 
 
 class BaseJsonSerializable:
-
     JSON_ENCODER = DefaultClassEncoder
 
     @classmethod
@@ -73,7 +72,6 @@ class Metrica(BaseJsonSerializable):
 
 
 class MetricsCollection:
-
     ITEM_MODEL = Metrica
 
     def __init__(self):
@@ -134,7 +132,6 @@ def get_random_slug():
 
 
 class SalaryReport(models.Model):
-
     NOT_CONFIRMED = "NOT_CONFIRMED"
     CONFIRMED_FOR_PAYMENT = "CONFIRMED_FOR_PAYMENT"
     PAID = "PAID"

@@ -4,7 +4,6 @@ from packages.Onlinepbx.Client import Client
 
 
 class OnpbxAccount(models.Model):
-
     subdomain = models.CharField("Субдомен", max_length=255)
     api_key = models.CharField("Ключ API", max_length=255)
 

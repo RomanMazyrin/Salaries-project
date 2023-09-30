@@ -33,7 +33,6 @@ def sales_fee_calc(builder, employee, timestamp_from, timestamp_to, *args, **kwa
 
 
 class SalesHeadSalaryCalculator(AbstractSalaryCalculator):
-
     METRICS_BUILDERS = [
         LeadsSumAggregatedValueMetricaBuilder(
             name="Сумма продаж",

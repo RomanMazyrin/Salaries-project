@@ -6,8 +6,8 @@ lint:
 	flake8 src
 
 test:
-	pytest -s
+	pytest -s tests/
 
 test-coverage:
-	pytest -s --cov --cov-report html --cov-report term --cov-fail-under=70
+	pytest -s --cov --cov-report html --cov-report term --cov-fail-under=70 tests/
     

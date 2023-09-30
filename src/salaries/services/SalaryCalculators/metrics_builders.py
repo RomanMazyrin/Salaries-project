@@ -21,7 +21,7 @@ def get_items_in_timestamp_interval(items, getter, timestamp_from, timestamp_to)
 
 def cut_months_leads_after_timestamp(leads_by_months, timestamp_value_getter, timestamp):
     res = {}
-    for (month_key, month_leads) in leads_by_months.items():
+    for month_key, month_leads in leads_by_months.items():
         update_month_leads = []
         for lead in month_leads:
             if timestamp_value_getter(lead) <= timestamp:
@@ -31,7 +31,6 @@ def cut_months_leads_after_timestamp(leads_by_months, timestamp_value_getter, ti
 
 
 class MetricaBuilder(ABC):
-
     DEFAULT_NAME = ""
     DEFAULT_LABEL = ""
     DEFAULT_GROUP = ""
@@ -111,7 +110,6 @@ class LeadsBonusArchievementValueMetricaBuilder(LeadsAggregatedValueMetricBuilde
         )
 
         def process_bonus(items):
-
             plan_value = self._plan_getter(employee)
             bonus_value = self._bonus_getter(employee)
             if plan_value is None or bonus_value is None:
@@ -135,7 +133,6 @@ class LeadsBonusArchievementValueMetricaBuilder(LeadsAggregatedValueMetricBuilde
 
 class LeadsSalesFeeValueMetricaBuilder(MetricaBuilder):
     def _calculate_value(self, employee, timestamp_from, timestamp_to, *args, **kwargs):
-
         leads_by_months = cut_months_leads_after_timestamp(
             kwargs["leads"], lambda lead: lead["closed_at"], timestamp_to
         )
@@ -143,7 +140,7 @@ class LeadsSalesFeeValueMetricaBuilder(MetricaBuilder):
 
         total_salary_money_for_sales = 0
 
-        for (month_key, month_leads) in leads_by_months.items():
+        for month_key, month_leads in leads_by_months.items():
             leads_in_interval = filter(
                 lambda lead: timestamp_from <= lead["closed_at"] <= timestamp_to,
                 month_leads,
@@ -178,7 +175,6 @@ class LeadsSalesFeeValueMetricaBuilder(MetricaBuilder):
 
 
 class SalaryPerDayMetricaBuilder(MetricaBuilder):
-
     DEFAULT_NAME = "Оклад"
     DEFAULT_LABEL = "salary"
     DEFAULT_GROUP = "salary"

@@ -20,7 +20,6 @@ class BaseApiIterator(ABC):
         total_limit=None,
         request_pause_timeout=1,
     ):
-
         self.url = url
         self.limit = fetch_limit
         self.start_page = start_page
@@ -61,7 +60,7 @@ class BaseApiIterator(ABC):
 
         if "filter" in request_params:
             filter_params = request_params["filter"]
-            if type(filter_params) == str:
+            if filter_params is str:
                 filter_params = json.loads(filter_params)
         else:
             filter_params = {}

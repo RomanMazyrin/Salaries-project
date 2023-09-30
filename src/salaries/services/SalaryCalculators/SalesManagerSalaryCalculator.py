@@ -30,7 +30,6 @@ def get_audits_money(builder, employee, timestamp_from, timestamp_to, *args, **k
 
 
 class SalesManagerSalaryCalculator(AbstractSalaryCalculator):
-
     METRICS_BUILDERS = [
         LeadsSumAggregatedValueMetricaBuilder(
             name="Сумма продаж",

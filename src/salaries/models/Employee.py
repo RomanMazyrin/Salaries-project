@@ -8,7 +8,6 @@ from .SipuniAccount import SipuniAccount
 
 
 class Employee(models.Model):
-
     SELF_EMPLOYEED = "SELF_EMPLOYEED"
     CARD_PAYMENT = "CARD_PAYMENT"
     INDIVIDUAL_ENTERPRENEUR = "INDIVIDUAL_ENTERPRENEUR"

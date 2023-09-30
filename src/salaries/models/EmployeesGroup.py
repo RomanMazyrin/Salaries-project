@@ -4,7 +4,6 @@ from salaries.models.Employee import Employee
 
 
 class EmployeeGroup(models.Model):
-
     group_name = models.CharField("Название группы", max_length=250)
     employee_list = models.ManyToManyField(
         Employee,
