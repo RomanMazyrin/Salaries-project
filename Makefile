@@ -1,13 +1,13 @@
 runserver:
-	cd src && gunicorn -w=2 --worker-class=gevent --worker-connections=1000 -t=60 app.wsgi --bind 0.0.0.0:80 --reload
+	poetry run gunicorn -w=2 -k=gevent --worker-connections=1000 -t=60 --bind 0.0.0.0:80 --reload salaries.wsgi
 	
 lint:
-	black src
-	flake8 src
+	poetry run black .
+	poetry run flake8 .
+	poetry run isort .
 
 test:
-	pytest -s tests/
+	poetry run pytest -s tests/
 
 test-coverage:
-	pytest -s --cov --cov-report html --cov-report term --cov-fail-under=70 tests/
-    
+	poetry run pytest -s --cov --cov-report term --cov-fail-under=70 tests/

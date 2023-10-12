@@ -18,3 +18,5 @@ pyvenv.cfg
 lib/
 bin/
 include/
+venv/
+.venv/

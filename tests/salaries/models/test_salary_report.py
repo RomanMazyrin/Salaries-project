@@ -17,7 +17,6 @@ def metrics_collection():
 
 
 def test_adding_metrica(report: SalaryReport):
-
     report.add_metrica(Metrica("hello", "world", group="hello"))
     report.add_metrica(Metrica("hello", "world", group="hello"))
     report.add_metrica(Metrica("hello", "world", group="hello"))

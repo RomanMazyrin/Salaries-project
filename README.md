@@ -2,13 +2,13 @@
 
 - **`SECRET_KEY`** - django SECRET_KEY from settings
 - **`DEBUG`** - 1 or 0. Debug mode in Django
-- **`DB_ENGINE`** - Engine for database in Django. Default is 'django'.db.backends.sqlite'
-- **`DB_DATABASE`** - Database name or path (if sqlite)
-- **`DB_USER`** - Database user name
-- **`DB_PASSWORD`** - Database user password
-- **`DB_HOST`** - Database host
-- **`DB_PORT`** - Database port
-- **`PROMETHEUS_MULTIPROC_DIR`** - Path for prometheus databases, where prometheus metrics are stored. Needs for multiple workers. Details [here](https://github.com/prometheus/client_python/blob/master/README.md#multiprocess-mode-eg-gunicorn). Default value in docker image is /app/src/prometheus_metrics.
+- **`DATABASE_URL`** - URL in the format of [dj-database-url](https://github.com/jazzband/dj-database-url/#url-schema)
+- **`RUN_MIGRATIONS`** - Flag to run migratioins or not. Set 1 to run migrations while container starting.
+- **`CREATE_SUPERUSER`** - Flag to create superuser or not. Set 1 to createsuperuser while container starting. Also must set another superuser environment variables, look next.
+- **`DJANGO_SUPERUSER_PASSWORD`** - superuser password. Need it and it is applied only when CREATE_SUPERUSER=1
+- **`DJANGO_SUPERUSER_USERNAME`** - superuser username.  Need it and it is applied only when CREATE_SUPERUSER=1
+- **`DJANGO_SUPERUSER_EMAIL`** - superuser email. Need it and it is applied only when CREATE_SUPERUSER=1
+<!-- - **`PROMETHEUS_MULTIPROC_DIR`** - Path for prometheus databases, where prometheus metrics are stored. Needs for multiple workers. Details [here](https://github.com/prometheus/client_python/blob/master/README.md#multiprocess-mode-eg-gunicorn). Default value in docker image is /app/src/prometheus_metrics. -->
 - **`AMOCRM_ENTITIES_ENDPOINT_AUTH_KEY`** - Auth key for third-party server requests for fetching amoCRM entities for salary calculating
 - **`SALARIES_DASHBOARD_AUTH_KEY`** - Auth key for access to salaries dashboard on application server on page https://{{hostname}}/salaries/sales-plan-progress?auth_key={{AUTH_KEY}}.
 
@@ -19,34 +19,33 @@ For docker environment variables look [Docker section](#Docker-container-environ
 ## Install dependencies
 
 ```
-$ pip install -r requirements.txt
+$ poetry install
 ```
 
 ## Activate virtual environment shell
 
 ```
-$ source bin/activate
+$ poetry shell
 ```
 
 ## Activate pre-commit hooks
 
 ```
-$ pre-commit install
+$ poetry run pre-commit install
 ```
 
 ## Set environment variables
 
 <br>
-Create .env file in src/ folder and set necessary values for env variables
+Create .env file in folder and set necessary values for env variables
 <br><br>
 
 ## Collect static and make migrations
 
 ```
-$ cd src
-$ python manage.py collectstatic --no-input
-$ python manage.py migrate --no-input
-$ python manage.py createsuperuser
+$ poetry run python manage.py collectstatic --no-input
+$ poetry run python manage.py migrate --no-input
+$ poetry run python manage.py createsuperuser
 ``` 
 
 # Starting server
@@ -90,10 +89,10 @@ Before launch you need to do next. It's optional, but you should know about it:
 
 All application environment variables + below:
 
-- **`NUM_OF_WORKERS`** - Number of workers on gunicorn
-- **`WORKER_TIMEOUT`** - Gunicorn worker request timeout
-- **`WORKER_CONNECTIONS`** - Number of connnections per one gunicorn worker
-- **`PORT`** - Port listened by gunicorn
+- **`G_NUM_OF_WORKERS`** - Number of workers on Gunicorn
+- **`G_WORKER_TIMEOUT`** - Gunicorn worker request timeout
+- **`G_WORKER_CONNECTIONS`** - Number of connnections per one Gunicorn worker
+- **`G_PORT`** - Port listened by Gunicorn
 
 ## Run
 ```
