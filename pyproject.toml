@@ -1,5 +1,69 @@
+[tool.flake8]
+ignore = ['E265', 'F811', 'PT001', 'DJ05', 'SIM113', 'SIM102', 'W503']
+extend-ignore = 'E203'
+max-line-length = 100
+filename = [
+    'salaries/*.py'
+]
+exclude = [
+    'static',
+      'migrations',
+      'frontend',
+      '.git',
+      '__pycache__',
+      'conftest.py',
+      '.venv'
+]
+
 [tool.black]
 line-length = 100
+exclude = '.venv\/|.local\/|.cache\/'
 
 [tool.isort]
 profile = "black"
+
+[tool.poetry]
+name = "salaries"
+version = "0.1.0"
+description = ""
+authors = ["Roman Mazyrin <roma212008@yandex.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pillow = ">=10.0.1,<10.1.0"
+requests = ">=2.31.0,<2.32.0"
+gunicorn = ">=21.2.0,<21.3.0"
+gevent = ">=23.9.1,<23.10.0"
+greenlet = ">=3.0.0,<3.1.0"
+whitenoise = ">=6.5.0,<6.6.0"
+python-dotenv = ">=1.0.0,<1.1.0"
+xlsxwriter = ">=3.1.6,<3.2.0"
+django-prometheus = ">=2.3.1,<2.4.0"
+pytz = ">=2023.3.post1,<2024.0"
+djangorestframework = ">=3.14.0,<3.15.0"
+django-cors-headers = ">=4.2.0,<4.3.0"
+django = "^4.2.6"
+psycopg2-binary = "^2.9.9"
+dj-database-url = "^2.1.0"
+
+
+[tool.poetry.group.dev.dependencies]
+flake8 = ">=6.1.0,<6.2.0"
+autopep8 = ">=2.0.4,<2.1.0"
+pytest = ">=7.4.2,<7.5.0"
+pytest-cov = ">=4.1.0,<4.2.0"
+black = ">=23.9.1,<23.10.0"
+isort = ">=5.12.0,<5.13.0"
+mypy = ">=1.5.1,<1.6.0"
+pytest-django = ">=4.5.2,<4.6.0"
+flake8-pyproject = "^1.2.3"
+
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "salaries.settings"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

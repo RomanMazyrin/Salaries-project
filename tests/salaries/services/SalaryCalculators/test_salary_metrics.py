@@ -11,7 +11,6 @@ class MockMetricaBuilder(MetricaBuilder):
 
 
 def test_mock_metrica_builder():
-
     builder = MockMetricaBuilder()
 
     assert builder.metrica_name == "Test name"

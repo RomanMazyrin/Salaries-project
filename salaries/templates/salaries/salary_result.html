@@ -1,0 +1,37 @@
+{% extends './salary_report_base.html' %}
+
+{% load static %}
+
+{% block report_content %}
+
+    {% include "./salary_report_table.html" %}
+
+    <form method="POST" class="show-loader" action="{% url 'salary_report_create' %}">
+        {% csrf_token %}
+        <div class="hidden">
+            {{ save_form }}
+        </div>
+        <button class="btn btn-success" type="submit">
+            <span class="spinner-border spinner-border-sm hidden" role="status" aria-hidden="true"></span>
+            Save report
+        </button>
+    </form>
+
+    <button type="button" id="modal-activator" class="btn btn-primary me-1 mb-1 hidden" data-bs-toggle="modal" data-bs-target="#loader">Calculate</button>
+
+    <div class="modal text-center" id="loader" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img src="{% static 'mazer_assets/images/svg-loaders/circles.svg' %}" class="me-4" style="width: 5rem" alt="audio">
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+{% endblock report_content %}
+
+{% block scripts_assets %}
+<script src="{% static 'salaries/js/main_page.js' %}"></script>
+{% endblock scripts_assets %}
