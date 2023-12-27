@@ -1,6 +1,6 @@
 FROM python:3.11-alpine
 
-LABEL org.opencontainers.image.source https://github.com/romanmazyrin/salaries-project
+LABEL org.opencontainers.image.source = "https://github.com/RomanMazyrin/Salaries-project"
 
 # Create separate user
 RUN addgroup --system app && adduser -S -G app app
