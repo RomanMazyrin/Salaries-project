@@ -2,9 +2,7 @@ version: "3.8"
 
 services:
   salaries:
-    build:
-      context: ./
-      dockerfile: ./Dockerfile
+    image: romanmazyrin/salaries-project:latest
     ports:
       - 80:${PORT:-8000}
     environment:
@@ -22,7 +20,7 @@ services:
       - db
 
   db:
-    image: postgres:16-alpine
+    image: postgres:13-alpine
     environment:
       POSTGRES_PASSWORD: '123456'
     volumes:

@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  web:
+    image: romanmazyrin/salaries-project:latest
+    environment:
+      DEBUG: 0
+      DATABASE_URL: postgres://postgres:${DATABASE_PASSWORD}@db:5432/postgres
+      RUN_MIGRATIONS: 1
+      CREATE_SUPERUSER: 1
+      DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
+      DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME}
+      DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
+      AMOCRM_ENTITIES_ENDPOINT_AUTH_KEY: ${AMOCRM_ENTITIES_ENDPOINT_AUTH_KEY}
+      SALARIES_DASHBOARD_AUTH_KEY: ${SALARIES_DASHBOARD_AUTH_KEY}
+    ports:
+      - 80:8000
+      - 8090:8000
+    depends_on:
+      - db
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  db:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: any
+
+volumes:
+  postgres_data:
+

@@ -1,6 +1,7 @@
 import os
 import sys
 from pathlib import Path
+
 import dj_database_url
 
 # import prometheus_client
@@ -28,6 +29,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "dk&%(9#899k2s_p_b4+vjyt(mb9916&i&4i+%
 DEBUG = int(os.environ.get("DEBUG", False))
 
 ALLOWED_HOSTS = ["*"]
+CSRF_TRUSTED_ORIGINS = ["*"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
