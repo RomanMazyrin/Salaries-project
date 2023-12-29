@@ -60,7 +60,7 @@ class BaseApiIterator(ABC):
 
         if "filter" in request_params:
             filter_params = request_params["filter"]
-            if filter_params is str:
+            if isinstance(filter_params, str):
                 filter_params = json.loads(filter_params)
         else:
             filter_params = {}
