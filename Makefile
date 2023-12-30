@@ -11,3 +11,6 @@ test:
 
 test-coverage:
 	poetry run pytest -s --cov --cov-report term --cov-fail-under=70 tests/
+
+collectstatic:
+	poetry run python manage.py collectstatic --no-input

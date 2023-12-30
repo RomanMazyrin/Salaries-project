@@ -29,7 +29,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "dk&%(9#899k2s_p_b4+vjyt(mb9916&i&4i+%
 DEBUG = int(os.environ.get("DEBUG", False))
 
 ALLOWED_HOSTS = ["*"]
-CSRF_TRUSTED_ORIGINS = ['http://delta-salaries.ru', 'https://delta-salaries.ru']
+CSRF_TRUSTED_ORIGINS = ["http://delta-salaries.ru", "https://delta-salaries.ru"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
